@@ -387,6 +387,7 @@
         <a class="pill" href="README.md">README</a>
         <a class="pill" href="docs/session-runbook.md">Runbook</a>
         <a class="pill" href="docs/producer-desk-routing.md">Producer Desk</a>
+        <a class="pill" href="docs/surface-local-producer.md">Surface Local</a>
         <a class="pill" href="connectors/registry.json">Registry</a>
       </div>
     </nav>
@@ -545,6 +546,7 @@
         <pre>${escapeHtml(parts.join(" "))}</pre>
         <pre>${escapeHtml(`python -m drum_floor inspect ${out}`)}</pre>
         <pre>${escapeHtml(`python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}</pre>
+        <pre>${escapeHtml(`$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}</pre>
       `;
     }
 

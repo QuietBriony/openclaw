@@ -9,6 +9,10 @@ The shape is:
 3. Repo-specific agents make small bounded changes.
 4. The human listens, arms, records, merges, or rejects.
 
+The Surface PC can run the actual local producer loop with
+`openclaw local-generate`. The public Pages site stays a readable contract; the
+generated candidates and traces stay under `.openclaw-local/`.
+
 ## Agent Roles
 
 - `Music Agent`: final runtime, producer habits, genre kits, low-end safety, recorder compatibility.

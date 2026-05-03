@@ -10,6 +10,7 @@ from .connectors import (
     inspect_registry,
 )
 from .contracts import load_manifest, validate_manifest
+from .local_runner import run_local_drum_floor
 from .planner import build_session_plan
 
 
@@ -36,6 +37,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     drum_floor.add_argument("manifest", type=Path)
     drum_floor.add_argument("--candidate-id", help="Override the candidate id.")
+
+    local = subparsers.add_parser(
+        "local-generate",
+        help="Generate and inspect a local drum-floor candidate under .openclaw-local. Requires --execute.",
+    )
+    local.add_argument("manifest", type=Path)
+    local.add_argument("--candidate-id", help="Override the candidate id.")
+    local.add_argument("--python", default="python", help="Python executable to use inside the drum-floor repo.")
+    local.add_argument("--execute", action="store_true", help="Actually run generation and inspect. Without this, print the local commands only.")
 
     return parser
 
@@ -93,6 +103,39 @@ def main(argv: list[str] | None = None) -> int:
         print("note: OpenClaw prints these commands only; it does not execute or arm candidates.")
         return 0
 
+    if args.command == "local-generate":
+        result = run_local_drum_floor(
+            args.manifest,
+            candidate_id=args.candidate_id,
+            python_cmd=args.python,
+            execute=args.execute,
+        )
+        print(f"session: {result.session_id}")
+        print(f"connector: {result.connector_id}")
+        print(f"candidate_id: {result.candidate_id}")
+        print(f"candidate_dir: {result.candidate_dir}")
+        print(f"executed: {str(result.executed).lower()}")
+        print(f"ok: {str(result.ok).lower()}")
+        print("generate:")
+        print("  " + _join_command(result.generate_command))
+        print("inspect:")
+        print("  " + _join_command(result.inspect_command))
+        if result.generate_returncode is not None:
+            print(f"generate_returncode: {result.generate_returncode}")
+        if result.inspect_returncode is not None:
+            print(f"inspect_returncode: {result.inspect_returncode}")
+        if result.run_log:
+            print(f"run_log: {result.run_log}")
+        for line in _important_lines(result.generate_stdout):
+            print(line)
+        for line in _important_lines(result.inspect_stdout):
+            print(line)
+        for error in result.errors:
+            print(f"error: {error}")
+        if not args.execute:
+            print("note: add --execute to generate locally. OpenClaw will not arm, record, upload, or push.")
+        return 0 if result.ok else 1
+
     parser.error("unknown command")
     return 2
 
@@ -121,3 +164,19 @@ def _quote(part: str) -> str:
     if any(char.isspace() for char in part):
         return f'"{part}"'
     return part
+
+
+def _important_lines(output: str) -> list[str]:
+    prefixes = (
+        "generated:",
+        "candidate:",
+        "frame:",
+        "ok:",
+        "style:",
+        "bpm:",
+        "bars:",
+        "energy:",
+        "seed:",
+        "event_count:",
+    )
+    return [line for line in output.splitlines() if line.startswith(prefixes)]

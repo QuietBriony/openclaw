@@ -24,6 +24,7 @@ python -m openclaw plan sessions/examples/music-stack-session.example.json
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/soft-piano-raw-drum-drive.example.json
+python -m openclaw local-generate sessions/examples/soft-piano-raw-drum-drive.example.json --execute
 ```
 
 If your Python runtime runs in isolated safe-path mode, use the local shim:
@@ -32,9 +33,15 @@ If your Python runtime runs in isolated safe-path mode, use the local shim:
 python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
+$py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
+python .\openclaw_cli.py local-generate sessions/examples/soft-piano-raw-drum-drive.example.json --execute --python $py
 ```
 
 The CLI is dry-run oriented. It does not arm live slots, start browser audio, record, upload, or write to GitHub.
+
+`local-generate` is the Surface PC producer path. It writes generated candidates
+and run traces under `.openclaw-local/`, which is ignored by git. It still does
+not arm, record, upload, or push.
 
 ## V1 Contract
 
