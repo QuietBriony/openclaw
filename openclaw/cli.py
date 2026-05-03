@@ -11,7 +11,7 @@ from .connectors import (
 )
 from .contracts import load_manifest, validate_manifest
 from .doctor import doctor_summary, run_doctor
-from .local_runner import run_local_drum_floor
+from .local_runner import list_local_candidates, run_local_drum_floor
 from .planner import build_session_plan
 
 
@@ -47,6 +47,12 @@ def build_parser() -> argparse.ArgumentParser:
     local.add_argument("--candidate-id", help="Override the candidate id.")
     local.add_argument("--python", default="python", help="Python executable to use inside the drum-floor repo.")
     local.add_argument("--execute", action="store_true", help="Actually run generation and inspect. Without this, print the local commands only.")
+
+    local_list = subparsers.add_parser(
+        "local-list",
+        help="List generated local candidates under .openclaw-local.",
+    )
+    local_list.add_argument("--session-id", help="Filter by session id.")
 
     doctor = subparsers.add_parser(
         "doctor",
@@ -139,9 +145,28 @@ def main(argv: list[str] | None = None) -> int:
             print(line)
         for error in result.errors:
             print(f"error: {error}")
+        if any("candidate already exists" in error for error in result.errors):
+            print("hint: use local-list to view existing candidates, or pass --candidate-id <new-name> for a fresh output path.")
         if not args.execute:
             print("note: add --execute to generate locally. OpenClaw will not arm, record, upload, or push.")
         return 0 if result.ok else 1
+
+    if args.command == "local-list":
+        candidates = list_local_candidates(args.session_id)
+        print(f"count: {len(candidates)}")
+        for candidate in candidates:
+            files = []
+            if candidate.has_pattern:
+                files.append("pattern")
+            if candidate.has_midi:
+                files.append("midi")
+            if candidate.has_preview:
+                files.append("preview")
+            if candidate.has_meta:
+                files.append("meta")
+            print(f"- session={candidate.session_id} candidate={candidate.candidate_id} files={','.join(files) or '-'}")
+            print(f"  path={candidate.path}")
+        return 0
 
     if args.command == "doctor":
         checks = run_doctor(args.python)

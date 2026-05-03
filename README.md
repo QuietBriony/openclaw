@@ -38,6 +38,7 @@ python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.
 python .\openclaw_cli.py doctor --python $py
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
+python .\openclaw_cli.py local-list
 python .\openclaw_cli.py local-generate sessions/examples/soft-piano-raw-drum-drive.example.json --execute --python $py
 ```
 

@@ -34,6 +34,17 @@ class LocalRunResult:
     errors: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class LocalCandidate:
+    session_id: str
+    candidate_id: str
+    path: Path
+    has_pattern: bool
+    has_midi: bool
+    has_preview: bool
+    has_meta: bool
+
+
 def run_local_drum_floor(
     manifest_path: Path,
     *,
@@ -178,6 +189,28 @@ def run_local_drum_floor(
         inspect_stdout=inspect.stdout if inspect else "",
         errors=tuple(_errors_from_completed(generate, inspect)),
     )
+
+
+def list_local_candidates(session_id: str | None = None) -> list[LocalCandidate]:
+    root = LOCAL_ROOT / "candidates"
+    if not root.exists():
+        return []
+    sessions = [root / _safe_name(session_id)] if session_id else [path for path in root.iterdir() if path.is_dir()]
+    candidates: list[LocalCandidate] = []
+    for session_dir in sessions:
+        if not session_dir.exists():
+            continue
+        for candidate_dir in sorted(path for path in session_dir.iterdir() if path.is_dir()):
+            candidates.append(LocalCandidate(
+                session_id=session_dir.name,
+                candidate_id=candidate_dir.name,
+                path=candidate_dir,
+                has_pattern=(candidate_dir / "pattern.json").exists(),
+                has_midi=(candidate_dir / "drums.mid").exists(),
+                has_preview=(candidate_dir / "preview.txt").exists(),
+                has_meta=(candidate_dir / "meta.json").exists(),
+            ))
+    return candidates
 
 
 def _run_command(command: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:

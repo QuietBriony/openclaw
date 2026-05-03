@@ -57,8 +57,8 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
             connector=drum_connector,
             action="print generate candidate command",
             gate="before_arm",
-            writes="../drum-floor/live/candidates/<candidate_id>",
-            detail=generate,
+            writes="printed raw command targets ../drum-floor/live/candidates; Surface local-generate writes .openclaw-local/candidates",
+            detail=f"{generate} | Surface actual: python .\\openclaw_cli.py local-generate <manifest> --execute --python <python.exe>",
         ),
         PlanStep(
             order=5,

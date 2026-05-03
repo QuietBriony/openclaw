@@ -77,6 +77,18 @@ $py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
 python .\openclaw_cli.py local-generate sessions\examples\soft-piano-raw-drum-drive.example.json --execute --python $py
 ```
 
+すでに同じ candidate がある場合は上書きしません。既存候補を見る:
+
+```powershell
+python .\openclaw_cli.py local-list
+```
+
+新しい出力名で生成する:
+
+```powershell
+python .\openclaw_cli.py local-generate sessions\examples\soft-piano-raw-drum-drive.example.json --candidate-id raw-drive-002 --execute --python $py
+```
+
 生成物はここに出ます:
 
 ```text
