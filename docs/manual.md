@@ -47,6 +47,23 @@ Surface PC の terminal で:
 cd C:\workspace\github-inventory\music-stack\openclaw
 ```
 
+最初に doctor で環境を確認:
+
+```powershell
+$py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
+python .\openclaw_cli.py doctor --python $py
+```
+
+ここで確認できること:
+
+- repo-local OpenClaw CLI があるか
+- `Music / drum-floor / chill / namima` が揃っているか
+- `drum-floor` CLI が呼べるか
+- 外部 `openclaw` CLI が PATH にあるか
+- `OPENCLAW_API_KEY / OPENCLAW_TOKEN / OPENAI_API_KEY` が存在するか
+
+secret の値は表示しません。
+
 セッションの流れを見る:
 
 ```powershell

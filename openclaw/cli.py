@@ -10,6 +10,7 @@ from .connectors import (
     inspect_registry,
 )
 from .contracts import load_manifest, validate_manifest
+from .doctor import doctor_summary, run_doctor
 from .local_runner import run_local_drum_floor
 from .planner import build_session_plan
 
@@ -46,6 +47,12 @@ def build_parser() -> argparse.ArgumentParser:
     local.add_argument("--candidate-id", help="Override the candidate id.")
     local.add_argument("--python", default="python", help="Python executable to use inside the drum-floor repo.")
     local.add_argument("--execute", action="store_true", help="Actually run generation and inspect. Without this, print the local commands only.")
+
+    doctor = subparsers.add_parser(
+        "doctor",
+        help="Check local Surface producer readiness and external OpenClaw subscription/auth hints.",
+    )
+    doctor.add_argument("--python", default="python", help="Python executable to use for drum-floor checks.")
 
     return parser
 
@@ -135,6 +142,18 @@ def main(argv: list[str] | None = None) -> int:
         if not args.execute:
             print("note: add --execute to generate locally. OpenClaw will not arm, record, upload, or push.")
         return 0 if result.ok else 1
+
+    if args.command == "doctor":
+        checks = run_doctor(args.python)
+        ok, warnings, failures = doctor_summary(checks)
+        print(f"ok: {str(ok).lower()}")
+        print(f"required_failures: {failures}")
+        print(f"optional_warnings: {warnings}")
+        for check in checks:
+            status = "ok" if check.ok else ("warn" if not check.required else "fail")
+            print(f"{status}: {check.name} - {check.detail}")
+        print("subscription_note: external OpenClaw subscription/auth cannot be verified unless its CLI or token is installed; repo-local OpenClaw works without a subscription.")
+        return 0 if ok else 1
 
     parser.error("unknown command")
     return 2

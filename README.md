@@ -22,6 +22,7 @@ Run from this directory:
 
 ```powershell
 python -m openclaw validate sessions/examples/music-stack-session.example.json
+python -m openclaw doctor
 python -m openclaw plan sessions/examples/music-stack-session.example.json
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
@@ -32,14 +33,19 @@ python -m openclaw local-generate sessions/examples/soft-piano-raw-drum-drive.ex
 If your Python runtime runs in isolated safe-path mode, use the local shim:
 
 ```powershell
+$py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
 python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.json
+python .\openclaw_cli.py doctor --python $py
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
-$py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
 python .\openclaw_cli.py local-generate sessions/examples/soft-piano-raw-drum-drive.example.json --execute --python $py
 ```
 
 The CLI is dry-run oriented. It does not arm live slots, start browser audio, record, upload, or write to GitHub.
+
+Use `doctor` first when checking this Surface setup. It confirms the local
+producer path and reports whether a separate external OpenClaw CLI or token is
+visible without printing secret values.
 
 `local-generate` is the Surface PC producer path. It writes generated candidates
 and run traces under `.openclaw-local/`, which is ignored by git. It still does
