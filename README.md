@@ -6,6 +6,8 @@ It does not make sound in v1. It reads contracts, prints safe dry-run steps, and
 
 Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
+Manual: [docs/manual.md](docs/manual.md)
+
 ## Stack Roles
 
 - `Music`: final integrated runtime and internal producer.

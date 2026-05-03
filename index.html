@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OpenClaw Session OS</title>
+  <title>OpenClaw Main Desk</title>
   <style>
     :root {
       color-scheme: dark;
@@ -98,6 +98,36 @@
       padding: 22px 0 18px;
     }
 
+    .start-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .start-card {
+      min-height: 142px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 13px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .start-card strong {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      background: #111711;
+      font-size: 0.92rem;
+    }
+
     .intro,
     .command-panel,
     .card,
@@ -187,6 +217,22 @@
     .command-list {
       display: grid;
       gap: 10px;
+    }
+
+    .command-block {
+      display: grid;
+      gap: 6px;
+    }
+
+    .command-block h3 {
+      font-size: 0.92rem;
+      color: var(--accent);
+    }
+
+    .command-block p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.42;
     }
 
     .session-switcher {
@@ -302,6 +348,34 @@
       gap: 10px;
     }
 
+    .manual-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .manual-link {
+      min-height: 96px;
+      display: grid;
+      gap: 6px;
+      align-content: center;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 12px;
+      text-decoration: none;
+    }
+
+    .manual-link strong {
+      color: var(--text);
+    }
+
+    .manual-link span {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
     .guard {
       min-height: 62px;
       border: 1px solid var(--line);
@@ -327,7 +401,9 @@
       .hero,
       .grid,
       .steps,
-      .guardrails {
+      .guardrails,
+      .start-grid,
+      .manual-list {
         grid-template-columns: 1fr 1fr;
       }
     }
@@ -349,6 +425,8 @@
       .grid,
       .steps,
       .guardrails,
+      .start-grid,
+      .manual-list,
       .status-row {
         grid-template-columns: 1fr;
       }
@@ -380,10 +458,11 @@
   <main class="shell">
     <nav class="topbar" aria-label="OpenClaw links">
       <div class="brand">
-        <strong>OpenClaw</strong>
-        <span>Session OS for the QuietBriony music stack</span>
+        <strong>OpenClaw Main Desk</strong>
+        <span>Surface local producer + public session manual</span>
       </div>
       <div class="links">
+        <a class="pill" href="docs/manual.md">Manual</a>
         <a class="pill" href="README.md">README</a>
         <a class="pill" href="docs/session-runbook.md">Runbook</a>
         <a class="pill" href="docs/producer-desk-routing.md">Producer Desk</a>
@@ -395,9 +474,9 @@
     <section class="hero">
       <div class="intro">
         <div>
-          <h1>Human-gated session control.</h1>
+          <h1>OpenClawにつなぐ入口。</h1>
           <p class="summary">
-            OpenClaw connects Music, drum-floor, chill, namima, and archived style ideas as a conductor desk. It observes, prints safe commands, and keeps arm, record, merge, and release decisions with the human.
+            このページは公開用の操作卓です。Surface PC の OpenClaw CLI で候補を生成し、Music / chill / drum-floor / namima へ戻す流れを、人間確認つきで迷わず回すための入口です。
           </p>
         </div>
         <div class="status-row" id="session-metrics" aria-label="Manifest summary">
@@ -408,8 +487,8 @@
       </div>
 
       <aside class="command-panel" aria-label="Dry-run commands">
-        <h2>Dry-Run Commands</h2>
-        <p class="muted">These commands are displayed for human review. The page does not execute them.</p>
+        <h2>Command Desk</h2>
+        <p class="muted">Pages は実行しません。Surface PC の terminal で確認してから実行します。</p>
         <div class="session-switcher" id="session-switcher" aria-label="Session examples"></div>
         <div class="command-list" id="commands">
           <pre>Loading manifest...</pre>
@@ -417,7 +496,51 @@
       </aside>
     </section>
 
+    <section class="wide-panel" aria-label="Start Here">
+      <h2>Start Here</h2>
+      <div class="start-grid">
+        <div class="start-card">
+          <strong>1</strong>
+          <h3>Pagesで方向を見る</h3>
+          <p class="muted">セッションを選び、BPM/energy/gate と各repoの役割を確認します。</p>
+        </div>
+        <div class="start-card">
+          <strong>2</strong>
+          <h3>Surfaceでplan</h3>
+          <p class="muted">`openclaw_cli.py plan` で生成前の流れと安全ゲートを読みます。</p>
+        </div>
+        <div class="start-card">
+          <strong>3</strong>
+          <h3>local-generate</h3>
+          <p class="muted">候補は `.openclaw-local/` にだけ生成。GitHubやPagesには出ません。</p>
+        </div>
+        <div class="start-card">
+          <strong>4</strong>
+          <h3>聴いて磨く</h3>
+          <p class="muted">良ければこのチャットから Music/chill/drum-floor/namima の小PRへ戻します。</p>
+        </div>
+      </div>
+    </section>
+
     <section class="grid" id="connectors" aria-label="Connectors"></section>
+
+    <section class="wide-panel" aria-label="Manual">
+      <h2>Manual</h2>
+      <div class="manual-list">
+        <a class="manual-link" href="docs/manual.md">
+          <strong>Full Manual</strong>
+          <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
+        </a>
+        <a class="manual-link" href="docs/surface-local-producer.md">
+          <strong>Surface Local</strong>
+          <span>このPCで生成する手順と `.openclaw-local/` の扱い。</span>
+        </a>
+        <a class="manual-link" href="docs/producer-desk-routing.md">
+          <strong>Producer Desk</strong>
+          <span>このMusicチャットから各repoへ指示を切る運用。</span>
+        </a>
+      </div>
+    </section>
 
     <section class="wide-panel" aria-label="Runbook">
       <h2>Session Loop</h2>
@@ -543,10 +666,20 @@
       if (intent.frame) parts.push(`--frame ${intent.frame}`);
       parts.push(`--out ${out}`);
       document.getElementById("commands").innerHTML = `
-        <pre>${escapeHtml(parts.join(" "))}</pre>
-        <pre>${escapeHtml(`python -m drum_floor inspect ${out}`)}</pre>
-        <pre>${escapeHtml(`python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}</pre>
-        <pre>${escapeHtml(`$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}</pre>
+        ${commandBlock("Plan", "最初に読む。実行前のセッション流れと human gate を確認します。", `python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}
+        ${commandBlock("Local Generate", "Surface PCで実生成。候補は .openclaw-local に保存され、GitHubには出ません。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}
+        ${commandBlock("Raw drum-floor command", "OpenClawを通さず確認したい時の元コマンド。通常は local-generate を使います。", parts.join(" "))}
+        ${commandBlock("Inspect", "生成候補の安全確認。local-generate はこれも自動で実行します。", `python -m drum_floor inspect ${out}`)}
+      `;
+    }
+
+    function commandBlock(title, description, command) {
+      return `
+        <div class="command-block">
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(description)}</p>
+          <pre>${escapeHtml(command)}</pre>
+        </div>
       `;
     }
 
