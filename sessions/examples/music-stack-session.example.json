@@ -1,0 +1,136 @@
+{
+  "session_id": "music-stack-001",
+  "title": "Music centered session with pocket candidate, soft room, and GI mood trace",
+  "duration_target": {
+    "minutes": 12
+  },
+  "bpm_range": {
+    "min": 72,
+    "max": 132,
+    "target": 96
+  },
+  "energy_arc": [
+    {
+      "at": 0,
+      "energy": 0.18,
+      "intent": "ambient haze and room"
+    },
+    {
+      "at": 0.35,
+      "energy": 0.48,
+      "intent": "memory particles and human groove"
+    },
+    {
+      "at": 0.72,
+      "energy": 0.72,
+      "intent": "dry grid and ghost pressure without bass overload"
+    },
+    {
+      "at": 1,
+      "energy": 0.34,
+      "intent": "transparent void tail"
+    }
+  ],
+  "roles": {
+    "musicProducer": {
+      "connector": "music",
+      "intent": "integrated RDJ-internal producer runtime, not a copy engine"
+    },
+    "pocketDrummer": {
+      "connector": "drumFloor",
+      "intent": "Art Blakey / D'Angelo / J Dilla style pocket candidate, inspected before any manual arm"
+    },
+    "softPiano": {
+      "connector": "chill",
+      "intent": "low-density piano room that stays behind Music"
+    },
+    "giMood": {
+      "connector": "namima",
+      "intent": "GI mood and water-touch trace as coarse session context"
+    }
+  },
+  "connectors": {
+    "music": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/Music/",
+      "snapshot": [
+        "window.MusicRuntimeState.producerHabits",
+        "window.MusicRuntimeState.genreTimbreKits",
+        "window.MusicRuntimeState.signatureCells.conductor",
+        "window.MusicRuntimeState.humanGroove"
+      ]
+    },
+    "drumFloor": {
+      "enabled": true,
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "intent": {
+        "candidate_id": "music-stack-001-pocket-seed-42",
+        "style": "nerdy_jazzy_hiphop",
+        "frame": "deep_neo_soul_pocket",
+        "bpm": 96,
+        "bars": 8,
+        "energy": 46,
+        "seed": 42
+      }
+    },
+    "chill": {
+      "enabled": true,
+      "snapshot": [
+        "window.chillAdapter.getRuntimeConfig()",
+        "window.chillAdapter.diagnostics.runDeterminismCheck()"
+      ],
+      "policy": "read-only snapshot; do not call setIntent or Tone transport"
+    },
+    "namima": {
+      "enabled": true,
+      "snapshot": [
+        "window.AudioEngine.mood",
+        "window.AudioEngine.auto",
+        "namima:session-trace:v1"
+      ],
+      "policy": "read-only coarse mood trace; no raw gesture capture"
+    },
+    "test": {
+      "enabled": false,
+      "policy": "reference archive only; translate style morph ideas into Music morphIntent later"
+    }
+  },
+  "human_gates": {
+    "before_arm": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "drum-floor inspect passes",
+        "candidate preview does not crowd Music",
+        "manual arm or skip decision recorded"
+      ]
+    },
+    "before_record": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "Music is still the main runtime",
+        "OUTPUT is manually checked",
+        "REC is started by human gesture only"
+      ]
+    },
+    "before_merge": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "listening notes are converted to a small PR",
+        "no sample, lyric, dependency, or workflow drift",
+        "copy risk is explicitly checked"
+      ]
+    }
+  },
+  "guardrails": {
+    "auto_arm": false,
+    "upload_audio": false,
+    "record_audio": false,
+    "write_samples": false,
+    "copy_reference_melody": false,
+    "modify_workflows": false
+  }
+}

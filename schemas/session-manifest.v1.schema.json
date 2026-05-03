@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quietbriony.github.io/openclaw/schemas/session-manifest.v1.schema.json",
+  "title": "OpenClaw SessionManifest v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "session_id",
+    "title",
+    "duration_target",
+    "bpm_range",
+    "energy_arc",
+    "roles",
+    "connectors",
+    "human_gates"
+  ],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "duration_target": {
+      "type": "object",
+      "required": ["minutes"],
+      "properties": {
+        "minutes": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "bpm_range": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 40,
+          "maximum": 240
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 40,
+          "maximum": 240
+        },
+        "target": {
+          "type": "integer",
+          "minimum": 40,
+          "maximum": 240
+        }
+      }
+    },
+    "energy_arc": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["at", "energy"],
+        "properties": {
+          "at": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "energy": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "intent": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "required": ["musicProducer", "pocketDrummer", "softPiano", "giMood"]
+    },
+    "connectors": {
+      "type": "object",
+      "required": ["music", "drumFloor", "chill", "namima"]
+    },
+    "human_gates": {
+      "type": "object",
+      "required": ["before_arm", "before_record", "before_merge"]
+    },
+    "guardrails": {
+      "type": "object",
+      "properties": {
+        "auto_arm": { "const": false },
+        "upload_audio": { "const": false },
+        "record_audio": { "const": false },
+        "write_samples": { "const": false },
+        "copy_reference_melody": { "const": false },
+        "modify_workflows": { "const": false }
+      }
+    }
+  }
+}

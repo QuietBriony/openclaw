@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "connectors": {
+    "music": {
+      "repo": "QuietBriony/Music",
+      "role": "Integrated experimental producer runtime",
+      "mode": "browser_snapshot",
+      "capabilities": [
+        "snapshot",
+        "runtime_state_review",
+        "manual_transport_review",
+        "manual_record_review"
+      ],
+      "surfaces": [
+        "window.MusicRuntimeState",
+        "window.MusicRuntimeState.producerHabits",
+        "window.MusicRuntimeState.genreTimbreKits",
+        "window.MusicRuntimeState.referenceMorph",
+        "window.MusicRuntimeState.signatureCells",
+        "window.MusicRuntimeState.humanGroove"
+      ],
+      "safety": [
+        "Music remains the main audio runtime",
+        "no automatic START, STOP, REC, or OUTPUT changes",
+        "no direct recorder mutation",
+        "no audio files, samples, lyrics, or workflow edits"
+      ]
+    },
+    "drumFloor": {
+      "repo": "QuietBriony/drum-floor",
+      "role": "Pocket candidate generator",
+      "mode": "cli_dry_run",
+      "capabilities": [
+        "generate_candidate_command",
+        "inspect_candidate_command",
+        "score_candidate_metadata",
+        "suggest_evolution_metadata"
+      ],
+      "surfaces": [
+        "python -m drum_floor generate",
+        "python -m drum_floor inspect",
+        "live/candidates/",
+        "live/logs/"
+      ],
+      "safety": [
+        "generate only under live/candidates/",
+        "inspect is read-only",
+        "never write live/armed/ or live/archive/",
+        "never arm Ableton, EP-133, or live slots",
+        "never write audio recordings or samples"
+      ]
+    },
+    "chill": {
+      "repo": "QuietBriony/chill",
+      "role": "Soft piano and room reference",
+      "mode": "browser_snapshot",
+      "capabilities": [
+        "snapshot",
+        "deterministic_preview_review",
+        "quiet_recovery_review"
+      ],
+      "surfaces": [
+        "window.chillAdapter.getRuntimeConfig()",
+        "window.chillAdapter.diagnostics.previewEventStream()",
+        "window.chillAdapter.diagnostics.runDeterminismCheck()",
+        "chill:session:v1",
+        "chill:recipe:v1",
+        "chill:lastSeed"
+      ],
+      "safety": [
+        "snapshot only in OpenClaw v1",
+        "do not call setIntent, setReference, schedule, or Tone transport",
+        "piano should not become foreground lead unless explicitly selected",
+        "do not reactivate chill as main runtime by accident"
+      ]
+    },
+    "namima": {
+      "repo": "QuietBriony/namima",
+      "role": "GI mood, water interaction, and coarse trace surface",
+      "mode": "browser_snapshot",
+      "capabilities": [
+        "snapshot",
+        "mood_profile_review",
+        "coarse_trace_review"
+      ],
+      "surfaces": [
+        "window.AudioEngine.started",
+        "window.AudioEngine.mood",
+        "window.AudioEngine.auto",
+        "profiles/mood-profiles.json",
+        "namima:session-trace:v1"
+      ],
+      "safety": [
+        "snapshot only in OpenClaw v1",
+        "do not call start, onTap, updateEnergy, setMood, setMoodProfile, or setAuto",
+        "trace is localStorage coarse metadata only",
+        "no raw pointer stream, audio, microphone, upload, or analytics"
+      ]
+    },
+    "test": {
+      "repo": "QuietBriony/test",
+      "role": "Style morph archive",
+      "mode": "reference_archive",
+      "capabilities": [
+        "morph_intent_reference"
+      ],
+      "surfaces": [
+        "Ambient to Lo-Fi to Goa to HardTechno style morph idea",
+        "archetype interpolation",
+        "16 step probability blending"
+      ],
+      "safety": [
+        "do not connect runtime directly",
+        "translate only into Music morphIntent",
+        "do not copy hard techno defaults into production"
+      ]
+    }
+  }
+}
