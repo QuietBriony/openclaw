@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenClaw Session OS</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101310;
+      --panel: #171d19;
+      --panel-2: #202820;
+      --line: #3b493c;
+      --text: #edf2e8;
+      --muted: #aebba8;
+      --accent: #9fd37f;
+      --blue: #7fb7d3;
+      --amber: #d3bd7f;
+      --danger: #d3867f;
+      --shadow: rgba(0, 0, 0, 0.28);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(1120px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 24px 0 36px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 52px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+    }
+
+    .brand strong {
+      font-size: clamp(1.35rem, 4vw, 2.1rem);
+      letter-spacing: 0;
+    }
+
+    .brand span,
+    .muted {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.45;
+    }
+
+    .links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      gap: 18px;
+      align-items: stretch;
+      padding: 22px 0 18px;
+    }
+
+    .intro,
+    .command-panel,
+    .card,
+    .wide-panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 18px 46px var(--shadow);
+      border-radius: 8px;
+    }
+
+    .intro {
+      padding: 22px;
+      display: grid;
+      align-content: space-between;
+      gap: 20px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 8vw, 4.8rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+      max-width: 720px;
+    }
+
+    h2 {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: 1.08rem;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      max-width: 64ch;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      min-height: 76px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .metric strong {
+      font-size: 1.08rem;
+      color: var(--accent);
+    }
+
+    .command-panel {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .command-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 12px;
+      overflow: auto;
+      min-height: 52px;
+      border: 1px solid #4a5948;
+      background: #0b0d0b;
+      border-radius: 7px;
+      color: #d9ead2;
+      font: 0.86rem/1.45 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      padding: 8px 0 18px;
+    }
+
+    .card {
+      min-height: 210px;
+      padding: 15px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 10px;
+    }
+
+    .badge {
+      width: max-content;
+      max-width: 100%;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent);
+      background: #111711;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.48;
+      font-size: 0.9rem;
+    }
+
+    .wide-panel {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      min-height: 126px;
+    }
+
+    .step small {
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .step p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+
+    .guardrails {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .guard {
+      min-height: 62px;
+      border: 1px solid var(--line);
+      background: #141914;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .guard strong {
+      color: var(--amber);
+    }
+
+    .footer {
+      color: var(--muted);
+      padding-top: 18px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .grid,
+      .steps,
+      .guardrails {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(100% - 18px, 560px);
+        padding-top: 12px;
+      }
+
+      .topbar,
+      .links {
+        align-items: stretch;
+        justify-content: flex-start;
+      }
+
+      .topbar,
+      .hero,
+      .grid,
+      .steps,
+      .guardrails,
+      .status-row {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: grid;
+        gap: 12px;
+        padding-bottom: 12px;
+      }
+
+      .pill {
+        min-height: 44px;
+        flex: 1 1 auto;
+      }
+
+      .intro,
+      .command-panel,
+      .wide-panel {
+        padding: 14px;
+      }
+
+      .card {
+        min-height: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="topbar" aria-label="OpenClaw links">
+      <div class="brand">
+        <strong>OpenClaw</strong>
+        <span>Session OS for the QuietBriony music stack</span>
+      </div>
+      <div class="links">
+        <a class="pill" href="README.md">README</a>
+        <a class="pill" href="docs/session-runbook.md">Runbook</a>
+        <a class="pill" href="connectors/registry.json">Registry</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="intro">
+        <div>
+          <h1>Human-gated session control.</h1>
+          <p class="summary">
+            OpenClaw connects Music, drum-floor, chill, namima, and archived style ideas as a conductor desk. It observes, prints safe commands, and keeps arm, record, merge, and release decisions with the human.
+          </p>
+        </div>
+        <div class="status-row" id="session-metrics" aria-label="Manifest summary">
+          <div class="metric"><span>Session</span><strong>loading</strong></div>
+          <div class="metric"><span>Target</span><strong>loading</strong></div>
+          <div class="metric"><span>Gates</span><strong>loading</strong></div>
+        </div>
+      </div>
+
+      <aside class="command-panel" aria-label="Dry-run commands">
+        <h2>Dry-Run Commands</h2>
+        <p class="muted">These commands are displayed for human review. The page does not execute them.</p>
+        <div class="command-list" id="commands">
+          <pre>Loading manifest...</pre>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid" id="connectors" aria-label="Connectors"></section>
+
+    <section class="wide-panel" aria-label="Runbook">
+      <h2>Session Loop</h2>
+      <div class="steps">
+        <div class="step">
+          <small>Observe</small>
+          <h3>Read runtime state</h3>
+          <p>Music producerHabits, genreTimbreKits, signatureCells, humanGroove, chill preview state, and namima mood traces.</p>
+        </div>
+        <div class="step">
+          <small>Generate</small>
+          <h3>Print candidate command</h3>
+          <p>drum-floor can generate into live/candidates only. OpenClaw v1 prints the command and waits.</p>
+        </div>
+        <div class="step">
+          <small>Inspect</small>
+          <h3>Check before arm</h3>
+          <p>Candidate inspection is read-only. Ableton, EP-133, live slots, and Music REC stay manual.</p>
+        </div>
+        <div class="step">
+          <small>Merge</small>
+          <h3>Turn listening into PRs</h3>
+          <p>Human listening notes become small repo-specific tuning changes, with copy and asset safety checked.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wide-panel" aria-label="Guardrails">
+      <h2>Guardrails</h2>
+      <div class="guardrails">
+        <div class="guard"><strong>No auto arm.</strong> Candidates never move into armed or device state by themselves.</div>
+        <div class="guard"><strong>No audio capture.</strong> No samples, microphones, waveform excerpts, lyrics, or uploads.</div>
+        <div class="guard"><strong>No copy engine.</strong> References become production judgment, not melodies, chords, or song forms.</div>
+      </div>
+    </section>
+
+    <p class="footer">
+      OpenClaw v1 is intentionally boring infrastructure: JSON manifest, connector registry, dry-run CLI, browser runtime state, local trace references, and PR review gates.
+    </p>
+  </main>
+
+  <script>
+    const registryUrl = "connectors/registry.json";
+    const manifestUrl = "sessions/examples/music-stack-session.example.json";
+
+    Promise.all([
+      fetch(registryUrl).then((response) => response.json()),
+      fetch(manifestUrl).then((response) => response.json())
+    ]).then(([registry, manifest]) => {
+      renderMetrics(manifest);
+      renderCommands(manifest);
+      renderConnectors(registry.connectors || {});
+    }).catch((error) => {
+      document.getElementById("commands").innerHTML = `<pre>Unable to load OpenClaw JSON: ${String(error)}</pre>`;
+    });
+
+    function renderMetrics(manifest) {
+      const gates = Object.keys(manifest.human_gates || {}).length;
+      const target = manifest.duration_target?.minutes ? `${manifest.duration_target.minutes} min` : "n/a";
+      const bpm = manifest.bpm_range ? `${manifest.bpm_range.min}-${manifest.bpm_range.max} bpm` : "n/a";
+      document.getElementById("session-metrics").innerHTML = `
+        <div class="metric"><span>Session</span><strong>${escapeHtml(manifest.session_id || "n/a")}</strong></div>
+        <div class="metric"><span>Target</span><strong>${escapeHtml(target)} / ${escapeHtml(bpm)}</strong></div>
+        <div class="metric"><span>Gates</span><strong>${gates} required</strong></div>
+      `;
+    }
+
+    function renderCommands(manifest) {
+      const drum = manifest.connectors?.drumFloor || {};
+      const intent = drum.intent || {};
+      const root = (drum.candidate_root || "../drum-floor/live/candidates").replace(/\/$/, "");
+      const candidateId = intent.candidate_id || `${manifest.session_id || "session"}-candidate`;
+      const out = `${root}/${candidateId}`;
+      const parts = [
+        "python -m drum_floor generate",
+        `--style ${intent.style || "nerdy_jazzy_hiphop"}`,
+        `--bpm ${intent.bpm || manifest.bpm_range?.target || 96}`,
+        `--bars ${intent.bars || 8}`,
+        `--energy ${intent.energy || 42}`,
+        `--seed ${intent.seed || 42}`
+      ];
+      if (intent.frame) parts.push(`--frame ${intent.frame}`);
+      parts.push(`--out ${out}`);
+      document.getElementById("commands").innerHTML = `
+        <pre>${escapeHtml(parts.join(" "))}</pre>
+        <pre>${escapeHtml(`python -m drum_floor inspect ${out}`)}</pre>
+        <pre>${escapeHtml("python .\\openclaw_cli.py plan sessions\\examples\\music-stack-session.example.json")}</pre>
+      `;
+    }
+
+    function renderConnectors(connectors) {
+      const node = document.getElementById("connectors");
+      node.innerHTML = Object.entries(connectors).map(([key, spec]) => {
+        const capabilities = (spec.capabilities || []).slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+        return `
+          <article class="card">
+            <span class="badge">${escapeHtml(spec.mode || "connector")}</span>
+            <h3>${escapeHtml(key)}</h3>
+            <p class="muted">${escapeHtml(spec.role || spec.repo || "")}</p>
+            <ul>${capabilities}</ul>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

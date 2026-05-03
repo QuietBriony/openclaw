@@ -4,6 +4,8 @@ OpenClaw is the human-gated session control plane for the QuietBriony music stac
 
 It does not make sound in v1. It reads contracts, prints safe dry-run steps, and keeps `Music`, `drum-floor`, `chill`, and `namima` in their own lanes.
 
+Pages dashboard: <https://quietbriony.github.io/openclaw/>
+
 ## Stack Roles
 
 - `Music`: final integrated runtime and internal producer.
