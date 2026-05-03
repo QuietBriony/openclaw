@@ -1,0 +1,134 @@
+{
+  "session_id": "raw-drum-candidate-export-001",
+  "session_mode": "raw_drum_candidate_export",
+  "title": "Raw Drum Candidate Export",
+  "duration_target": {
+    "minutes": 8
+  },
+  "bpm_range": {
+    "min": 68,
+    "max": 128,
+    "target": 96
+  },
+  "energy_arc": [
+    {
+      "at": 0,
+      "energy": 0.34,
+      "intent": "generate a local drum-floor MIDI candidate for later human audition"
+    },
+    {
+      "at": 1,
+      "energy": 0.62,
+      "intent": "inspect raw live drive without arming Ableton, EP-133, or chill"
+    }
+  ],
+  "roles": {
+    "musicProducer": {
+      "connector": "music",
+      "intent": "optional mix reference only"
+    },
+    "pocketDrummer": {
+      "connector": "rawDrumDrive",
+      "intent": "raw live drum MIDI candidate export"
+    },
+    "softPiano": {
+      "connector": "chill",
+      "intent": "optional listening context; not controlled by this export"
+    },
+    "giMood": {
+      "connector": "namima",
+      "intent": "optional coarse mood context"
+    }
+  },
+  "connectors": {
+    "music": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/Music/",
+      "snapshot": [
+        "window.MusicRuntimeState.output.level",
+        "window.MusicRuntimeState.genreTimbreKits"
+      ],
+      "policy": "read-only observation; no REC, transport, or OUTPUT changes"
+    },
+    "drumFloor": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/drum-floor/",
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "snapshot": [
+        "profiles/groove-profiles.json",
+        "patterns/drum-pattern-frames.json"
+      ],
+      "policy": "source JSON and browser adapter remain owned by drum-floor"
+    },
+    "rawDrumDrive": {
+      "enabled": true,
+      "generate_enabled": true,
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "intent": {
+        "candidate_id": "raw-drum-candidate-export-001-drive",
+        "style": "raw_live_drum_drive",
+        "frame": "raw_live_break_drive",
+        "bpm": 96,
+        "bars": 8,
+        "energy": 64,
+        "seed": 514
+      },
+      "policy": "Surface local-generate writes only under .openclaw-local and runs inspect; human decides arm or skip"
+    },
+    "chill": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/chill/session.html",
+      "snapshot": [
+        "window.chillTrioSession.snapshot()"
+      ],
+      "policy": "optional live reference; raw export does not control chill"
+    },
+    "namima": {
+      "enabled": true,
+      "snapshot": [
+        "window.AudioEngine.mood",
+        "namima:session-trace:v1"
+      ],
+      "policy": "read-only coarse mood trace; no raw gesture capture"
+    }
+  },
+  "human_gates": {
+    "before_arm": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "generated candidate inspect passes",
+        "candidate remains under .openclaw-local until reviewed",
+        "no live slot, Ableton project, EP-133 state, or chill transport is changed"
+      ]
+    },
+    "before_record": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "recording is started by a human gesture only",
+        "generated MIDI is previewed before use",
+        "low-end and brightness are checked in context"
+      ]
+    },
+    "before_merge": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "listening notes become small repo-specific changes",
+        "candidate files are not committed unless intentionally promoted as examples",
+        "no sample, lyric, dependency, or workflow drift"
+      ]
+    }
+  },
+  "guardrails": {
+    "auto_arm": false,
+    "upload_audio": false,
+    "record_audio": false,
+    "write_samples": false,
+    "copy_reference_melody": false,
+    "modify_workflows": false
+  }
+}

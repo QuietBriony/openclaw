@@ -34,6 +34,14 @@ python -m drum_floor generate --style <profile-id> --frame <optional-frame-id> -
 python -m drum_floor inspect live/candidates/<candidate-id>
 ```
 
+OpenClaw only calls `local-generate` for a connector with:
+
+- `generate_enabled: true`
+- `intent.style`
+
+Live browser manifests such as `Chill Trio Live` are observe-only and should
+route candidate export to `sessions/examples/raw-drum-candidate-export.example.json`.
+
 Allowed write area:
 
 - `live/candidates/`

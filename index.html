@@ -618,13 +618,18 @@
       },
       {
         id: "soft-piano-raw-drums",
-        label: "Soft Piano + Raw Drums",
+        label: "Soft Piano + Raw Drums (Legacy)",
         url: "sessions/examples/soft-piano-raw-drum-drive.example.json"
       },
       {
-        id: "chill-trio",
-        label: "Chill Trio",
-        url: "sessions/examples/chill-piano-bass-drum-trio.example.json"
+        id: "chill-trio-live",
+        label: "Chill Trio Live",
+        url: "sessions/examples/chill-trio-live.example.json"
+      },
+      {
+        id: "raw-drum-candidate",
+        label: "Raw Drum Candidate Export",
+        url: "sessions/examples/raw-drum-candidate-export.example.json"
       }
     ];
     let activeManifest = manifests[0];
@@ -655,32 +660,49 @@
     }
 
     function renderCommands(manifest) {
-      const drum = manifest.connectors?.rawDrumDrive || manifest.connectors?.drumFloor || {};
+      const generation = generationConnector(manifest);
+      const drum = generation?.config || {};
       const intent = drum.intent || {};
-      const root = (drum.candidate_root || "../drum-floor/live/candidates").replace(/\/$/, "");
-      const candidateId = intent.candidate_id || `${manifest.session_id || "session"}-candidate`;
-      const out = `${root}/${candidateId}`;
-      const parts = [
-        "python -m drum_floor generate",
-        `--style ${intent.style || "nerdy_jazzy_hiphop"}`,
-        `--bpm ${intent.bpm || manifest.bpm_range?.target || 96}`,
-        `--bars ${intent.bars || 8}`,
-        `--energy ${intent.energy || 42}`,
-        `--seed ${intent.seed || 42}`
-      ];
-      if (intent.frame) parts.push(`--frame ${intent.frame}`);
-      parts.push(`--out ${out}`);
       const chillUrl = manifest.connectors?.chill?.runtime_url;
-      const openTrio = manifest.session_mode === "chill_trio" && chillUrl
+      const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
         ? commandBlock("Open Chill Trio", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
         : "";
+      const observeOnly = generation ? "" : commandBlock("No Local Generate", "このmanifestは観測用です。候補生成は Raw Drum Candidate Export を選びます。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate sessions\\examples\\raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py`);
+      let generateBlocks = "";
+      if (generation) {
+        const root = (drum.candidate_root || "../drum-floor/live/candidates").replace(/\/$/, "");
+        const candidateId = intent.candidate_id || `${manifest.session_id || "session"}-candidate`;
+        const out = `${root}/${candidateId}`;
+        const parts = [
+          "python -m drum_floor generate",
+          `--style ${intent.style || "nerdy_jazzy_hiphop"}`,
+          `--bpm ${intent.bpm || manifest.bpm_range?.target || 96}`,
+          `--bars ${intent.bars || 8}`,
+          `--energy ${intent.energy || 42}`,
+          `--seed ${intent.seed || 42}`
+        ];
+        if (intent.frame) parts.push(`--frame ${intent.frame}`);
+        parts.push(`--out ${out}`);
+        generateBlocks = `
+          ${commandBlock("Local Generate", "Surface PCで実生成。候補は .openclaw-local に保存され、GitHubには出ません。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}
+          ${commandBlock("Raw drum-floor command", "OpenClawを通さず確認したい時の元コマンド。通常は local-generate を使います。", parts.join(" "))}
+          ${commandBlock("Inspect", "生成候補の安全確認。local-generate はこれも自動で実行します。", `python -m drum_floor inspect ${out}`)}
+        `;
+      }
       document.getElementById("commands").innerHTML = `
         ${commandBlock("Plan", "最初に読む。実行前のセッション流れと human gate を確認します。", `python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}
         ${openTrio}
-        ${commandBlock("Local Generate", "Surface PCで実生成。候補は .openclaw-local に保存され、GitHubには出ません。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}
-        ${commandBlock("Raw drum-floor command", "OpenClawを通さず確認したい時の元コマンド。通常は local-generate を使います。", parts.join(" "))}
-        ${commandBlock("Inspect", "生成候補の安全確認。local-generate はこれも自動で実行します。", `python -m drum_floor inspect ${out}`)}
+        ${observeOnly}
+        ${generateBlocks}
       `;
+    }
+
+    function generationConnector(manifest) {
+      const connectors = manifest.connectors || {};
+      const entry = Object.entries(connectors).find(([, config]) => {
+        return config?.generate_enabled === true && config?.intent?.style;
+      });
+      return entry ? { id: entry[0], config: entry[1] } : null;
     }
 
     function commandBlock(title, description, command) {

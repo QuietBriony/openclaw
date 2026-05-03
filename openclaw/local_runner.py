@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .connectors import candidate_connector_id
 from .contracts import load_manifest, validate_manifest
 
 
@@ -32,6 +33,7 @@ class LocalRunResult:
     generate_stdout: str
     inspect_stdout: str
     errors: tuple[str, ...]
+    notes: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -64,9 +66,32 @@ def run_local_drum_floor(
             executed=False,
         )
 
-    connector_id = "rawDrumDrive" if "rawDrumDrive" in (manifest.get("connectors") or {}) else "drumFloor"
+    connector_id = candidate_connector_id(manifest)
+    if connector_id is None:
+        session_id = str(manifest.get("session_id") or "session")
+        safe_candidate_id = _safe_name(candidate_id or session_id)
+        return LocalRunResult(
+            ok=True,
+            executed=False,
+            session_id=session_id,
+            connector_id="none",
+            candidate_id=safe_candidate_id,
+            candidate_dir=(LOCAL_ROOT / "candidates" / _safe_name(session_id) / safe_candidate_id).resolve(),
+            run_log=None,
+            generate_command=[],
+            inspect_command=[],
+            generate_returncode=None,
+            inspect_returncode=None,
+            generate_stdout="",
+            inspect_stdout="",
+            errors=(),
+            notes=(
+                "this manifest is observe-only; no connector has generate_enabled:true with intent.style",
+                "use sessions/examples/raw-drum-candidate-export.example.json for local drum candidate export",
+            ),
+        )
     connectors = manifest.get("connectors") or {}
-    connector = connectors.get(connector_id) or connectors.get("drumFloor") or {}
+    connector = connectors.get(connector_id) or {}
     intent = connector.get("intent") or {}
     session_id = str(manifest.get("session_id") or "session")
     safe_candidate_id = _safe_name(candidate_id or str(intent.get("candidate_id") or session_id))
@@ -311,6 +336,7 @@ def _failed_result(
         generate_stdout="",
         inspect_stdout="",
         errors=errors,
+        notes=(),
     )
 
 

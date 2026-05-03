@@ -33,6 +33,7 @@
       "capabilities": [
         "generate_candidate_command",
         "inspect_candidate_command",
+        "generate_enabled_manifest_target",
         "browser_session_adapter_preview",
         "score_candidate_metadata",
         "suggest_evolution_metadata"
@@ -47,6 +48,7 @@
         "live/logs/"
       ],
       "safety": [
+        "local-generate requires generate_enabled:true and intent.style",
         "generate only under live/candidates/",
         "inspect is read-only",
         "browser adapter is loaded by chill and stays human-gated",

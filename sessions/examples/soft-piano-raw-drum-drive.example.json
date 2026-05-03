@@ -76,6 +76,7 @@
     },
     "rawDrumDrive": {
       "enabled": true,
+      "generate_enabled": true,
       "candidate_root": "../drum-floor/live/candidates",
       "allow_auto_arm": false,
       "intent": {

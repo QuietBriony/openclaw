@@ -4,7 +4,7 @@ import shlex
 from dataclasses import dataclass
 from typing import Any
 
-from .connectors import drum_floor_generate_command, drum_floor_inspect_command
+from .connectors import candidate_connector_id, drum_floor_generate_command, drum_floor_inspect_command
 
 
 @dataclass(frozen=True)
@@ -19,13 +19,13 @@ class PlanStep:
 
 
 def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None) -> list[PlanStep]:
-    drum_connector = "rawDrumDrive" if "rawDrumDrive" in (manifest.get("connectors") or {}) else "drumFloor"
-    generate = _command_to_text(drum_floor_generate_command(manifest, candidate_id, drum_connector))
-    inspect = _command_to_text(drum_floor_inspect_command(manifest, candidate_id, drum_connector))
+    drum_connector = candidate_connector_id(manifest)
+    generate = _command_to_text(drum_floor_generate_command(manifest, candidate_id, drum_connector)) if drum_connector else ""
+    inspect = _command_to_text(drum_floor_inspect_command(manifest, candidate_id, drum_connector)) if drum_connector else ""
     if _is_chill_trio(manifest):
-        return _build_chill_trio_plan(drum_connector, generate, inspect)
+        return _build_chill_trio_plan()
 
-    return [
+    steps = [
         PlanStep(
             order=1,
             phase="observe",
@@ -53,6 +53,10 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
             writes="localStorage summary only",
             detail="Read mood, auto state, and coarse namima:session-trace:v1 summaries; never audio or raw pointer streams.",
         ),
+    ]
+
+    if drum_connector:
+        steps.extend([
         PlanStep(
             order=4,
             phase="generate",
@@ -80,6 +84,19 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
             writes="human notes only",
             detail="OpenClaw never writes live/armed, Ableton, EP-133, or Music runtime control without explicit human action.",
         ),
+        ])
+    else:
+        steps.append(PlanStep(
+            order=4,
+            phase="listen",
+            connector="human",
+            action="review runtime state",
+            gate="before_arm",
+            writes="human notes only",
+            detail="This manifest is observe-only; it has no generate_enabled connector. Use raw-drum-candidate-export for local drum generation.",
+        ))
+
+    steps.extend([
         PlanStep(
             order=7,
             phase="record",
@@ -98,18 +115,19 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
             writes="code review notes or explicit PR only",
             detail="Convert listening observations into small PRs; no automatic external upload or workflow edits.",
         ),
-    ]
+    ])
+    return _renumber(steps)
 
 
 def _is_chill_trio(manifest: dict[str, Any]) -> bool:
     roles = manifest.get("roles") or {}
-    return manifest.get("session_mode") == "chill_trio" or any(
+    return manifest.get("session_mode") in {"chill_trio", "chill_trio_live"} or any(
         key in roles for key in ("chillPiano", "chillBass", "drumFloorDrums")
     )
 
 
-def _build_chill_trio_plan(drum_connector: str, generate: str, inspect: str) -> list[PlanStep]:
-    return [
+def _build_chill_trio_plan() -> list[PlanStep]:
+    return _renumber([
         PlanStep(
             order=1,
             phase="open",
@@ -126,46 +144,37 @@ def _build_chill_trio_plan(drum_connector: str, generate: str, inspect: str) -> 
             action="trio snapshot",
             gate=None,
             writes="none",
-            detail="Read window.chillTrioSession.snapshot() for bassOn, drumsOn, auto, barIndex, sessionShape, bassPreview, and drumAdapter snapshot.",
+            detail="Read window.chillTrioSession.snapshot() for flow, mixMeter, pressureStatus, bassPreview, sessionShape, and drumAdapter snapshot.",
         ),
         PlanStep(
             order=3,
             phase="observe",
             connector="drumFloor",
-            action="browser adapter preview",
+            action="browser adapter boundary",
             gate=None,
             writes="none",
-            detail="The chill page loads createDrumFloorSessionAdapter(); previewBar and diagnostics.previewSession stay read-only unless the human enables DRUMS.",
+            detail="The chill page owns drum-floor adapter scheduling; OpenClaw only observes the snapshot and does not recreate chill's flow director.",
         ),
         PlanStep(
             order=4,
-            phase="generate",
-            connector=drum_connector,
-            action="print drum candidate command",
+            phase="route",
+            connector="openclaw",
+            action="candidate export pointer",
             gate="before_arm",
-            writes="printed raw command targets ../drum-floor/live/candidates; Surface local-generate writes .openclaw-local/candidates",
-            detail=f"{generate} | Surface actual: python .\\openclaw_cli.py local-generate <manifest> --execute --python <python.exe>",
+            writes="none",
+            detail="This live manifest is observe-only. Use sessions/examples/raw-drum-candidate-export.example.json when a local drum MIDI candidate is needed.",
         ),
         PlanStep(
             order=5,
-            phase="inspect",
-            connector=drum_connector,
-            action="print inspect command",
+            phase="listen",
+            connector="human",
+            action="choose BASS/DRUMS/AUTO/PANIC",
             gate="before_arm",
-            writes="none",
-            detail=inspect,
+            writes="human notes only",
+            detail="OpenClaw does not start browser audio, arm live slots, upload, record, or duplicate chill's live trio decisions.",
         ),
         PlanStep(
             order=6,
-            phase="listen",
-            connector="human",
-            action="choose BASS/DRUMS/arm/skip",
-            gate="before_arm",
-            writes="human notes only",
-            detail="OpenClaw does not start browser audio, arm live slots, upload, or record; the trio remains human-gated.",
-        ),
-        PlanStep(
-            order=7,
             phase="observe",
             connector="music",
             action="optional producer context",
@@ -174,7 +183,7 @@ def _build_chill_trio_plan(drum_connector: str, generate: str, inspect: str) -> 
             detail="Music may be checked as context, but this session keeps chill as the piano/bass master.",
         ),
         PlanStep(
-            order=8,
+            order=7,
             phase="merge",
             connector="github",
             action="repo-specific tuning proposal",
@@ -182,6 +191,21 @@ def _build_chill_trio_plan(drum_connector: str, generate: str, inspect: str) -> 
             writes="code review notes or explicit PR only",
             detail="Convert listening observations into small changes in chill, drum-floor, or OpenClaw.",
         ),
+    ])
+
+
+def _renumber(steps: list[PlanStep]) -> list[PlanStep]:
+    return [
+        PlanStep(
+            order=index,
+            phase=step.phase,
+            connector=step.connector,
+            action=step.action,
+            gate=step.gate,
+            writes=step.writes,
+            detail=step.detail,
+        )
+        for index, step in enumerate(steps, start=1)
     ]
 
 

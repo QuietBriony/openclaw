@@ -9,27 +9,29 @@ The shape is:
 3. Repo-specific agents make small bounded changes.
 4. The human listens, arms, records, merges, or rejects.
 
-The Surface PC can run the actual local producer loop with
-`openclaw local-generate`. The public Pages site stays a readable contract; the
-generated candidates and traces stay under `.openclaw-local/`.
+The Surface PC can run local candidate export with `openclaw local-generate`,
+but only for manifests that explicitly mark a connector with
+`generate_enabled: true`. Live runtime sessions stay human-operated in the
+browser. The public Pages site stays a readable contract; generated candidates
+and traces stay under `.openclaw-local/`.
 
 ## Agent Roles
 
 - `Music Agent`: final runtime, producer habits, genre kits, low-end safety, recorder compatibility.
-- `Chill Agent`: soft piano, gentle melody, memory dots, quiet recovery.
+- `Chill Agent`: live trio source of truth: piano, elastic quiet bass, flow director, pressure, local score.
 - `Drum-Floor Agent`: raw live drum drive, pocket candidates, MIDI preview, inspect/score loop.
 - `Namima Agent`: GI mood, coarse trace, water interaction safety.
 - `OpenClaw Agent`: session manifest, connector contract, Pages dashboard, human gates.
 
 ## Current Session Direction
 
-`Soft Piano + Raw Drum Drive`
+`Chill Trio Live` + `Raw Drum Candidate Export`
 
-- `Music` remains the main producer.
-- `chill` specializes in `soft-melody-piano`.
-- `drum-floor` provides `raw_live_drum_drive` candidates.
+- `chill` owns the live trio and `window.chillTrioSession.snapshot()`.
+- `drum-floor` provides browser drum grammar to chill and raw MIDI candidates to OpenClaw.
+- `Music` remains a separate integrated producer session, not the chill trio master.
 - `namima` contributes mood context only.
-- OpenClaw prints commands and keeps arm/record/merge manual.
+- OpenClaw routes live observe vs candidate export and keeps arm/record/merge manual.
 
 ## Rules
 

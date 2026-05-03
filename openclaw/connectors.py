@@ -20,6 +20,17 @@ class ConnectorSpec:
     surfaces: tuple[str, ...]
 
 
+def candidate_connector_id(manifest: dict[str, Any]) -> str | None:
+    connectors = manifest.get("connectors") or {}
+    for connector_id, config in connectors.items():
+        if not isinstance(config, dict):
+            continue
+        intent = config.get("intent") or {}
+        if config.get("generate_enabled") is True and isinstance(intent, dict) and intent.get("style"):
+            return str(connector_id)
+    return None
+
+
 def load_registry(path: Path = REGISTRY_PATH) -> dict[str, ConnectorSpec]:
     with path.open("r", encoding="utf-8") as handle:
         raw = json.load(handle)
@@ -62,7 +73,8 @@ def drum_floor_generate_command(
     connector_id: str = "drumFloor",
 ) -> list[str]:
     connectors = manifest.get("connectors") or {}
-    drum_floor = connectors.get(connector_id) or connectors.get("drumFloor") or {}
+    target_id = candidate_connector_id(manifest) or connector_id
+    drum_floor = connectors.get(target_id) or connectors.get(connector_id) or connectors.get("drumFloor") or {}
     intent = drum_floor.get("intent") or {}
     bpm_range = manifest.get("bpm_range") or {}
 
@@ -105,7 +117,8 @@ def drum_floor_inspect_command(
     connector_id: str = "drumFloor",
 ) -> list[str]:
     connectors = manifest.get("connectors") or {}
-    drum_floor = connectors.get(connector_id) or connectors.get("drumFloor") or {}
+    target_id = candidate_connector_id(manifest) or connector_id
+    drum_floor = connectors.get(target_id) or connectors.get(connector_id) or connectors.get("drumFloor") or {}
     intent = drum_floor.get("intent") or {}
     safe_candidate_id = candidate_id or str(intent.get("candidate_id") or manifest.get("session_id") or "candidate")
     out_root = str(drum_floor.get("candidate_root") or "../drum-floor/live/candidates")

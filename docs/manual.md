@@ -74,7 +74,13 @@ python .\openclaw_cli.py plan sessions\examples\soft-piano-raw-drum-drive.exampl
 chill trio の流れを見る:
 
 ```powershell
-python .\openclaw_cli.py plan sessions\examples\chill-piano-bass-drum-trio.example.json
+python .\openclaw_cli.py plan sessions\examples\chill-trio-live.example.json
+```
+
+raw drum candidate export の流れを見る:
+
+```powershell
+python .\openclaw_cli.py plan sessions\examples\raw-drum-candidate-export.example.json
 ```
 
 候補を生成して inspect する:
@@ -96,10 +102,10 @@ python .\openclaw_cli.py local-list
 python .\openclaw_cli.py local-generate sessions\examples\soft-piano-raw-drum-drive.example.json --candidate-id raw-drive-002 --execute --python $py
 ```
 
-chill trio 用に生成する:
+raw drum candidate を生成する:
 
 ```powershell
-python .\openclaw_cli.py local-generate sessions\examples\chill-piano-bass-drum-trio.example.json --candidate-id trio-drive-001 --execute --python $py
+python .\openclaw_cli.py local-generate sessions\examples\raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py
 ```
 
 生成物はここに出ます:
@@ -123,10 +129,17 @@ python .\openclaw_cli.py local-generate sessions\examples\chill-piano-bass-drum-
 
 `Chill Piano Bass Drum Trio`
 
-- `chill`: main piano and sparse bass
-- `drum-floor`: browser soft pocket plus local raw drum candidate
-- `OpenClaw`: plan, local-generate, inspect, human gates
+- `chill`: main piano, elastic quiet bass, flow director, pressure, local score
+- `drum-floor`: browser soft pocket follows chill `sessionShape`
+- `OpenClaw`: plan, routing, observe-only human gates
 - console: `window.chillTrioSession.snapshot()`
+
+`Raw Drum Candidate Export`
+
+- `OpenClaw`: `local-generate` and inspect
+- `drum-floor`: `raw_live_drum_drive` + `raw_live_break_drive`
+- output: `.openclaw-local/candidates/`
+- no Ableton / EP-133 / chill transport auto-arm
 
 `Soft Piano + Raw Drums`
 

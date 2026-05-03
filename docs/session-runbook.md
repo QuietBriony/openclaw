@@ -7,12 +7,13 @@ Producer desk routing: [producer-desk-routing.md](producer-desk-routing.md)
 ## Flow
 
 1. `plan`: validate `SessionManifest v1` and print connector actions.
-2. `generate candidates`: print the `drum-floor` command; the human decides whether to run it.
-3. `inspect`: inspect the candidate before any manual arm.
-4. `human listen`: Music remains the center; decide whether pocket, chill, or namima context helps.
-5. `arm/skip`: only the human can arm external gear or live slots.
-6. `trace`: keep coarse notes and local snapshot context.
-7. `PR tuning`: convert listening observations into small repo-specific PRs.
+2. `observe live`: for `Chill Trio Live`, open `chill/session.html` and read `window.chillTrioSession.snapshot()`.
+3. `generate candidates`: only `generate_enabled` manifests print/run `drum-floor` commands.
+4. `inspect`: inspect the candidate before any manual arm.
+5. `human listen`: decide whether the live trio or exported candidate helps.
+6. `arm/skip`: only the human can arm external gear or live slots.
+7. `trace`: keep coarse notes and local snapshot context.
+8. `PR tuning`: convert listening observations into small repo-specific PRs.
 
 ## First Practical Session
 
@@ -30,6 +31,12 @@ Producer desk routing: [producer-desk-routing.md](producer-desk-routing.md)
 - `chill` selects `soft-melody-piano` when the human wants soft piano answers and memory dots.
 - `drum-floor` uses `raw_live_drum_drive` with `raw_live_break_drive` to print a live drum drive candidate.
 - OpenClaw only prints generate and inspect commands; any arm, routing, recording, or merge remains human-gated.
+
+## Chill Trio Live Session
+
+- `chill` is the source of truth for piano, elastic quiet bass, flow director, pressure, and local score.
+- `drum-floor` browser adapter follows `chill` `sessionShape`.
+- `OpenClaw` observes only; use `raw-drum-candidate-export.example.json` for local MIDI candidate export.
 
 ## Listening Gate
 

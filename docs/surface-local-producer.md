@@ -27,11 +27,15 @@ From `C:\workspace\github-inventory\music-stack\openclaw`:
 
 ```powershell
 $py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
-python .\openclaw_cli.py local-generate sessions\examples\soft-piano-raw-drum-drive.example.json --execute --python $py
+python .\openclaw_cli.py local-generate sessions\examples\raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py
 ```
 
 This runs `drum-floor generate`, then `drum-floor inspect`, and writes a local
 run log. It does not arm Ableton, EP-133, Music REC, or any live slot.
+
+`local-generate` only works when a manifest has a connector with
+`generate_enabled: true` and `intent.style`. `chill-trio-live.example.json` is
+observe-only; open `chill/session.html` for that live session.
 
 ## Human Gates
 

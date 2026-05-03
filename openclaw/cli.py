@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from .connectors import (
+    candidate_connector_id,
     drum_floor_generate_command,
     drum_floor_inspect_command,
     inspect_registry,
@@ -108,8 +109,15 @@ def main(argv: list[str] | None = None) -> int:
         if not result.ok:
             _print_validation(result.summary, result.warnings, result.errors)
             return 1
+        connector_id = candidate_connector_id(manifest)
+        if connector_id is None:
+            print("generate:")
+            print("  -")
+            print("inspect:")
+            print("  -")
+            print("note: this manifest is observe-only; use sessions/examples/raw-drum-candidate-export.example.json for local drum candidate export.")
+            return 0
         print("generate:")
-        connector_id = "rawDrumDrive" if "rawDrumDrive" in (manifest.get("connectors") or {}) else "drumFloor"
         print("  " + _join_command(drum_floor_generate_command(manifest, args.candidate_id, connector_id)))
         print("inspect:")
         print("  " + _join_command(drum_floor_inspect_command(manifest, args.candidate_id, connector_id)))
@@ -130,9 +138,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"executed: {str(result.executed).lower()}")
         print(f"ok: {str(result.ok).lower()}")
         print("generate:")
-        print("  " + _join_command(result.generate_command))
+        print("  " + (_join_command(result.generate_command) if result.generate_command else "-"))
         print("inspect:")
-        print("  " + _join_command(result.inspect_command))
+        print("  " + (_join_command(result.inspect_command) if result.inspect_command else "-"))
         if result.generate_returncode is not None:
             print(f"generate_returncode: {result.generate_returncode}")
         if result.inspect_returncode is not None:
@@ -145,6 +153,8 @@ def main(argv: list[str] | None = None) -> int:
             print(line)
         for error in result.errors:
             print(f"error: {error}")
+        for note in result.notes:
+            print(f"note: {note}")
         if any("candidate already exists" in error for error in result.errors):
             print("hint: use local-list to view existing candidates, or pass --candidate-id <new-name> for a fresh output path.")
         if not args.execute:
