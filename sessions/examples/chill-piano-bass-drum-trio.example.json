@@ -1,0 +1,175 @@
+{
+  "session_id": "chill-piano-bass-drum-trio-001",
+  "session_mode": "chill_trio",
+  "title": "Chill piano bass drum trio",
+  "duration_target": {
+    "minutes": 12
+  },
+  "bpm_range": {
+    "min": 68,
+    "max": 84,
+    "target": 72
+  },
+  "energy_arc": [
+    {
+      "at": 0,
+      "energy": 0.22,
+      "intent": "chill piano opens with sparse bass roots"
+    },
+    {
+      "at": 0.35,
+      "energy": 0.42,
+      "intent": "drum-floor soft pocket joins after manual DRUMS ON"
+    },
+    {
+      "at": 0.64,
+      "energy": 0.58,
+      "intent": "raw drive candidate is inspected before any arm decision"
+    },
+    {
+      "at": 1,
+      "energy": 0.3,
+      "intent": "return to piano room and bass space"
+    }
+  ],
+  "roles": {
+    "musicProducer": {
+      "connector": "music",
+      "intent": "optional context only; Music is not the trio master in this session"
+    },
+    "pocketDrummer": {
+      "connector": "drumFloor",
+      "intent": "browser session pocket for chill, never auto-armed"
+    },
+    "softPiano": {
+      "connector": "chill",
+      "intent": "quiet piano room and memory chords"
+    },
+    "giMood": {
+      "connector": "namima",
+      "intent": "coarse mood context only"
+    },
+    "chillPiano": {
+      "connector": "chill",
+      "intent": "main soft piano surface in chill/session.html"
+    },
+    "chillBass": {
+      "connector": "chill",
+      "intent": "sparse synthetic upright-ish roots and fifths"
+    },
+    "drumFloorDrums": {
+      "connector": "drumFloor",
+      "intent": "raw live drum drive candidate plus browser soft pocket"
+    }
+  },
+  "connectors": {
+    "music": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/Music/",
+      "snapshot": [
+        "window.MusicRuntimeState.producerHabits",
+        "window.MusicRuntimeState.genreTimbreKits",
+        "window.MusicRuntimeState.output.level"
+      ],
+      "policy": "optional observation only; do not start, stop, record, or change OUTPUT"
+    },
+    "drumFloor": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/drum-floor/",
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "snapshot": [
+        "createDrumFloorSessionAdapter().snapshot()",
+        "createDrumFloorSessionAdapter().previewBar({barIndex:0})",
+        "createDrumFloorSessionAdapter().diagnostics.previewSession({bars:4})"
+      ],
+      "intent": {
+        "candidate_id": "chill-piano-bass-drum-trio-001-pocket",
+        "style": "nerdy_jazzy_hiphop",
+        "frame": "deep_neo_soul_pocket",
+        "bpm": 72,
+        "bars": 8,
+        "energy": 48,
+        "seed": 314
+      },
+      "policy": "browser adapter is loaded by chill; OpenClaw does not start audio or arm live slots"
+    },
+    "rawDrumDrive": {
+      "enabled": true,
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "intent": {
+        "candidate_id": "chill-piano-bass-drum-trio-001-raw-drive",
+        "style": "raw_live_drum_drive",
+        "frame": "raw_live_break_drive",
+        "bpm": 72,
+        "bars": 8,
+        "energy": 62,
+        "seed": 314
+      },
+      "policy": "Surface local-generate creates a drum candidate only; human decides arm or skip"
+    },
+    "chill": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/chill/session.html",
+      "snapshot": [
+        "window.chillTrioSession.snapshot()",
+        "window.chillAdapter.getRuntimeConfig()",
+        "window.chillAdapter.session.previewBassBar({barIndex:0})",
+        "window.chillAdapter.diagnostics.runDeterminismCheck()"
+      ],
+      "intent": {
+        "referenceId": "piano-jazz-chill",
+        "role": "main piano and sparse bass trio surface"
+      },
+      "policy": "human opens START, BASS, DRUMS, AUTO, and PANIC manually"
+    },
+    "namima": {
+      "enabled": true,
+      "snapshot": [
+        "window.AudioEngine.mood",
+        "window.AudioEngine.auto",
+        "namima:session-trace:v1"
+      ],
+      "policy": "read-only coarse mood trace; no raw gesture capture"
+    }
+  },
+  "human_gates": {
+    "before_arm": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "chill piano and bass are audible before drums are armed",
+        "drum-floor browser pocket does not crowd piano rests",
+        "raw drive candidate inspect passes",
+        "manual arm or skip decision is recorded in notes"
+      ]
+    },
+    "before_record": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "recording is started by a human gesture only",
+        "bass stays sparse and does not overload low end",
+        "DRUMS can be stopped without breaking piano playback"
+      ]
+    },
+    "before_merge": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "listening notes are converted to small repo-specific changes",
+        "OpenClaw generated files stay under .openclaw-local unless intentionally reviewed",
+        "no sample, lyric, dependency, or workflow drift"
+      ]
+    }
+  },
+  "guardrails": {
+    "auto_arm": false,
+    "upload_audio": false,
+    "record_audio": false,
+    "write_samples": false,
+    "copy_reference_melody": false,
+    "modify_workflows": false
+  }
+}

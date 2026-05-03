@@ -48,18 +48,32 @@ Forbidden automatic write areas:
 - audio recordings or samples
 - `.github/workflows`
 
+Browser trio surface:
+
+- `createDrumFloorSessionAdapter().snapshot()`
+- `createDrumFloorSessionAdapter().previewBar()`
+- `createDrumFloorSessionAdapter().diagnostics.previewSession()`
+
+This surface is loaded by `chill/session.html` for manual trio audition. OpenClaw
+may document and inspect it, but v1 must not use it to start browser audio, arm
+drums, record, or bypass the human listening gate.
+
 ## Chill
 
 OpenClaw may snapshot:
 
+- `window.chillTrioSession.snapshot()`
 - `window.chillAdapter.getRuntimeConfig()`
+- `window.chillAdapter.session.previewBassBar()`
 - `window.chillAdapter.diagnostics.previewEventStream()`
 - `window.chillAdapter.diagnostics.runDeterminismCheck()`
 - `chill:session:v1`
 - `chill:recipe:v1`
 - `chill:lastSeed`
 
-OpenClaw v1 must not call `setIntent`, `setReference`, `schedule`, direct generator mutation, UI clicks, or Tone transport/audio calls.
+OpenClaw v1 must not call `setIntent`, `setReference`, `schedule`,
+`scheduleBassBar`, direct generator mutation, UI clicks, or Tone
+transport/audio calls.
 
 ## Namima
 

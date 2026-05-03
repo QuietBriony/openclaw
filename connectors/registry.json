@@ -28,23 +28,28 @@
     },
     "drumFloor": {
       "repo": "QuietBriony/drum-floor",
-      "role": "Pocket candidate generator",
-      "mode": "cli_dry_run",
+      "role": "Pocket candidate generator and browser trio drum surface",
+      "mode": "cli_dry_run_and_browser_adapter",
       "capabilities": [
         "generate_candidate_command",
         "inspect_candidate_command",
+        "browser_session_adapter_preview",
         "score_candidate_metadata",
         "suggest_evolution_metadata"
       ],
       "surfaces": [
         "python -m drum_floor generate",
         "python -m drum_floor inspect",
+        "createDrumFloorSessionAdapter().snapshot()",
+        "createDrumFloorSessionAdapter().previewBar()",
+        "createDrumFloorSessionAdapter().diagnostics.previewSession()",
         "live/candidates/",
         "live/logs/"
       ],
       "safety": [
         "generate only under live/candidates/",
         "inspect is read-only",
+        "browser adapter is loaded by chill and stays human-gated",
         "never write live/armed/ or live/archive/",
         "never arm Ableton, EP-133, or live slots",
         "never write audio recordings or samples"
@@ -52,15 +57,19 @@
     },
     "chill": {
       "repo": "QuietBriony/chill",
-      "role": "Soft piano and room reference",
+      "role": "Soft piano, sparse bass, and room reference",
       "mode": "browser_snapshot",
       "capabilities": [
         "snapshot",
+        "trio_session_snapshot_review",
+        "bass_preview_review",
         "deterministic_preview_review",
         "quiet_recovery_review"
       ],
       "surfaces": [
+        "window.chillTrioSession.snapshot()",
         "window.chillAdapter.getRuntimeConfig()",
+        "window.chillAdapter.session.previewBassBar()",
         "window.chillAdapter.diagnostics.previewEventStream()",
         "window.chillAdapter.diagnostics.runDeterminismCheck()",
         "chill:session:v1",
@@ -69,6 +78,7 @@
       ],
       "safety": [
         "snapshot only in OpenClaw v1",
+        "do not schedule session bass or drum-floor bars from OpenClaw",
         "do not call setIntent, setReference, schedule, or Tone transport",
         "piano should not become foreground lead unless explicitly selected",
         "do not reactivate chill as main runtime by accident"

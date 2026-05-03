@@ -620,6 +620,11 @@
         id: "soft-piano-raw-drums",
         label: "Soft Piano + Raw Drums",
         url: "sessions/examples/soft-piano-raw-drum-drive.example.json"
+      },
+      {
+        id: "chill-trio",
+        label: "Chill Trio",
+        url: "sessions/examples/chill-piano-bass-drum-trio.example.json"
       }
     ];
     let activeManifest = manifests[0];
@@ -665,8 +670,13 @@
       ];
       if (intent.frame) parts.push(`--frame ${intent.frame}`);
       parts.push(`--out ${out}`);
+      const chillUrl = manifest.connectors?.chill?.runtime_url;
+      const openTrio = manifest.session_mode === "chill_trio" && chillUrl
+        ? commandBlock("Open Chill Trio", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
+        : "";
       document.getElementById("commands").innerHTML = `
         ${commandBlock("Plan", "最初に読む。実行前のセッション流れと human gate を確認します。", `python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}
+        ${openTrio}
         ${commandBlock("Local Generate", "Surface PCで実生成。候補は .openclaw-local に保存され、GitHubには出ません。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}
         ${commandBlock("Raw drum-floor command", "OpenClawを通さず確認したい時の元コマンド。通常は local-generate を使います。", parts.join(" "))}
         ${commandBlock("Inspect", "生成候補の安全確認。local-generate はこれも自動で実行します。", `python -m drum_floor inspect ${out}`)}

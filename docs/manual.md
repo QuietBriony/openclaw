@@ -9,13 +9,14 @@ OpenClaw は、Music stack のための「人間確認つき制作卓」です�
 - OpenClaw Main Desk: <https://quietbriony.github.io/openclaw/>
 - Music: <https://quietbriony.github.io/Music/>
 - chill: <https://quietbriony.github.io/chill/>
+- chill trio: <https://quietbriony.github.io/chill/session.html>
 - drum-floor: <https://quietbriony.github.io/drum-floor/>
 
 ## 役割
 
 - `Music`: 母艦。最終 runtime、音色、producer habits、低域安全。
-- `chill`: soft piano / やわらかメロディ / memory dots。
-- `drum-floor`: raw live drums / pocket / MIDI candidate。
+- `chill`: soft piano / sparse bass / やわらかメロディ / memory dots。
+- `drum-floor`: raw live drums / pocket / browser trio drum surface / MIDI candidate。
 - `namima`: mood / water interaction / coarse trace。
 - `OpenClaw`: manifest、local generate、inspect、human gate、repo横断の制作卓。
 
@@ -70,6 +71,12 @@ secret の値は表示しません。
 python .\openclaw_cli.py plan sessions\examples\soft-piano-raw-drum-drive.example.json
 ```
 
+chill trio の流れを見る:
+
+```powershell
+python .\openclaw_cli.py plan sessions\examples\chill-piano-bass-drum-trio.example.json
+```
+
 候補を生成して inspect する:
 
 ```powershell
@@ -87,6 +94,12 @@ python .\openclaw_cli.py local-list
 
 ```powershell
 python .\openclaw_cli.py local-generate sessions\examples\soft-piano-raw-drum-drive.example.json --candidate-id raw-drive-002 --execute --python $py
+```
+
+chill trio 用に生成する:
+
+```powershell
+python .\openclaw_cli.py local-generate sessions\examples\chill-piano-bass-drum-trio.example.json --candidate-id trio-drive-001 --execute --python $py
 ```
 
 生成物はここに出ます:
@@ -107,6 +120,13 @@ python .\openclaw_cli.py local-generate sessions\examples\soft-piano-raw-drum-dr
 8. 必要な repo だけ小さく磨いて commit / push / Pages 確認する。
 
 ## 今の推奨セッション
+
+`Chill Piano Bass Drum Trio`
+
+- `chill`: main piano and sparse bass
+- `drum-floor`: browser soft pocket plus local raw drum candidate
+- `OpenClaw`: plan, local-generate, inspect, human gates
+- console: `window.chillTrioSession.snapshot()`
 
 `Soft Piano + Raw Drums`
 

@@ -11,8 +11,8 @@ Manual: [docs/manual.md](docs/manual.md)
 ## Stack Roles
 
 - `Music`: final integrated runtime and internal producer.
-- `drum-floor`: pocket candidate generator and inspector.
-- `chill`: soft piano / room reference, snapshot only.
+- `drum-floor`: pocket candidate generator, inspector, and trio drum surface.
+- `chill`: soft piano / sparse bass / room reference, snapshot only from OpenClaw.
 - `namima`: GI mood, water interaction, and coarse local trace context.
 - `test`: style morph archive, not a runtime connector.
 
@@ -27,6 +27,7 @@ python -m openclaw plan sessions/examples/music-stack-session.example.json
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/soft-piano-raw-drum-drive.example.json
+python -m openclaw plan sessions/examples/chill-piano-bass-drum-trio.example.json
 python -m openclaw local-generate sessions/examples/soft-piano-raw-drum-drive.example.json --execute
 ```
 
@@ -38,8 +39,9 @@ python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.
 python .\openclaw_cli.py doctor --python $py
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
+python .\openclaw_cli.py plan sessions/examples/chill-piano-bass-drum-trio.example.json
 python .\openclaw_cli.py local-list
-python .\openclaw_cli.py local-generate sessions/examples/soft-piano-raw-drum-drive.example.json --execute --python $py
+python .\openclaw_cli.py local-generate sessions/examples/chill-piano-bass-drum-trio.example.json --candidate-id trio-drive-001 --execute --python $py
 ```
 
 The CLI is dry-run oriented. It does not arm live slots, start browser audio, record, upload, or write to GitHub.
@@ -80,3 +82,13 @@ Required connectors:
 - No copied reference melodies, chords, structures, or sample gestures.
 
 OpenClaw is a conductor desk, not a hidden performer.
+
+## Chill Trio
+
+`sessions/examples/chill-piano-bass-drum-trio.example.json` treats `chill` as the
+piano/bass master and `drum-floor` as the drum surface.
+
+- Open <https://quietbriony.github.io/chill/session.html>
+- Use `START`, `BASS`, `DRUMS`, `AUTO`, and `PANIC` manually.
+- Check `window.chillTrioSession.snapshot()` in the browser console.
+- Use `local-generate` only for local drum candidates under `.openclaw-local/`.
