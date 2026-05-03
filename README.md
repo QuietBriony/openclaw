@@ -23,6 +23,7 @@ python -m openclaw validate sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/music-stack-session.example.json
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
+python -m openclaw plan sessions/examples/soft-piano-raw-drum-drive.example.json
 ```
 
 If your Python runtime runs in isolated safe-path mode, use the local shim:
@@ -30,6 +31,7 @@ If your Python runtime runs in isolated safe-path mode, use the local shim:
 ```powershell
 python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
+python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
 ```
 
 The CLI is dry-run oriented. It does not arm live slots, start browser audio, record, upload, or write to GitHub.

@@ -19,8 +19,9 @@ class PlanStep:
 
 
 def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None) -> list[PlanStep]:
-    generate = _command_to_text(drum_floor_generate_command(manifest, candidate_id))
-    inspect = _command_to_text(drum_floor_inspect_command(manifest, candidate_id))
+    drum_connector = "rawDrumDrive" if "rawDrumDrive" in (manifest.get("connectors") or {}) else "drumFloor"
+    generate = _command_to_text(drum_floor_generate_command(manifest, candidate_id, drum_connector))
+    inspect = _command_to_text(drum_floor_inspect_command(manifest, candidate_id, drum_connector))
 
     return [
         PlanStep(
@@ -39,7 +40,7 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
             action="snapshot",
             gate=None,
             writes="none",
-            detail="Read window.chillAdapter.getRuntimeConfig() and diagnostics preview state if the browser is open.",
+            detail="Read window.chillAdapter.getRuntimeConfig() and diagnostics preview state; Soft Melody remains behind Music unless selected.",
         ),
         PlanStep(
             order=3,
@@ -53,7 +54,7 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
         PlanStep(
             order=4,
             phase="generate",
-            connector="drumFloor",
+            connector=drum_connector,
             action="print generate candidate command",
             gate="before_arm",
             writes="../drum-floor/live/candidates/<candidate_id>",
@@ -62,7 +63,7 @@ def build_session_plan(manifest: dict[str, Any], candidate_id: str | None = None
         PlanStep(
             order=5,
             phase="inspect",
-            connector="drumFloor",
+            connector=drum_connector,
             action="print inspect command",
             gate="before_arm",
             writes="none",

@@ -56,9 +56,13 @@ def inspect_registry(path: Path = REGISTRY_PATH) -> list[dict[str, Any]]:
     ]
 
 
-def drum_floor_generate_command(manifest: dict[str, Any], candidate_id: str | None = None) -> list[str]:
+def drum_floor_generate_command(
+    manifest: dict[str, Any],
+    candidate_id: str | None = None,
+    connector_id: str = "drumFloor",
+) -> list[str]:
     connectors = manifest.get("connectors") or {}
-    drum_floor = connectors.get("drumFloor") or {}
+    drum_floor = connectors.get(connector_id) or connectors.get("drumFloor") or {}
     intent = drum_floor.get("intent") or {}
     bpm_range = manifest.get("bpm_range") or {}
 
@@ -95,9 +99,13 @@ def drum_floor_generate_command(manifest: dict[str, Any], candidate_id: str | No
     return command
 
 
-def drum_floor_inspect_command(manifest: dict[str, Any], candidate_id: str | None = None) -> list[str]:
+def drum_floor_inspect_command(
+    manifest: dict[str, Any],
+    candidate_id: str | None = None,
+    connector_id: str = "drumFloor",
+) -> list[str]:
     connectors = manifest.get("connectors") or {}
-    drum_floor = connectors.get("drumFloor") or {}
+    drum_floor = connectors.get(connector_id) or connectors.get("drumFloor") or {}
     intent = drum_floor.get("intent") or {}
     safe_candidate_id = candidate_id or str(intent.get("candidate_id") or manifest.get("session_id") or "candidate")
     out_root = str(drum_floor.get("candidate_root") or "../drum-floor/live/candidates")

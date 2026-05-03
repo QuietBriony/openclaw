@@ -86,9 +86,10 @@ def main(argv: list[str] | None = None) -> int:
             _print_validation(result.summary, result.warnings, result.errors)
             return 1
         print("generate:")
-        print("  " + _join_command(drum_floor_generate_command(manifest, args.candidate_id)))
+        connector_id = "rawDrumDrive" if "rawDrumDrive" in (manifest.get("connectors") or {}) else "drumFloor"
+        print("  " + _join_command(drum_floor_generate_command(manifest, args.candidate_id, connector_id)))
         print("inspect:")
-        print("  " + _join_command(drum_floor_inspect_command(manifest, args.candidate_id)))
+        print("  " + _join_command(drum_floor_inspect_command(manifest, args.candidate_id, connector_id)))
         print("note: OpenClaw prints these commands only; it does not execute or arm candidates.")
         return 0
 

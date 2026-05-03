@@ -1,0 +1,153 @@
+{
+  "session_id": "soft-piano-raw-drum-drive-001",
+  "title": "Soft piano memory with raw live drum drive",
+  "duration_target": {
+    "minutes": 10
+  },
+  "bpm_range": {
+    "min": 88,
+    "max": 128,
+    "target": 112
+  },
+  "energy_arc": [
+    {
+      "at": 0,
+      "energy": 0.22,
+      "intent": "Music haze with chill soft piano room"
+    },
+    {
+      "at": 0.32,
+      "energy": 0.42,
+      "intent": "soft melody answers stay behind the producer runtime"
+    },
+    {
+      "at": 0.58,
+      "energy": 0.78,
+      "intent": "raw live drum drive candidate enters only after inspect and manual arm"
+    },
+    {
+      "at": 1,
+      "energy": 0.36,
+      "intent": "return to transparent room and memory dots"
+    }
+  ],
+  "roles": {
+    "musicProducer": {
+      "connector": "music",
+      "intent": "Music remains the integrated producer and low-end safety source"
+    },
+    "pocketDrummer": {
+      "connector": "rawDrumDrive",
+      "intent": "生音バキバキ drum drive candidate, never auto-armed"
+    },
+    "softPiano": {
+      "connector": "chill",
+      "intent": "piano and gentle melody specialist, behind Music"
+    },
+    "giMood": {
+      "connector": "namima",
+      "intent": "GI mood and water-touch trace as coarse session context"
+    }
+  },
+  "connectors": {
+    "music": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/Music/",
+      "snapshot": [
+        "window.MusicRuntimeState.producerHabits",
+        "window.MusicRuntimeState.genreTimbreKits",
+        "window.MusicRuntimeState.signatureCells.conductor",
+        "window.MusicRuntimeState.output.level"
+      ]
+    },
+    "drumFloor": {
+      "enabled": true,
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "intent": {
+        "candidate_id": "soft-piano-raw-drum-drive-001-pocket",
+        "style": "nerdy_jazzy_hiphop",
+        "frame": "deep_neo_soul_pocket",
+        "bpm": 96,
+        "bars": 8,
+        "energy": 46,
+        "seed": 42
+      }
+    },
+    "rawDrumDrive": {
+      "enabled": true,
+      "candidate_root": "../drum-floor/live/candidates",
+      "allow_auto_arm": false,
+      "intent": {
+        "candidate_id": "soft-piano-raw-drum-drive-001-raw-drive",
+        "style": "raw_live_drum_drive",
+        "frame": "raw_live_break_drive",
+        "bpm": 112,
+        "bars": 8,
+        "energy": 76,
+        "seed": 77
+      },
+      "policy": "print generate/inspect commands only; human decides whether to run and arm"
+    },
+    "chill": {
+      "enabled": true,
+      "snapshot": [
+        "window.chillAdapter.getRuntimeConfig()",
+        "window.chillAdapter.diagnostics.previewEventStream({referenceId:'soft-melody-piano', bars:16})",
+        "window.chillAdapter.diagnostics.runDeterminismCheck({referenceId:'soft-melody-piano'})"
+      ],
+      "intent": {
+        "referenceId": "soft-melody-piano",
+        "role": "soft piano and gentle melody specialist"
+      },
+      "policy": "read-only snapshot unless the human selects Soft Melody in chill"
+    },
+    "namima": {
+      "enabled": true,
+      "snapshot": [
+        "window.AudioEngine.mood",
+        "window.AudioEngine.auto",
+        "namima:session-trace:v1"
+      ],
+      "policy": "read-only coarse mood trace; no raw gesture capture"
+    }
+  },
+  "human_gates": {
+    "before_arm": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "raw drum drive candidate inspect passes",
+        "preview does not overload Music low end",
+        "chill Soft Melody stays behind Music",
+        "manual arm or skip decision recorded"
+      ]
+    },
+    "before_record": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "Music OUTPUT is manually checked",
+        "REC is started by human gesture only",
+        "raw drum drive is not brighter or louder than intended"
+      ]
+    },
+    "before_merge": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "listening notes are converted to small repo-specific PRs",
+        "no sample, lyric, dependency, or workflow drift",
+        "copy risk is explicitly checked"
+      ]
+    }
+  },
+  "guardrails": {
+    "auto_arm": false,
+    "upload_audio": false,
+    "record_audio": false,
+    "write_samples": false,
+    "copy_reference_melody": false,
+    "modify_workflows": false
+  }
+}

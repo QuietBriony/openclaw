@@ -189,6 +189,28 @@
       gap: 10px;
     }
 
+    .session-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .session-button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      background: #121712;
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+
+    .session-button.is-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #182118;
+    }
+
     pre {
       margin: 0;
       padding: 12px;
@@ -364,6 +386,7 @@
       <div class="links">
         <a class="pill" href="README.md">README</a>
         <a class="pill" href="docs/session-runbook.md">Runbook</a>
+        <a class="pill" href="docs/producer-desk-routing.md">Producer Desk</a>
         <a class="pill" href="connectors/registry.json">Registry</a>
       </div>
     </nav>
@@ -386,6 +409,7 @@
       <aside class="command-panel" aria-label="Dry-run commands">
         <h2>Dry-Run Commands</h2>
         <p class="muted">These commands are displayed for human review. The page does not execute them.</p>
+        <div class="session-switcher" id="session-switcher" aria-label="Session examples"></div>
         <div class="command-list" id="commands">
           <pre>Loading manifest...</pre>
         </div>
@@ -420,6 +444,32 @@
       </div>
     </section>
 
+    <section class="wide-panel" aria-label="Producer Desk">
+      <h2>Producer Desk Routing</h2>
+      <div class="steps">
+        <div class="step">
+          <small>Music Chat</small>
+          <h3>Intent source</h3>
+          <p>This chat names the musical direction, acceptance gates, and which organ should change.</p>
+        </div>
+        <div class="step">
+          <small>OpenClaw</small>
+          <h3>Session contract</h3>
+          <p>OpenClaw turns the direction into manifest, dry-run commands, and human-gated runbooks.</p>
+        </div>
+        <div class="step">
+          <small>Repo Agents</small>
+          <h3>Small patches</h3>
+          <p>Each repo gets one bounded role: Music, chill, drum-floor, or namima. No cross-repo sprawl.</p>
+        </div>
+        <div class="step">
+          <small>Human</small>
+          <h3>Listen and approve</h3>
+          <p>Arm, record, merge, release, and reference-copy checks stay human decisions.</p>
+        </div>
+      </div>
+    </section>
+
     <section class="wide-panel" aria-label="Guardrails">
       <h2>Guardrails</h2>
       <div class="guardrails">
@@ -436,12 +486,27 @@
 
   <script>
     const registryUrl = "connectors/registry.json";
-    const manifestUrl = "sessions/examples/music-stack-session.example.json";
+    const manifests = [
+      {
+        id: "music-stack",
+        label: "Music Stack",
+        url: "sessions/examples/music-stack-session.example.json"
+      },
+      {
+        id: "soft-piano-raw-drums",
+        label: "Soft Piano + Raw Drums",
+        url: "sessions/examples/soft-piano-raw-drum-drive.example.json"
+      }
+    ];
+    let activeManifest = manifests[0];
+    let registryCache = null;
 
     Promise.all([
       fetch(registryUrl).then((response) => response.json()),
-      fetch(manifestUrl).then((response) => response.json())
+      fetch(activeManifest.url).then((response) => response.json())
     ]).then(([registry, manifest]) => {
+      registryCache = registry;
+      renderSwitcher();
       renderMetrics(manifest);
       renderCommands(manifest);
       renderConnectors(registry.connectors || {});
@@ -461,7 +526,7 @@
     }
 
     function renderCommands(manifest) {
-      const drum = manifest.connectors?.drumFloor || {};
+      const drum = manifest.connectors?.rawDrumDrive || manifest.connectors?.drumFloor || {};
       const intent = drum.intent || {};
       const root = (drum.candidate_root || "../drum-floor/live/candidates").replace(/\/$/, "");
       const candidateId = intent.candidate_id || `${manifest.session_id || "session"}-candidate`;
@@ -479,8 +544,32 @@
       document.getElementById("commands").innerHTML = `
         <pre>${escapeHtml(parts.join(" "))}</pre>
         <pre>${escapeHtml(`python -m drum_floor inspect ${out}`)}</pre>
-        <pre>${escapeHtml("python .\\openclaw_cli.py plan sessions\\examples\\music-stack-session.example.json")}</pre>
+        <pre>${escapeHtml(`python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}</pre>
       `;
+    }
+
+    function renderSwitcher() {
+      const node = document.getElementById("session-switcher");
+      node.innerHTML = manifests.map((manifest) => `
+        <button class="session-button ${manifest.id === activeManifest.id ? "is-active" : ""}" type="button" data-manifest="${manifest.id}">
+          ${escapeHtml(manifest.label)}
+        </button>
+      `).join("");
+      node.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const next = manifests.find((manifest) => manifest.id === button.dataset.manifest);
+          if (!next || next.id === activeManifest.id) return;
+          activeManifest = next;
+          fetch(activeManifest.url)
+            .then((response) => response.json())
+            .then((manifest) => {
+              renderSwitcher();
+              renderMetrics(manifest);
+              renderCommands(manifest);
+              renderConnectors(registryCache.connectors || {});
+            });
+        });
+      });
     }
 
     function renderConnectors(connectors) {
