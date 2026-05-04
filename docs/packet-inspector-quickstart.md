@@ -1,4 +1,4 @@
-# Packet Inspector Quickstart
+# JSON最短手順
 
 Music の `JSON` は音ではありません。今の Music の状態を、drum-floor や
 namima に渡すための短い地図です。
