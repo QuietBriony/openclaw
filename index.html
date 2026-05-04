@@ -1158,6 +1158,7 @@
       const clearButton = document.getElementById("packet-clear-button");
       const output = document.getElementById("packet-inspect-output");
       if (!fileInput || !textInput || !inspectButton || !clearButton || !output) return;
+      let lastInspectedPacket = null;
 
       const runInspect = () => {
         const raw = textInput.value.trim();
@@ -1170,6 +1171,7 @@
           if (!packet || Array.isArray(packet) || typeof packet !== "object") {
             throw new Error("Music session packet must be a JSON object");
           }
+          lastInspectedPacket = packet;
           output.innerHTML = renderPacketInspection(inspectMusicSessionPacket(packet));
         } catch (error) {
           output.innerHTML = `<div class="packet-status error">JSONを読めません: ${escapeHtml(error.message || error)}</div>`;
@@ -1188,6 +1190,7 @@
         if (!packet) return false;
         try {
           textInput.value = JSON.stringify(packet, null, 2);
+          lastInspectedPacket = packet;
           output.innerHTML = renderPacketInspection(inspectMusicSessionPacket(packet), {
             prefix: `SYNC受信 (${source})`
           });
@@ -1223,6 +1226,7 @@
       clearButton.addEventListener("click", () => {
         fileInput.value = "";
         textInput.value = "";
+        lastInspectedPacket = null;
         output.innerHTML = `
           <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。JSON選択はfallbackです。</div>
           <div class="packet-next-grid">
@@ -1232,7 +1236,22 @@
         `;
       });
       output.addEventListener("click", async (event) => {
-        const button = event.target.closest("[data-copy-prompt]");
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) return;
+        const saveButton = target.closest("[data-save-surface-packet]");
+        if (saveButton) {
+          if (!lastInspectedPacket) {
+            saveButton.textContent = "packetなし";
+            return;
+          }
+          const fileName = downloadSurfacePacket(lastInspectedPacket);
+          saveButton.textContent = `保存: ${fileName}`;
+          window.setTimeout(() => {
+            saveButton.textContent = "Surfaceへ保存";
+          }, 1800);
+          return;
+        }
+        const button = target.closest("[data-copy-prompt]");
         if (!button) return;
         const prompt = decodeURIComponent(button.dataset.copyPrompt || "");
         if (!prompt) return;
@@ -1267,6 +1286,28 @@
         }
       });
       readLatestStackPacket();
+    }
+
+    function downloadSurfacePacket(packet) {
+      const fileName = surfacePacketFileName(packet);
+      const blob = new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return fileName;
+    }
+
+    function surfacePacketFileName(packet) {
+      const session = String(packet?.session_id || "latest")
+        .replace(/[^A-Za-z0-9._-]+/g, "-")
+        .replace(/^[-_.]+|[-_.]+$/g, "")
+        .slice(0, 96) || "latest";
+      return `music-session-packet.${session}.json`;
     }
 
     function showCopyFallback(card, prompt) {
@@ -1653,6 +1694,7 @@
             <p>confidence: ${escapeHtml(nextAction.confidence)} / 手動開始: ${escapeHtml(nextAction.manual_start_required ? "yes" : "no")}</p>
             <div class="packet-route-actions">
               <a class="packet-button primary" href="${escapeHtml(nextActionUrl(nextAction.destination))}">${escapeHtml(nextActionButtonLabel(nextAction.destination))}</a>
+              <button class="packet-button secondary" type="button" data-save-surface-packet>Surfaceへ保存</button>
             </div>
           </div>
           <div class="packet-result-card">

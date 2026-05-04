@@ -15,11 +15,26 @@ Public:
 
 Local only:
 
+- `.openclaw-local/inbox/latest-music-session-packet.json`
+- `.openclaw-local/inbox/history/`
 - `.openclaw-local/candidates/`
 - `.openclaw-local/runs/`
 - generated MIDI candidates
 - inspect results
 - listening notes before PR
+
+## Import The Latest Music Packet
+
+From OpenClaw Pages, click `Surfaceへ保存` after Music `SYNC`.
+Then import the newest valid packet from Downloads:
+
+```powershell
+python .\openclaw_cli.py packet-import --latest-download
+python .\openclaw_cli.py packet-inspect --latest
+```
+
+This copies metadata only. It does not start browser audio, record, upload,
+arm gear, or call an external OpenClaw subscription.
 
 ## Generate A Candidate
 

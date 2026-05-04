@@ -12,6 +12,7 @@ class PacketInspection:
     packet: dict[str, Any]
     drum_floor: dict[str, Any]
     namima: dict[str, Any]
+    chill: dict[str, Any]
     openclaw: dict[str, Any]
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
@@ -24,12 +25,14 @@ def inspect_music_session_packet(path: str | Path) -> PacketInspection:
     _validate_packet(packet, warnings, errors)
     drum_floor = _translate_drum_floor(packet)
     namima = _translate_namima(packet)
+    chill = _translate_chill(packet)
     openclaw = _openclaw_summary(packet)
     return PacketInspection(
         ok=not errors,
         packet=_packet_summary(packet),
         drum_floor=drum_floor,
         namima=namima,
+        chill=chill,
         openclaw=openclaw,
         warnings=warnings,
         errors=errors,
@@ -42,6 +45,7 @@ def inspection_to_dict(inspection: PacketInspection) -> dict[str, Any]:
         "packet": inspection.packet,
         "drum_floor": inspection.drum_floor,
         "namima": inspection.namima,
+        "chill": inspection.chill,
         "openclaw": inspection.openclaw,
         "warnings": inspection.warnings,
         "errors": inspection.errors,
@@ -88,7 +92,7 @@ def _validate_packet(packet: dict[str, Any], warnings: list[str], errors: list[s
             errors.append(f"safety.{key} must be false")
 
     routing = _obj(packet.get("routing"))
-    for key in ("drum_floor", "namima", "openclaw"):
+    for key in ("drum_floor", "namima", "chill", "openclaw"):
         if key not in routing:
             warnings.append(f"routing.{key} is missing")
     if _obj(routing.get("openclaw")).get("human_review_required") is not True:
@@ -219,7 +223,78 @@ def _openclaw_summary(packet: dict[str, Any]) -> dict[str, Any]:
         "enabled": openclaw.get("enabled") is not False,
         "promotion_status": str(openclaw.get("promotion_status") or "draft"),
         "human_review_required": openclaw.get("human_review_required") is True,
+        "next_action": _normalize_next_action(openclaw.get("next_action")),
         "next": "turn listening notes into a small repo-specific PR only after human approval",
+    }
+
+
+def _translate_chill(packet: dict[str, Any]) -> dict[str, Any]:
+    routing = _obj(packet.get("routing"))
+    chill = _obj(routing.get("chill"))
+    intent = _obj(chill.get("trio_intent"))
+    gradient = _obj(_obj(packet.get("reference_gradient")).get("weights"))
+    ucm = _obj(packet.get("ucm_state"))
+    energy = _percent(ucm.get("energy"), 32) / 100
+    creation = _percent(ucm.get("creation"), 28) / 100
+    voidness = _percent(ucm.get("void"), 24) / 100
+    observer = _percent(ucm.get("observer"), 48) / 100
+    memory = _unit(gradient.get("memory"), 0.34)
+    haze = _unit(gradient.get("haze"), 0.38)
+    micro = _unit(gradient.get("micro"), 0.24)
+    ghost = _unit(gradient.get("ghost"), 0.24)
+    reference_text = str(intent.get("reference_id") or intent.get("referenceId") or "").lower()
+    if reference_text in ("piano-jazz-chill", "rainy-lofi-room", "soft-solo-drift"):
+        reference = reference_text
+    elif memory > 0.5:
+        reference = "soft-solo-drift"
+    elif haze > 0.52 or _unit(gradient.get("chrome")) > 0.46:
+        reference = "rainy-lofi-room"
+    else:
+        reference = "piano-jazz-chill"
+    touch = _unit(intent.get("touch"), _clamp(0.16 + energy * 0.24 + micro * 0.12 - voidness * 0.1, 0.08, 0.68))
+    phrase = _unit(intent.get("phrase"), _clamp(0.12 + creation * 0.22 + memory * 0.16 + ghost * 0.08, 0.08, 0.72))
+    room = _unit(intent.get("room"), _clamp(0.54 + voidness * 0.2 + observer * 0.12 + haze * 0.12 - energy * 0.12, 0.42, 0.94))
+    drum_support = _unit(chill.get("drum_support"), energy * 0.28 + ghost * 0.2 + micro * 0.12 - voidness * 0.18)
+    pressure_target = intent.get("pressure_target")
+    if pressure_target not in ("safe", "warm", "full"):
+        pressure_target = "safe" if energy > 0.58 else "warm"
+    return {
+        "enabled": chill.get("enabled") is not False,
+        "review_only": True,
+        "reference": reference,
+        "trio": {
+            "touch": round(touch, 3),
+            "phrase": round(phrase, 3),
+            "room": round(room, 3),
+            "bass_on": intent.get("bass_on") is not False,
+            "flow_on": intent.get("flow_on") is not False,
+            "drums_suggested": bool(intent.get("drums_suggested", drum_support > 0.34 and voidness < 0.58)),
+            "pressure_target": pressure_target,
+        },
+        "piano_memory": round(_unit(chill.get("piano_memory"), memory * 0.45 + haze * 0.22), 3),
+        "drum_support": round(drum_support, 3),
+        "next": "open chill session; START remains human-operated",
+    }
+
+
+def _normalize_next_action(value: Any) -> dict[str, Any]:
+    action = _obj(value)
+    destination = str(action.get("destination") or "").strip() or "openclaw"
+    labels = {
+        "music": "Musicで削る",
+        "chill": "chillで聴く",
+        "drum_floor": "drum-floorで押す",
+        "namima": "namimaで空気に逃がす",
+        "openclaw": "OpenClawで見る",
+    }
+    return {
+        "destination": destination,
+        "label": str(action.get("label") or labels.get(destination) or destination),
+        "reason": str(action.get("reason") or "Musicのpacketを安全に見立てる。"),
+        "action": str(action.get("action") or "OpenClawで結果を見て、必要ならこのチャットへ投げる。"),
+        "confidence": round(_unit(action.get("confidence"), 0.28), 3),
+        "manual_start_required": action.get("manual_start_required") is not False,
+        "metadata_only": action.get("metadata_only") is not False,
     }
 
 

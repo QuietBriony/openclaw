@@ -18,6 +18,13 @@ namima、chill、OpenClaw に渡すための短い地図です。
 
 JSONファイル選択と貼り付け欄は、localhostの別portなどでSYNCが届かない時のfallbackです。
 
+Surfaceローカル母艦へ渡す時は、OpenClaw画面の `Surfaceへ保存` を押してから:
+
+```powershell
+python .\openclaw_cli.py packet-import --latest-download
+python .\openclaw_cli.py packet-inspect --latest
+```
+
 ## 結果の見方
 
 - `Musicの今`: その瞬間の energy、void、haze、micro。まずここで雰囲気を見る。
