@@ -6,7 +6,7 @@ listening results into repo-specific PRs.
 
 ## Inputs
 
-- `Music` emits a local `music-session-packet` JSON from the browser.
+- `Music` emits a metadata-only `music-session-packet` through browser `SYNC`.
 - `drum-floor` translates `routing.drum_floor` into groove controls with
   `translateMusicSessionPacket(packet)`.
 - `namima` translates `routing.namima` into a family-safe mood with
@@ -17,10 +17,12 @@ listening results into repo-specific PRs.
 ## Board Flow
 
 1. Human opens Music and listens.
-2. Human clicks `JSON` in Music to download a metadata-only packet.
-3. Human opens the OpenClaw Pages `Packet Inspector` and selects the packet.
-   The browser displays review-only routing locally. CLI `packet-inspect
-   <packet.json>` remains the Surface fallback.
+2. Human clicks `SYNC` in Music. No audio, recording, samples, or lyrics are
+   sent.
+3. Human opens the OpenClaw Pages `Packet Inspector`. The latest packet appears
+   automatically when it was synced on `quietbriony.github.io`. JSON file
+   selection and CLI `packet-inspect <packet.json>` remain Surface/localhost
+   fallbacks.
 4. `drum-floor` and `namima` can preview translations from the packet.
 5. Human listens, chooses arm/skip/record manually, and writes notes.
 6. Approved changes become small PRs in the owning repo.
