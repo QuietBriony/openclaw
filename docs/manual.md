@@ -7,6 +7,7 @@ OpenClaw は、Music stack のための「人間確認つき制作卓」です�
 ## まず開くページ
 
 - OpenClaw Main Desk: <https://quietbriony.github.io/openclaw/>
+- Packet Inspector Quickstart: [packet-inspector-quickstart.md](packet-inspector-quickstart.md)
 - Music: <https://quietbriony.github.io/Music/>
 - chill: <https://quietbriony.github.io/chill/>
 - chill trio: <https://quietbriony.github.io/chill/session.html>
