@@ -1353,6 +1353,7 @@
         },
         density: round3(density),
         pressure: round3(pressure),
+        review_reason: String(drum.review_reason || "Music packetから作る手動preview候補。"),
         next: "preview via drum-floor adapter; use raw-drum-candidate-export only after human review"
       };
     }
@@ -1448,11 +1449,43 @@
 
     function openclawSummary(packet) {
       const openclaw = asObject(asObject(packet.routing).openclaw);
+      const nextAction = normalizeNextAction(openclaw.next_action);
+      const selfReview = asObject(openclaw.self_review);
       return {
         enabled: openclaw.enabled !== false,
         promotion_status: String(openclaw.promotion_status || "draft"),
         human_review_required: openclaw.human_review_required === true,
+        next_action: nextAction,
+        self_review: {
+          densityRisk: round3(unit(selfReview.densityRisk, 0)),
+          lowEndRisk: round3(unit(selfReview.lowEndRisk, 0)),
+          brightnessRisk: round3(unit(selfReview.brightnessRisk, 0)),
+          restraintScore: round3(unit(selfReview.restraintScore, 0)),
+          referenceFit: round3(unit(selfReview.referenceFit, 0)),
+          nextSuggestion: String(selfReview.nextSuggestion || "")
+        },
         next: "turn listening notes into a small repo-specific PR only after human approval"
+      };
+    }
+
+    function normalizeNextAction(value) {
+      const action = asObject(value);
+      const destination = String(action.destination || "").trim() || "openclaw";
+      const labels = {
+        music: "Musicで削る",
+        chill: "chillで聴く",
+        drum_floor: "drum-floorで押す",
+        namima: "namimaで空気に逃がす",
+        openclaw: "OpenClawで見る"
+      };
+      return {
+        destination,
+        label: String(action.label || labels[destination] || destination),
+        reason: String(action.reason || "Musicのpacketを安全に見立てる。"),
+        action: String(action.action || "OpenClawで結果を見て、必要ならこのチャットへ投げる。"),
+        confidence: round3(unit(action.confidence, 0.28)),
+        manual_start_required: action.manual_start_required !== false,
+        metadata_only: action.metadata_only !== false
       };
     }
 
@@ -1518,6 +1551,7 @@
       const namima = inspection.namima;
       const chill = inspection.chill;
       const packet = inspection.packet;
+      const nextAction = inspection.openclaw.next_action;
       const statusText = inspection.ok
         ? `OK: ${packet.session_id || "Music packet"} を安全に読みました。`
         : `確認が必要です: ${inspection.errors.length}件のerror。`;
@@ -1543,6 +1577,13 @@
         </div>
         <div class="packet-result-grid">
           <div class="packet-result-card">
+            <h3>今はこれ</h3>
+            <p><strong>${escapeHtml(nextAction.label)}</strong></p>
+            <p>${escapeHtml(nextAction.reason)}</p>
+            <p>${escapeHtml(nextAction.action)}</p>
+            <p>confidence: ${escapeHtml(nextAction.confidence)} / 手動開始: ${escapeHtml(nextAction.manual_start_required ? "yes" : "no")}</p>
+          </div>
+          <div class="packet-result-card">
             <h3>Musicの今</h3>
             <p>mode: ${escapeHtml(packet.mode || "n/a")}</p>
             <p>energy: ${escapeHtml(packet.ucm.energy)} / void: ${escapeHtml(packet.ucm.void)}</p>
@@ -1553,6 +1594,7 @@
             <p>${escapeHtml(drum.profile)} / ${escapeHtml(drum.frame)}</p>
             <p>bpm ${escapeHtml(drum.controls.bpm)} / density ${escapeHtml(drum.controls.density)} / pressure ${escapeHtml(drum.pressure)}</p>
             <p>kit: ${escapeHtml(drum.controls.kit)}</p>
+            <p>${escapeHtml(drum.review_reason || "手動preview候補。")}</p>
           </div>
           <div class="packet-result-card">
             <h3>namimaへ</h3>
@@ -1569,8 +1611,8 @@
         </div>
         <div class="packet-next-grid">
           <div class="packet-next-card">
-            <strong>まず聴く</strong>
-            <span>Musicに戻って、同じ方向を3〜5分聴く。良ければそのpacketを基準にする。</span>
+            <strong>推奨: ${escapeHtml(nextAction.label)}</strong>
+            <span>${escapeHtml(nextAction.action)}</span>
           </div>
           <div class="packet-next-card">
             <strong>ドラムを育てる</strong>
