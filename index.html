@@ -675,7 +675,7 @@
       const chillUrl = manifest.connectors?.chill?.runtime_url;
       const musicUrl = manifest.connectors?.music?.runtime_url || "https://quietbriony.github.io/Music/";
       const musicPacketBoard = manifest.session_mode === "music_orchestra_mission_board"
-        ? commandBlock("Music Packet", "MusicでJSONを作り、drum-floor / namima translationをreviewします。", `${musicUrl}\nClick JSON\nConsole: window.MusicSessionPacket.build()\nDrum: window.DrumFloorMusicSessionAdapter.translateMusicSessionPacket(packet)\nNamima: window.NamimaMusicSessionAdapter.translateMusicSessionPacket(packet)`)
+        ? commandBlock("Music Packet", "MusicでJSONを作り、OpenClaw CLIでrouting translationをreviewします。", `${musicUrl}\nClick JSON\npython .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"\nDrum: routing.drum_floor -> drum-floor preview controls\nNamima: routing.namima -> family-safe mood`)
         : "";
       const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
         ? commandBlock("Open Chill Trio", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)

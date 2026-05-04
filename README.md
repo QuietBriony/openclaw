@@ -27,6 +27,7 @@ python -m openclaw validate sessions/examples/music-stack-session.example.json
 python -m openclaw doctor
 python -m openclaw plan sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/music-orchestra-mission-board.example.json
+python -m openclaw packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/soft-piano-raw-drum-drive.example.json
@@ -43,6 +44,7 @@ python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.
 python .\openclaw_cli.py doctor --python $py
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/music-orchestra-mission-board.example.json
+python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
 python .\openclaw_cli.py plan sessions/examples/chill-trio-live.example.json
 python .\openclaw_cli.py plan sessions/examples/raw-drum-candidate-export.example.json
@@ -60,6 +62,9 @@ visible without printing secret values.
 `generate_enabled: true` and an `intent.style`. It writes generated candidates
 and run traces under `.openclaw-local/`, which is ignored by git. It still does
 not arm, record, upload, or push.
+
+`packet-inspect` reads a Music `JSON` download and prints review-only
+drum-floor / namima routing translations. It does not execute the translations.
 
 ## V1 Contract
 
