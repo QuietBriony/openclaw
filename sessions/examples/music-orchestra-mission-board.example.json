@@ -1,0 +1,124 @@
+{
+  "session_id": "music-orchestra-mission-board-001",
+  "session_mode": "music_orchestra_mission_board",
+  "title": "Music packet review board for drum-floor and namima routing",
+  "duration_target": {
+    "minutes": 15
+  },
+  "bpm_range": {
+    "min": 64,
+    "max": 136,
+    "target": 96
+  },
+  "energy_arc": [
+    {
+      "at": 0,
+      "energy": 0.18,
+      "intent": "Music emits low-energy ambient packet"
+    },
+    {
+      "at": 0.45,
+      "energy": 0.58,
+      "intent": "Music packet routes ghost groove and safe water mood"
+    },
+    {
+      "at": 1,
+      "energy": 0.32,
+      "intent": "review and choose repo-specific promotion"
+    }
+  ],
+  "roles": {
+    "musicProducer": {
+      "connector": "music",
+      "intent": "create metadata-only session packet from Music JSON button"
+    },
+    "pocketDrummer": {
+      "connector": "drumFloor",
+      "intent": "translate routing.drum_floor to preview controls only"
+    },
+    "softPiano": {
+      "connector": "chill",
+      "intent": "observe live trio if piano/bass context is needed"
+    },
+    "giMood": {
+      "connector": "namima",
+      "intent": "translate routing.namima to safe public mood only"
+    }
+  },
+  "connectors": {
+    "music": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/Music/",
+      "snapshot": [
+        "window.MusicRuntimeState",
+        "window.MusicSessionPacket.build()",
+        "window.MusicSessionPacket.download()"
+      ],
+      "policy": "human clicks JSON; packet is local metadata only"
+    },
+    "drumFloor": {
+      "enabled": true,
+      "generate_enabled": false,
+      "snapshot": [
+        "window.DrumFloorMusicSessionAdapter.translateMusicSessionPacket(packet)",
+        "createDrumFloorSessionAdapter().applyMusicSessionPacket(packet)",
+        "createDrumFloorSessionAdapter().previewBar()"
+      ],
+      "policy": "translation and preview only; raw candidate export uses raw-drum-candidate-export manifest"
+    },
+    "chill": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/chill/session.html",
+      "snapshot": [
+        "window.chillTrioSession.snapshot()"
+      ],
+      "policy": "observe-only live trio context; chill owns piano, bass, flow, and browser drums"
+    },
+    "namima": {
+      "enabled": true,
+      "runtime_url": "https://quietbriony.github.io/namima/",
+      "snapshot": [
+        "window.NamimaMusicSessionAdapter.translateMusicSessionPacket(packet)",
+        "window.namimaAdapter.snapshot()"
+      ],
+      "policy": "safe mood translation only; no dark glitch, low pressure, or upload"
+    }
+  },
+  "human_gates": {
+    "before_arm": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "Music packet reviewed locally",
+        "drum-floor translation is previewed before any candidate export",
+        "namima translation remains family-safe"
+      ]
+    },
+    "before_record": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "browser audio is started manually",
+        "Music REC or any recording is started by human gesture only",
+        "no packet contains audio or raw traces"
+      ]
+    },
+    "before_merge": {
+      "required": true,
+      "owner": "human producer",
+      "criteria": [
+        "listening note maps to one repo owner",
+        "PR is small and repo-specific",
+        "no sample, lyric, dependency, workflow, or secret drift"
+      ]
+    }
+  },
+  "guardrails": {
+    "auto_arm": false,
+    "upload_audio": false,
+    "record_audio": false,
+    "write_samples": false,
+    "copy_reference_melody": false,
+    "modify_workflows": false
+  }
+}

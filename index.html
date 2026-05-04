@@ -539,6 +539,10 @@
           <strong>Producer Desk</strong>
           <span>このMusicチャットから各repoへ指示を切る運用。</span>
         </a>
+        <a class="manual-link" href="docs/music-orchestra-mission-board.md">
+          <strong>Orchestra Board</strong>
+          <span>Music packetをdrum-floor / namima / chillへ流すreview-only制作卓。</span>
+        </a>
       </div>
     </section>
 
@@ -617,6 +621,11 @@
         url: "sessions/examples/music-stack-session.example.json"
       },
       {
+        id: "music-orchestra-board",
+        label: "Music Orchestra Board",
+        url: "sessions/examples/music-orchestra-mission-board.example.json"
+      },
+      {
         id: "soft-piano-raw-drums",
         label: "Soft Piano + Raw Drums (Legacy)",
         url: "sessions/examples/soft-piano-raw-drum-drive.example.json"
@@ -664,6 +673,10 @@
       const drum = generation?.config || {};
       const intent = drum.intent || {};
       const chillUrl = manifest.connectors?.chill?.runtime_url;
+      const musicUrl = manifest.connectors?.music?.runtime_url || "https://quietbriony.github.io/Music/";
+      const musicPacketBoard = manifest.session_mode === "music_orchestra_mission_board"
+        ? commandBlock("Music Packet", "MusicでJSONを作り、drum-floor / namima translationをreviewします。", `${musicUrl}\nClick JSON\nConsole: window.MusicSessionPacket.build()\nDrum: window.DrumFloorMusicSessionAdapter.translateMusicSessionPacket(packet)\nNamima: window.NamimaMusicSessionAdapter.translateMusicSessionPacket(packet)`)
+        : "";
       const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
         ? commandBlock("Open Chill Trio", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
         : "";
@@ -691,6 +704,7 @@
       }
       document.getElementById("commands").innerHTML = `
         ${commandBlock("Plan", "最初に読む。実行前のセッション流れと human gate を確認します。", `python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}
+        ${musicPacketBoard}
         ${openTrio}
         ${observeOnly}
         ${generateBlocks}

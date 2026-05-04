@@ -17,6 +17,8 @@ plan, and print safe commands, but it does not take over audio runtime control.
 `Music` is the final integrated runtime. OpenClaw may inspect:
 
 - `window.MusicRuntimeState`
+- `window.MusicSessionPacket.build()`
+- `window.MusicSessionPacket.download()`
 - `producerHabits`
 - `genreTimbreKits`
 - `referenceMorph`
@@ -24,6 +26,8 @@ plan, and print safe commands, but it does not take over audio runtime control.
 - `humanGroove`
 
 OpenClaw v1 must not click `START`, `STOP`, `REC`, alter `OUTPUT`, or mutate the recorder.
+The packet is local metadata only and remains a review sidecar until the human
+chooses a repo-specific next step.
 
 ## Drum-Floor
 
@@ -59,6 +63,8 @@ Forbidden automatic write areas:
 Browser trio surface:
 
 - `createDrumFloorSessionAdapter().snapshot()`
+- `createDrumFloorSessionAdapter().applyMusicSessionPacket(packet)`
+- `window.DrumFloorMusicSessionAdapter.translateMusicSessionPacket(packet)`
 - `createDrumFloorSessionAdapter().previewBar()`
 - `createDrumFloorSessionAdapter().diagnostics.previewSession()`
 
@@ -90,10 +96,14 @@ OpenClaw may snapshot:
 - `window.AudioEngine.started`
 - `window.AudioEngine.mood`
 - `window.AudioEngine.auto`
+- `window.NamimaMusicSessionAdapter.translateMusicSessionPacket(packet)`
+- `window.namimaAdapter.snapshot()`
 - `profiles/mood-profiles.json`
 - `namima:session-trace:v1` if present
 
 OpenClaw v1 must not call `start`, `onTap`, `updateEnergy`, `setMood`, `setMoodProfile`, or `setAuto`.
+Music packet translation is allowed as review context, but applying a mood in a
+live browser remains a human-reviewed action.
 
 If trace storage is added, it should remain local, capped, and coarse: mood,
 visual mode, auto state, touch energy bands, x-position bands, and listening

@@ -8,11 +8,14 @@
       "capabilities": [
         "snapshot",
         "runtime_state_review",
+        "music_session_packet_export_review",
         "manual_transport_review",
         "manual_record_review"
       ],
       "surfaces": [
         "window.MusicRuntimeState",
+        "window.MusicSessionPacket.build()",
+        "window.MusicSessionPacket.download()",
         "window.MusicRuntimeState.producerHabits",
         "window.MusicRuntimeState.genreTimbreKits",
         "window.MusicRuntimeState.referenceMorph",
@@ -35,12 +38,15 @@
         "inspect_candidate_command",
         "generate_enabled_manifest_target",
         "browser_session_adapter_preview",
+        "music_session_packet_translation",
         "score_candidate_metadata",
         "suggest_evolution_metadata"
       ],
       "surfaces": [
         "python -m drum_floor generate",
         "python -m drum_floor inspect",
+        "window.DrumFloorMusicSessionAdapter.translateMusicSessionPacket(packet)",
+        "createDrumFloorSessionAdapter().applyMusicSessionPacket(packet)",
         "createDrumFloorSessionAdapter().snapshot()",
         "createDrumFloorSessionAdapter().previewBar()",
         "createDrumFloorSessionAdapter().diagnostics.previewSession()",
@@ -93,12 +99,15 @@
       "capabilities": [
         "snapshot",
         "mood_profile_review",
+        "music_session_packet_mood_translation",
         "coarse_trace_review"
       ],
       "surfaces": [
         "window.AudioEngine.started",
         "window.AudioEngine.mood",
         "window.AudioEngine.auto",
+        "window.NamimaMusicSessionAdapter.translateMusicSessionPacket(packet)",
+        "window.namimaAdapter.snapshot()",
         "profiles/mood-profiles.json",
         "namima:session-trace:v1"
       ],
