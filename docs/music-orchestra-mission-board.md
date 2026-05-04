@@ -18,7 +18,9 @@ listening results into repo-specific PRs.
 
 1. Human opens Music and listens.
 2. Human clicks `JSON` in Music to download a metadata-only packet.
-3. Human runs `packet-inspect <packet.json>` in OpenClaw to review routing.
+3. Human opens the OpenClaw Pages `Packet Inspector` and selects the packet.
+   The browser displays review-only routing locally. CLI `packet-inspect
+   <packet.json>` remains the Surface fallback.
 4. `drum-floor` and `namima` can preview translations from the packet.
 5. Human listens, chooses arm/skip/record manually, and writes notes.
 6. Approved changes become small PRs in the owning repo.

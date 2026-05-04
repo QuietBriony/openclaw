@@ -6,6 +6,9 @@ It does not make sound in v1. It reads contracts, prints safe dry-run steps, and
 
 Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
+The dashboard includes a local Packet Inspector: choose a Music `JSON` download
+to review drum-floor / namima routing without upload, recording, arm, or generate.
+
 Manual: [docs/manual.md](docs/manual.md)
 
 Music Orchestra Mission Board: [docs/music-orchestra-mission-board.md](docs/music-orchestra-mission-board.md)

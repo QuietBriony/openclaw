@@ -27,6 +27,7 @@ Public Pages に置いてよいもの:
 - manifest
 - connector registry
 - command examples
+- local packet inspector UI
 - docs
 - manual
 
@@ -90,6 +91,14 @@ python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.ex
 ```
 
 Music で `JSON` を押して保存した packet を読む:
+
+Pagesで簡単に見る:
+
+1. OpenClaw Main Desk を開く。
+2. `Packet Inspector` の file chooser で Music の JSON を選ぶ。
+3. drum-floor / namima / OpenClaw の review-only translation を読む。
+
+Surface PC の CLI で見る:
 
 ```powershell
 python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
