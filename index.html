@@ -100,7 +100,7 @@
 
     .start-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -239,6 +239,38 @@
       padding: 18px;
       display: grid;
       gap: 12px;
+    }
+
+    .desk-details {
+      display: grid;
+      gap: 12px;
+    }
+
+    .desk-details > summary {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 8px;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 800;
+      list-style-position: inside;
+    }
+
+    .desk-details > summary span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .desk-details[open] > summary {
+      margin-bottom: 12px;
     }
 
     .command-list {
@@ -746,11 +778,8 @@
       </div>
       <div class="links">
         <a class="pill" href="docs/packet-inspector-quickstart.md">SYNC最短</a>
+        <a class="pill" href="https://quietbriony.github.io/Music/">Music</a>
         <a class="pill" href="docs/manual.md">使い方</a>
-        <a class="pill" href="README.md">README</a>
-        <a class="pill" href="docs/session-runbook.md">手順</a>
-        <a class="pill" href="docs/producer-desk-routing.md">制作ルート</a>
-        <a class="pill" href="connectors/registry.json">接続一覧</a>
       </div>
     </nav>
 
@@ -759,28 +788,31 @@
         <div>
           <h1>Music SYNCを、次の制作指示にする。</h1>
           <p class="summary">
-            Musicで良い瞬間を見つけたら`SYNC`。ここでは「ドラムへ」「空気へ」「ピアノtrioへ」「Musicを磨く」だけ決めます。実行はしません。
+            やることは3つだけ。Musicで`SYNC`、ここでlatestを読む、出た行き先を開く。実行や生成は人間が選ぶまでしません。
           </p>
         </div>
         <div class="hero-actions">
-          <a class="hero-action primary" href="#packet-inspector">SYNCを読む</a>
-          <a class="hero-action" href="https://quietbriony.github.io/Music/">Musicを開く</a>
-          <a class="hero-action" href="docs/packet-inspector-quickstart.md">最短手順</a>
-        </div>
-        <div class="status-row" id="session-metrics" aria-label="Manifest summary">
-          <div class="metric"><span>Session</span><strong>loading</strong></div>
-          <div class="metric"><span>Target</span><strong>loading</strong></div>
-          <div class="metric"><span>Gates</span><strong>loading</strong></div>
+          <a class="hero-action" href="https://quietbriony.github.io/Music/">1. Musicを開く</a>
+          <a class="hero-action primary" href="#packet-inspector">2. SYNCを読む</a>
+          <a class="hero-action" href="#packet-inspector">3. 次を開く</a>
         </div>
       </div>
 
       <aside class="command-panel" aria-label="Dry-run commands">
-        <h2>制作ルート</h2>
-        <p class="muted">ふだんは Music Orchestra Board だけでOK。CLIや候補生成は必要な時だけ開きます。</p>
-        <div class="session-switcher" id="session-switcher" aria-label="Session examples"></div>
-        <div class="command-list" id="commands">
-          <pre>Loading manifest...</pre>
-        </div>
+        <details class="desk-details">
+          <summary>CLI / 生成ルート <span>必要な時だけ開く</span></summary>
+          <h2>制作ルート</h2>
+          <p class="muted">ふだんは Music Orchestra Board だけでOK。CLIや候補生成は必要な時だけ開きます。</p>
+          <div class="status-row" id="session-metrics" aria-label="Manifest summary">
+            <div class="metric"><span>Session</span><strong>loading</strong></div>
+            <div class="metric"><span>Target</span><strong>loading</strong></div>
+            <div class="metric"><span>Gates</span><strong>loading</strong></div>
+          </div>
+          <div class="session-switcher" id="session-switcher" aria-label="Session examples"></div>
+          <div class="command-list" id="commands">
+            <pre>Loading manifest...</pre>
+          </div>
+        </details>
       </aside>
     </section>
 
@@ -833,118 +865,126 @@
     </section>
 
     <section class="wide-panel" aria-label="Start Here">
-      <h2>全体の流れ</h2>
+      <h2>これだけ</h2>
       <div class="start-grid">
         <div class="start-card">
           <strong>1</strong>
-          <h3>Musicを聴く</h3>
+          <h3>MusicでSYNC</h3>
           <p class="muted">良い瞬間、崩れた瞬間、方向が見えた瞬間で`SYNC`。</p>
         </div>
         <div class="start-card">
           <strong>2</strong>
           <h3>ここで読む</h3>
-          <p class="muted">ドラム、空気、次の制作PRの方向だけを見る。</p>
+          <p class="muted">latestが自動表示。見るのはNextと行き先だけ。</p>
         </div>
         <div class="start-card">
           <strong>3</strong>
-          <h3>このチャットへ</h3>
-          <p class="muted">「このpacketでdrum-floor育てて」みたいに言う。</p>
-        </div>
-        <div class="start-card">
-          <strong>4</strong>
           <h3>開いて聴く</h3>
           <p class="muted">drum-floorは再生、namimaはTap、chillはSTART。</p>
         </div>
       </div>
     </section>
 
-    <section class="grid" id="connectors" aria-label="Connectors"></section>
+    <section class="wide-panel" aria-label="Connectors">
+      <details class="desk-details">
+        <summary>接続一覧 <span>各repoの役割を見る</span></summary>
+        <section class="grid" id="connectors" aria-label="Connectors"></section>
+      </details>
+    </section>
 
     <section class="wide-panel" aria-label="Manual">
-      <h2>資料</h2>
-      <div class="manual-list">
-        <a class="manual-link" href="docs/manual.md">
-          <strong>全体マニュアル</strong>
-          <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
-        </a>
-        <a class="manual-link" href="docs/packet-inspector-quickstart.md">
-          <strong>SYNC最短手順</strong>
-          <span>Music SYNCの後、何を見るか、次に何を言うか。</span>
-        </a>
-        <a class="manual-link" href="docs/surface-local-producer.md">
-          <strong>Surfaceローカル</strong>
-          <span>このPCで生成する手順と `.openclaw-local/` の扱い。</span>
-        </a>
-        <a class="manual-link" href="docs/producer-desk-routing.md">
-          <strong>制作ルート</strong>
-          <span>このMusicチャットから各repoへ指示を切る運用。</span>
-        </a>
-        <a class="manual-link" href="docs/music-orchestra-mission-board.md">
-          <strong>Orchestra Board</strong>
-          <span>Music packetをdrum-floor / namima / chillへ流すreview-only制作卓。</span>
-        </a>
-      </div>
+      <details class="desk-details">
+        <summary>資料 <span>迷った時だけ開く</span></summary>
+        <div class="manual-list">
+          <a class="manual-link" href="docs/manual.md">
+            <strong>全体マニュアル</strong>
+            <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
+          </a>
+          <a class="manual-link" href="docs/packet-inspector-quickstart.md">
+            <strong>SYNC最短手順</strong>
+            <span>Music SYNCの後、何を見るか、次に何を言うか。</span>
+          </a>
+          <a class="manual-link" href="docs/surface-local-producer.md">
+            <strong>Surfaceローカル</strong>
+            <span>このPCで生成する手順と `.openclaw-local/` の扱い。</span>
+          </a>
+          <a class="manual-link" href="docs/producer-desk-routing.md">
+            <strong>制作ルート</strong>
+            <span>このMusicチャットから各repoへ指示を切る運用。</span>
+          </a>
+          <a class="manual-link" href="docs/music-orchestra-mission-board.md">
+            <strong>Orchestra Board</strong>
+            <span>Music packetをdrum-floor / namima / chillへ流すreview-only制作卓。</span>
+          </a>
+        </div>
+      </details>
     </section>
 
     <section class="wide-panel" aria-label="Runbook">
-      <h2>セッションの考え方</h2>
-      <div class="steps">
-        <div class="step">
-          <small>Observe</small>
-          <h3>状態を見る</h3>
-          <p>MusicのproducerHabits、genreTimbreKits、signatureCells、humanGrooveを見る。</p>
+      <details class="desk-details">
+        <summary>セッションの考え方 <span>制作の深い流れ</span></summary>
+        <div class="steps">
+          <div class="step">
+            <small>Observe</small>
+            <h3>状態を見る</h3>
+            <p>MusicのproducerHabits、genreTimbreKits、signatureCells、humanGrooveを見る。</p>
+          </div>
+          <div class="step">
+            <small>Translate</small>
+            <h3>方向へ翻訳</h3>
+            <p>drum-floorならgroove、namimaならmoodへ。音や録音は保存しません。</p>
+          </div>
+          <div class="step">
+            <small>Listen</small>
+            <h3>人間が聴く</h3>
+            <p>Music、chill、drum-floor、namimaを開く操作と録音は人間が決めます。</p>
+          </div>
+          <div class="step">
+            <small>Merge</small>
+            <h3>小PRへ戻す</h3>
+            <p>聴感メモを小さなrepo別PRに変え、Pagesで聴き直します。</p>
+          </div>
         </div>
-        <div class="step">
-          <small>Translate</small>
-          <h3>方向へ翻訳</h3>
-          <p>drum-floorならgroove、namimaならmoodへ。音や録音は保存しません。</p>
-        </div>
-        <div class="step">
-          <small>Listen</small>
-          <h3>人間が聴く</h3>
-          <p>Music、chill、drum-floor、namimaを開く操作と録音は人間が決めます。</p>
-        </div>
-        <div class="step">
-          <small>Merge</small>
-          <h3>小PRへ戻す</h3>
-          <p>聴感メモを小さなrepo別PRに変え、Pagesで聴き直します。</p>
-        </div>
-      </div>
+      </details>
     </section>
 
     <section class="wide-panel" aria-label="Producer Desk">
-      <h2>このチャットからの回し方</h2>
-      <div class="steps">
-        <div class="step">
-          <small>Music Chat</small>
-          <h3>方向を言う</h3>
-          <p>「もっと生ドラム」「namimaへ柔らかく」など、耳の方向をここで言います。</p>
+      <details class="desk-details">
+        <summary>このチャットからの回し方 <span>repo別に磨く時</span></summary>
+        <div class="steps">
+          <div class="step">
+            <small>Music Chat</small>
+            <h3>方向を言う</h3>
+            <p>「もっと生ドラム」「namimaへ柔らかく」など、耳の方向をここで言います。</p>
+          </div>
+          <div class="step">
+            <small>OpenClaw</small>
+            <h3>制作卓</h3>
+            <p>JSON、manifest、手順、安全ゲートを整理します。隠れて演奏はしません。</p>
+          </div>
+          <div class="step">
+            <small>Repo</small>
+            <h3>役割ごとに磨く</h3>
+            <p>Music、chill、drum-floor、namimaのうち、必要な場所だけ触ります。</p>
+          </div>
+          <div class="step">
+            <small>Human</small>
+            <h3>聴いて決める</h3>
+            <p>arm、record、merge、releaseは人間の確認が最後です。</p>
+          </div>
         </div>
-        <div class="step">
-          <small>OpenClaw</small>
-          <h3>制作卓</h3>
-          <p>JSON、manifest、手順、安全ゲートを整理します。隠れて演奏はしません。</p>
-        </div>
-        <div class="step">
-          <small>Repo</small>
-          <h3>役割ごとに磨く</h3>
-          <p>Music、chill、drum-floor、namimaのうち、必要な場所だけ触ります。</p>
-        </div>
-        <div class="step">
-          <small>Human</small>
-          <h3>聴いて決める</h3>
-          <p>arm、record、merge、releaseは人間の確認が最後です。</p>
-        </div>
-      </div>
+      </details>
     </section>
 
     <section class="wide-panel" aria-label="Guardrails">
-      <h2>安全ルール</h2>
-      <div class="guardrails">
-        <div class="guard"><strong>自動armなし。</strong> Ableton、EP-133、live slot、Music RECは勝手に触りません。</div>
-        <div class="guard"><strong>音声保存なし。</strong> サンプル、マイク、波形、歌詞、アップロードは扱いません。</div>
-        <div class="guard"><strong>コピーなし。</strong> 参照は制作判断へ翻訳し、メロディやコード進行は移しません。</div>
-      </div>
+      <details class="desk-details">
+        <summary>安全ルール <span>常に守る境界</span></summary>
+        <div class="guardrails">
+          <div class="guard"><strong>自動armなし。</strong> Ableton、EP-133、live slot、Music RECは勝手に触りません。</div>
+          <div class="guard"><strong>音声保存なし。</strong> サンプル、マイク、波形、歌詞、アップロードは扱いません。</div>
+          <div class="guard"><strong>コピーなし。</strong> 参照は制作判断へ翻訳し、メロディやコード進行は移しません。</div>
+        </div>
+      </details>
     </section>
 
     <p class="footer">
