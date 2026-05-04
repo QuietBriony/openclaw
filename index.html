@@ -376,6 +376,128 @@
       line-height: 1.4;
     }
 
+    .packet-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .packet-controls,
+    .packet-output {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .packet-controls label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.4;
+    }
+
+    .packet-controls input[type="file"],
+    .packet-controls textarea,
+    .packet-button {
+      width: 100%;
+      border: 1px solid #4a5948;
+      background: #0b0d0b;
+      color: var(--text);
+      border-radius: 7px;
+      font: inherit;
+    }
+
+    .packet-controls input[type="file"] {
+      min-height: 44px;
+      padding: 9px;
+      cursor: pointer;
+    }
+
+    .packet-controls textarea {
+      min-height: 180px;
+      resize: vertical;
+      padding: 10px;
+      color: #d9ead2;
+      font: 0.86rem/1.45 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    .packet-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    .packet-button {
+      min-height: 44px;
+      padding: 0 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .packet-button.primary {
+      border-color: var(--accent);
+      background: #172117;
+      color: var(--accent);
+    }
+
+    .packet-button.secondary {
+      width: auto;
+      color: var(--muted);
+    }
+
+    .packet-status {
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .packet-status.ok {
+      border-color: #4f8d66;
+      color: #cfead5;
+    }
+
+    .packet-status.error {
+      border-color: #a06a5f;
+      color: #ffd4cc;
+    }
+
+    .packet-result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .packet-result-card {
+      min-height: 132px;
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+
+    .packet-result-card h3 {
+      color: var(--accent);
+      font-size: 0.92rem;
+    }
+
+    .packet-result-card p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 0.88rem;
+    }
+
     .guard {
       min-height: 62px;
       border: 1px solid var(--line);
@@ -403,6 +525,7 @@
       .steps,
       .guardrails,
       .start-grid,
+      .packet-panel,
       .manual-list {
         grid-template-columns: 1fr 1fr;
       }
@@ -426,6 +549,8 @@
       .steps,
       .guardrails,
       .start-grid,
+      .packet-panel,
+      .packet-result-grid,
       .manual-list,
       .status-row {
         grid-template-columns: 1fr;
@@ -518,6 +643,30 @@
           <strong>4</strong>
           <h3>聴いて磨く</h3>
           <p class="muted">良ければこのチャットから Music/chill/drum-floor/namima の小PRへ戻します。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wide-panel" aria-label="Packet Inspector">
+      <h2>Packet Inspector</h2>
+      <p class="muted">Musicで`JSON`を押して保存したpacketを選ぶだけ。ここでdrum-floor / namima / OpenClawへの翻訳をローカル表示します。アップロード、録音、arm、生成はしません。</p>
+      <div class="packet-panel">
+        <div class="packet-controls">
+          <label for="packet-file">
+            Music packet file
+            <input id="packet-file" type="file" accept=".json,application/json">
+          </label>
+          <label for="packet-input">
+            Paste or edit JSON
+            <textarea id="packet-input" spellcheck="false" placeholder="{ &quot;source_repo&quot;: &quot;Music&quot;, ... }"></textarea>
+          </label>
+          <div class="packet-actions">
+            <button class="packet-button primary" id="packet-inspect-button" type="button">Inspect Packet</button>
+            <button class="packet-button secondary" id="packet-clear-button" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="packet-output" id="packet-inspect-output" aria-live="polite">
+          <div class="packet-status">MusicのJSONを選ぶと、routing translationがここに出ます。</div>
         </div>
       </div>
     </section>
@@ -656,6 +805,7 @@
     }).catch((error) => {
       document.getElementById("commands").innerHTML = `<pre>Unable to load OpenClaw JSON: ${String(error)}</pre>`;
     });
+    setupPacketInspector();
 
     function renderMetrics(manifest) {
       const gates = Object.keys(manifest.human_gates || {}).length;
@@ -675,7 +825,7 @@
       const chillUrl = manifest.connectors?.chill?.runtime_url;
       const musicUrl = manifest.connectors?.music?.runtime_url || "https://quietbriony.github.io/Music/";
       const musicPacketBoard = manifest.session_mode === "music_orchestra_mission_board"
-        ? commandBlock("Music Packet", "MusicでJSONを作り、OpenClaw CLIでrouting translationをreviewします。", `${musicUrl}\nClick JSON\npython .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"\nDrum: routing.drum_floor -> drum-floor preview controls\nNamima: routing.namima -> family-safe mood`)
+        ? commandBlock("Music Packet", "MusicでJSONを作り、このページのPacket Inspectorでrouting translationをreviewします。", `${musicUrl}\nClick JSON\nOpen this page -> Packet Inspector -> choose the JSON file\nCLI fallback: python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
         : "";
       const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
         ? commandBlock("Open Chill Trio", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
@@ -766,6 +916,349 @@
           </article>
         `;
       }).join("");
+    }
+
+    function setupPacketInspector() {
+      const fileInput = document.getElementById("packet-file");
+      const textInput = document.getElementById("packet-input");
+      const inspectButton = document.getElementById("packet-inspect-button");
+      const clearButton = document.getElementById("packet-clear-button");
+      const output = document.getElementById("packet-inspect-output");
+      if (!fileInput || !textInput || !inspectButton || !clearButton || !output) return;
+
+      const runInspect = () => {
+        const raw = textInput.value.trim();
+        if (!raw) {
+          output.innerHTML = `<div class="packet-status error">Music packet JSONを選ぶか貼り付けてください。</div>`;
+          return;
+        }
+        try {
+          const packet = JSON.parse(raw);
+          if (!packet || Array.isArray(packet) || typeof packet !== "object") {
+            throw new Error("Music session packet must be a JSON object");
+          }
+          output.innerHTML = renderPacketInspection(inspectMusicSessionPacket(packet));
+        } catch (error) {
+          output.innerHTML = `<div class="packet-status error">JSONを読めません: ${escapeHtml(error.message || error)}</div>`;
+        }
+      };
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        try {
+          textInput.value = await file.text();
+          runInspect();
+        } catch (error) {
+          output.innerHTML = `<div class="packet-status error">ファイルを読めません: ${escapeHtml(error.message || error)}</div>`;
+        }
+      });
+      inspectButton.addEventListener("click", runInspect);
+      clearButton.addEventListener("click", () => {
+        fileInput.value = "";
+        textInput.value = "";
+        output.innerHTML = `<div class="packet-status">MusicのJSONを選ぶと、routing translationがここに出ます。</div>`;
+      });
+    }
+
+    function inspectMusicSessionPacket(packet) {
+      const warnings = [];
+      const errors = [];
+      validateMusicPacket(packet, warnings, errors);
+      return {
+        ok: errors.length === 0,
+        packet: packetSummary(packet),
+        drum_floor: translateDrumFloor(packet),
+        namima: translateNamima(packet),
+        openclaw: openclawSummary(packet),
+        warnings,
+        errors
+      };
+    }
+
+    function validateMusicPacket(packet, warnings, errors) {
+      [
+        "version",
+        "source_repo",
+        "created_at",
+        "session_id",
+        "mode",
+        "reference_gradient",
+        "ucm_state",
+        "music_intent",
+        "routing",
+        "safety"
+      ].forEach((key) => {
+        if (!(key in packet)) errors.push(`missing required packet field: ${key}`);
+      });
+      if (packet.source_repo !== "Music") errors.push("source_repo must be Music");
+      if (!packet.session_id) errors.push("session_id must be present");
+
+      const safety = asObject(packet.safety);
+      if (safety.metadata_only !== true) errors.push("safety.metadata_only must be true");
+      if (safety.human_review_required !== true) errors.push("safety.human_review_required must be true");
+      ["stores_audio", "stores_samples", "stores_lyrics"].forEach((key) => {
+        if (safety[key] !== false) errors.push(`safety.${key} must be false`);
+      });
+
+      const routing = asObject(packet.routing);
+      ["drum_floor", "namima", "openclaw"].forEach((key) => {
+        if (!(key in routing)) warnings.push(`routing.${key} is missing`);
+      });
+      if (asObject(routing.openclaw).human_review_required !== true) {
+        warnings.push("routing.openclaw.human_review_required should be true");
+      }
+    }
+
+    function packetSummary(packet) {
+      const gradient = asObject(asObject(packet.reference_gradient).weights);
+      const ucm = asObject(packet.ucm_state);
+      return {
+        session_id: String(packet.session_id || ""),
+        mode: String(packet.mode || ""),
+        created_at: String(packet.created_at || ""),
+        version: packet.version,
+        reference_gradient: {
+          haze: unit(gradient.haze),
+          memory: unit(gradient.memory),
+          micro: unit(gradient.micro),
+          ghost: unit(gradient.ghost),
+          chrome: unit(gradient.chrome),
+          organic: unit(gradient.organic)
+        },
+        ucm: {
+          energy: percent(ucm.energy),
+          void: percent(ucm.void),
+          circle: percent(ucm.circle),
+          body: percent(ucm.body),
+          resource: percent(ucm.resource),
+          observer: percent(ucm.observer)
+        }
+      };
+    }
+
+    function translateDrumFloor(packet) {
+      const routing = asObject(packet.routing);
+      const drum = asObject(routing.drum_floor);
+      const groove = asObject(drum.groove_intent);
+      const gradient = asObject(asObject(packet.reference_gradient).weights);
+      const ucm = asObject(packet.ucm_state);
+      const density = unit(drum.density, percent(ucm.energy) / 100);
+      const pressure = unit(drum.pressure, percent(ucm.body) / 100);
+      const section = drumSection(drum.section || asObject(packet.performance_state).active_pad);
+      const profile = drumProfile(packet, drum, gradient, density, pressure);
+      const frame = drumFrame(profile, packet, drum, gradient, pressure);
+      const style = String(groove.style || "soft_pocket");
+      const resource = percent(ucm.resource) / 100;
+      const voidness = percent(ucm.void) / 100;
+      const micro = unit(gradient.micro);
+      const ghost = unit(gradient.ghost);
+      const organic = unit(gradient.organic);
+      return {
+        enabled: drum.enabled !== false,
+        review_only: true,
+        style,
+        profile,
+        frame,
+        controls: {
+          bpm: estimateBpm(packet, density, pressure),
+          section,
+          energy: Math.round(clamp(percent(ucm.energy, density * 100), 0, 100)),
+          density: Math.round(clamp(density * 72 + resource * 18 + pressure * 10, 8, 92)),
+          swing: Math.round(clamp(4 + micro * 7 + organic * 5 - pressure * 2, 0, 18)),
+          humanize: Math.round(clamp(30 + micro * 24 + ghost * 20 + organic * 12, 18, 92)),
+          kit: drumKit(profile, packet, drum, pressure),
+          frame,
+          risk: Math.round(clamp(16 + pressure * 24 + micro * 12, 8, 58)),
+          space: Math.round(clamp(24 + voidness * 38 + unit(gradient.haze) * 18 - pressure * 12, 12, 86)),
+          lift: Math.round(clamp(22 + resource * 30 + pressure * 24 + density * 16, 12, 86)),
+          fillDemand: Math.round(clamp(10 + micro * 24 + pressure * 18 + (section === "chorus" ? 12 : 0), 4, 68)),
+          crashGate: pressure > 0.62 && section !== "bridge"
+        },
+        density: round3(density),
+        pressure: round3(pressure),
+        next: "preview via drum-floor adapter; use raw-drum-candidate-export only after human review"
+      };
+    }
+
+    function translateNamima(packet) {
+      const routing = asObject(packet.routing);
+      const namima = asObject(routing.namima);
+      const moodIntent = asObject(namima.mood_intent);
+      const gradient = asObject(asObject(packet.reference_gradient).weights);
+      const ucm = asObject(packet.ucm_state);
+      const energy = percent(ucm.energy) / 100;
+      const voidness = percent(ucm.void) / 100;
+      const circle = percent(ucm.circle) / 100;
+      const observer = percent(ucm.observer) / 100;
+      const calm = circle * 0.3 + observer * 0.28 + voidness * 0.2 + unit(gradient.haze) * 0.22;
+      const moodText = String(moodIntent.mood || namima.mood_intent || "").toLowerCase();
+      let mood = "water_day";
+      if (namima.family_safe === false) {
+        mood = "family_room";
+      } else if (moodText.includes("transparent") || voidness > 0.58) {
+        mood = energy < 0.28 ? "soft_sleep" : "transparent_evening";
+      } else if (moodText.includes("garden") || calm > 0.62) {
+        mood = "garden_morning";
+      } else if (moodText.includes("family") || energy > 0.52) {
+        mood = "family_room";
+      } else if (moodText.includes("sleep")) {
+        mood = "soft_sleep";
+      }
+      const waterMotion = unit(namima.water_motion, percent(ucm.wave, 35) / 100);
+      const brightness = Math.min(unit(namima.brightness, unit(gradient.chrome, 0.42)), 0.78);
+      const calmContinuity = unit((circle + observer) / 2, 0.45);
+      const energyCap = Math.min(unit(moodIntent.safe_energy_cap, 0.54), 0.62);
+      return {
+        enabled: namima.enabled !== false,
+        review_only: true,
+        mood,
+        family_safe: namima.family_safe !== false,
+        intent: {
+          water_motion: round3(waterMotion),
+          brightness: round3(brightness),
+          calm_continuity: round3(calmContinuity),
+          energy_cap: round3(energyCap),
+          foreground_energy: round3(Math.min(energy, 0.52))
+        },
+        next: "review safe mood only; no dark glitch, bass pressure, upload, or raw trace"
+      };
+    }
+
+    function openclawSummary(packet) {
+      const openclaw = asObject(asObject(packet.routing).openclaw);
+      return {
+        enabled: openclaw.enabled !== false,
+        promotion_status: String(openclaw.promotion_status || "draft"),
+        human_review_required: openclaw.human_review_required === true,
+        next: "turn listening notes into a small repo-specific PR only after human approval"
+      };
+    }
+
+    function drumProfile(packet, drum, gradient, density, pressure) {
+      const style = String(asObject(drum.groove_intent).style || "").toLowerCase();
+      const section = String(drum.section || "").toLowerCase();
+      const mode = String(packet.mode || "").toLowerCase();
+      if (style.includes("dry_grid") || mode.includes("techno")) return "breakbeat_live";
+      if (style.includes("ghost_pressure") || pressure > 0.68 || section === "punch") return "raw_live_drum_drive";
+      if (style.includes("broken") || mode.includes("idm") || unit(gradient.micro) > 0.48) return "nerdy_jazzy_hiphop";
+      if (section === "void" || unit(gradient.haze) > 0.56 || density < 0.26) return "dubby_half_time";
+      return "nerdy_jazzy_hiphop";
+    }
+
+    function drumFrame(profile, packet, drum, gradient, pressure) {
+      const section = String(drum.section || "").toLowerCase();
+      const style = String(asObject(drum.groove_intent).style || "").toLowerCase();
+      const mode = String(packet.mode || "").toLowerCase();
+      if (profile === "raw_live_drum_drive") return "raw_live_break_drive";
+      if (style.includes("dry_grid") || pressure > 0.66) return "live_break_pressure";
+      if (section === "void" || unit(gradient.haze) > 0.58 || mode === "ambient") return "dub_space_lift";
+      if (style.includes("broken") || unit(gradient.micro) > 0.46) return "jazzy_ghost_glue";
+      return "deep_neo_soul_pocket";
+    }
+
+    function drumKit(profile, packet, drum, pressure) {
+      const section = String(drum.section || "").toLowerCase();
+      const style = String(asObject(drum.groove_intent).style || "").toLowerCase();
+      const mode = String(packet.mode || "").toLowerCase();
+      if (section === "void" || mode === "ambient") return "dub_space";
+      if (profile === "raw_live_drum_drive" || pressure > 0.66) return "live_breaker";
+      if (style.includes("broken") || style.includes("soft")) return "dusty_pocket";
+      return "hard_bop_room";
+    }
+
+    function estimateBpm(packet, density, pressure) {
+      const mode = String(packet.mode || "").toLowerCase();
+      if (mode.includes("techno")) return 126;
+      if (mode.includes("idm") || mode.includes("reference_gradient")) return Math.round(96 + density * 28 + pressure * 10);
+      if (mode.includes("ambient")) return Math.round(72 + density * 18);
+      return Math.round(84 + density * 34 + pressure * 10);
+    }
+
+    function drumSection(value) {
+      const mapping = {
+        drift: "verse",
+        repeat: "chorus",
+        punch: "chorus",
+        void: "bridge",
+        self_running: "verse",
+        manual: "verse",
+        intro: "verse",
+        verse: "verse",
+        chorus: "chorus",
+        bridge: "bridge",
+        end: "end"
+      };
+      return mapping[String(value || "").toLowerCase()] || "verse";
+    }
+
+    function renderPacketInspection(inspection) {
+      const drum = inspection.drum_floor;
+      const namima = inspection.namima;
+      const packet = inspection.packet;
+      const statusText = inspection.ok
+        ? `OK: ${packet.session_id || "Music packet"} をreview-onlyで翻訳しました。`
+        : `Review needed: ${inspection.errors.length} error(s)。`;
+      const warningText = inspection.warnings.length ? `<p>Warnings: ${escapeHtml(inspection.warnings.join(" / "))}</p>` : "";
+      const errorText = inspection.errors.length ? `<p>Errors: ${escapeHtml(inspection.errors.join(" / "))}</p>` : "";
+      const raw = {
+        packet,
+        drum_floor: drum,
+        namima,
+        openclaw: inspection.openclaw,
+        warnings: inspection.warnings,
+        errors: inspection.errors
+      };
+      return `
+        <div class="packet-status ${inspection.ok ? "ok" : "error"}">
+          <strong>${escapeHtml(statusText)}</strong>
+          ${warningText}
+          ${errorText}
+        </div>
+        <div class="packet-result-grid">
+          <div class="packet-result-card">
+            <h3>Packet</h3>
+            <p>mode: ${escapeHtml(packet.mode || "n/a")}</p>
+            <p>energy: ${escapeHtml(packet.ucm.energy)} / void: ${escapeHtml(packet.ucm.void)}</p>
+            <p>haze: ${escapeHtml(packet.reference_gradient.haze)} / micro: ${escapeHtml(packet.reference_gradient.micro)}</p>
+          </div>
+          <div class="packet-result-card">
+            <h3>drum-floor</h3>
+            <p>${escapeHtml(drum.profile)} / ${escapeHtml(drum.frame)}</p>
+            <p>bpm ${escapeHtml(drum.controls.bpm)} / density ${escapeHtml(drum.controls.density)} / pressure ${escapeHtml(drum.pressure)}</p>
+            <p>kit: ${escapeHtml(drum.controls.kit)}</p>
+          </div>
+          <div class="packet-result-card">
+            <h3>namima</h3>
+            <p>mood: ${escapeHtml(namima.mood)}</p>
+            <p>water ${escapeHtml(namima.intent.water_motion)} / brightness ${escapeHtml(namima.intent.brightness)}</p>
+            <p>family-safe: ${escapeHtml(namima.family_safe ? "yes" : "no")}</p>
+          </div>
+        </div>
+        <pre>${escapeHtml(JSON.stringify(raw, null, 2))}</pre>
+      `;
+    }
+
+    function asObject(value) {
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    }
+
+    function unit(value, fallback = 0) {
+      const number = Number(value);
+      return Number.isFinite(number) ? clamp(number, 0, 1) : fallback;
+    }
+
+    function percent(value, fallback = 0) {
+      const number = Number(value);
+      return Number.isFinite(number) ? clamp(number, 0, 100) : fallback;
+    }
+
+    function round3(value) {
+      return Math.round(value * 1000) / 1000;
+    }
+
+    function clamp(value, minimum, maximum) {
+      return Math.min(maximum, Math.max(minimum, value));
     }
 
     function escapeHtml(value) {
