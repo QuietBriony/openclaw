@@ -10,8 +10,11 @@ namima、chill、OpenClaw に渡すための短い地図です。
 3. Music の `SYNC` を押す。
 4. OpenClaw を開く: <https://quietbriony.github.io/openclaw/>
 5. `Packet Inspector` に latest SYNC が自動表示される。
-6. `OK` が出たら、下の `Next` を読む。
-7. やりたい方向の `指示文をコピー` を押して、このチャットへ貼る。
+6. `drum-floorへ`、`namimaへ`、`chillへ` のどれで遊ぶか決める。
+7. 行き先を開いて、音を出すボタンだけ押す。
+   - drum-floor: `AI Live / 再生`
+   - namima: `Tap to start`
+   - chill: `START`
 
 JSONファイル選択と貼り付け欄は、localhostの別portなどでSYNCが届かない時のfallbackです。
 

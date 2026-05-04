@@ -752,7 +752,7 @@
         <div>
           <h1>Music SYNCを、次の制作指示にする。</h1>
           <p class="summary">
-            Musicで良い瞬間を見つけたら`SYNC`を押す。ここではdrum-floorならどんなドラムへ、namimaならどんな空気へ、chillならどんなtrioへ渡すかが見えます。ここでは実行しません。判断だけを軽くします。
+            Musicで良い瞬間を見つけたら`SYNC`。ここでは「ドラムへ」「空気へ」「ピアノtrioへ」「Musicを磨く」だけ決めます。実行はしません。
           </p>
         </div>
         <div class="hero-actions">
@@ -768,8 +768,8 @@
       </div>
 
       <aside class="command-panel" aria-label="Dry-run commands">
-        <h2>セッション選択</h2>
-        <p class="muted">通常は`Music Orchestra Board`を選べばOK。CLIは予備ルートとして下に出します。</p>
+        <h2>制作ルート</h2>
+        <p class="muted">ふだんは Music Orchestra Board だけでOK。CLIや候補生成は必要な時だけ開きます。</p>
         <div class="session-switcher" id="session-switcher" aria-label="Session examples"></div>
         <div class="command-list" id="commands">
           <pre>Loading manifest...</pre>
@@ -782,7 +782,7 @@
         <h2>SYNCを読む</h2>
         <span>Musicの状態を、次の制作判断に翻訳します。</span>
       </div>
-      <p class="muted">Musicの状態を読むだけの入口です。SYNC済みなら自動で表示します。JSON選択/貼り付けはfallbackです。アップロード、録音、arm、生成はしません。</p>
+      <p class="muted">MusicでSYNCしたら、ここに最新の翻訳が自動で出ます。アップロード、録音、arm、生成はしません。</p>
       <div class="packet-guide">
         <div class="packet-mini-step">
           <strong>1. MusicでSYNC</strong>
@@ -790,7 +790,7 @@
         </div>
         <div class="packet-mini-step">
           <strong>2. ここで読む</strong>
-          <span>latest SYNCを自動表示。届かない時だけJSON fallback。</span>
+          <span>latest SYNCを自動表示。</span>
         </div>
         <div class="packet-mini-step">
           <strong>3. 次を決める</strong>
@@ -799,21 +799,24 @@
       </div>
       <div class="packet-panel">
         <div class="packet-controls">
-          <label for="packet-file">
-            MusicのJSONファイル fallback
-            <input id="packet-file" type="file" accept=".json,application/json">
-          </label>
-          <label for="packet-input">
-            JSONを貼る fallback
-            <textarea id="packet-input" spellcheck="false" placeholder="{ &quot;source_repo&quot;: &quot;Music&quot;, ... }"></textarea>
-          </label>
-          <div class="packet-actions">
-            <button class="packet-button primary" id="packet-inspect-button" type="button">読む</button>
-            <button class="packet-button secondary" id="packet-clear-button" type="button">消す</button>
-          </div>
+          <details class="packet-detail">
+            <summary>JSON fallbackを開く</summary>
+            <label for="packet-file">
+              MusicのJSONファイル
+              <input id="packet-file" type="file" accept=".json,application/json">
+            </label>
+            <label for="packet-input">
+              JSONを貼る
+              <textarea id="packet-input" spellcheck="false" placeholder="{ &quot;source_repo&quot;: &quot;Music&quot;, ... }"></textarea>
+            </label>
+            <div class="packet-actions">
+              <button class="packet-button primary" id="packet-inspect-button" type="button">fallbackを読む</button>
+              <button class="packet-button secondary" id="packet-clear-button" type="button">消す</button>
+            </div>
+          </details>
         </div>
         <div class="packet-output" id="packet-inspect-output" aria-live="polite">
-          <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。JSON選択はfallbackです。</div>
+          <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。</div>
           <div class="packet-next-grid">
             <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
             <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>
@@ -828,7 +831,7 @@
         <div class="start-card">
           <strong>1</strong>
           <h3>Musicを聴く</h3>
-          <p class="muted">良い瞬間、崩れた瞬間、方向が見えた瞬間で`JSON`。</p>
+          <p class="muted">良い瞬間、崩れた瞬間、方向が見えた瞬間で`SYNC`。</p>
         </div>
         <div class="start-card">
           <strong>2</strong>
@@ -842,8 +845,8 @@
         </div>
         <div class="start-card">
           <strong>4</strong>
-          <h3>小さく反映</h3>
-          <p class="muted">必要なrepoだけ磨いて、Pagesで聴き直す。</p>
+          <h3>開いて聴く</h3>
+          <p class="muted">drum-floorは再生、namimaはTap、chillはSTART。</p>
         </div>
       </div>
     </section>
