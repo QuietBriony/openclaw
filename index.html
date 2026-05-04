@@ -460,6 +460,42 @@
       line-height: 1.42;
     }
 
+    .packet-copy-button {
+      min-height: 38px;
+      margin-top: 4px;
+      border: 1px solid #4a5948;
+      background: #172117;
+      color: var(--accent);
+      border-radius: 7px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .packet-copy-button.is-copied {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .packet-copy-fallback {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .packet-copy-fallback textarea {
+      min-height: 104px;
+      resize: vertical;
+      border: 1px solid #4a5948;
+      background: #0b0d0b;
+      color: #d9ead2;
+      border-radius: 7px;
+      padding: 8px;
+      font: 0.78rem/1.42 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
     .packet-controls,
     .packet-output {
       border: 1px solid var(--line);
@@ -754,7 +790,7 @@
         </div>
         <div class="packet-mini-step">
           <strong>2. ここで読む</strong>
-          <span>ファイルを選ぶか、JSONを貼って`読む`。</span>
+          <span>ファイルを選ぶか、JSONを貼って「読む」。</span>
         </div>
         <div class="packet-mini-step">
           <strong>3. 次を決める</strong>
@@ -780,7 +816,7 @@
           <div class="packet-status">ここに結果が出ます。まずはMusicのJSONを選んでください。</div>
           <div class="packet-next-grid">
             <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
-            <div class="packet-next-card"><strong>その後</strong><span>このチャットで「このpacketでdrum強め」みたいに言えば進められます。</span></div>
+            <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>
           </div>
         </div>
       </div>
@@ -1106,10 +1142,42 @@
           <div class="packet-status">ここに結果が出ます。まずはMusicのJSONを選んでください。</div>
           <div class="packet-next-grid">
             <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
-            <div class="packet-next-card"><strong>その後</strong><span>このチャットで「このpacketでdrum強め」みたいに言えば進められます。</span></div>
+            <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>
           </div>
         `;
       });
+      output.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-copy-prompt]");
+        if (!button) return;
+        const prompt = decodeURIComponent(button.dataset.copyPrompt || "");
+        if (!prompt) return;
+        const copied = await copyText(prompt);
+        const card = button.closest(".packet-next-card");
+        card?.querySelector(".packet-copy-fallback")?.remove();
+        if (!copied && card) {
+          showCopyFallback(card, prompt);
+        }
+        button.classList.toggle("is-copied", copied);
+        button.textContent = copied ? "コピー済み" : "コピーできません";
+        window.setTimeout(() => {
+          button.classList.remove("is-copied");
+          button.textContent = "指示文をコピー";
+        }, 1600);
+      });
+    }
+
+    function showCopyFallback(card, prompt) {
+      const label = document.createElement("label");
+      label.className = "packet-copy-fallback";
+      const hint = document.createElement("span");
+      hint.textContent = "自動コピーできない時は、この文を選択してコピーしてください。";
+      const textarea = document.createElement("textarea");
+      textarea.value = prompt;
+      label.appendChild(hint);
+      label.appendChild(textarea);
+      card.appendChild(label);
+      textarea.focus();
+      textarea.select();
     }
 
     function inspectMusicSessionPacket(packet) {
@@ -1360,6 +1428,7 @@
         warnings: inspection.warnings,
         errors: inspection.errors
       };
+      const promptCards = renderPromptCards(buildPromptSuggestions(packet, drum, namima, inspection.openclaw));
       return `
         <div class="packet-status ${inspection.ok ? "ok" : "error"}">
           <strong>${escapeHtml(statusText)}</strong>
@@ -1404,11 +1473,90 @@
             <span>「このpacketで次PR切って」と言う。OpenClawは候補と手順だけ作る。</span>
           </div>
         </div>
+        <div class="soft-section-title">
+          <h2>このチャットへ投げる</h2>
+          <span>やりたい方向の指示文をコピーして、そのまま貼ればOKです。</span>
+        </div>
+        <div class="packet-next-grid">
+          ${promptCards}
+        </div>
         <details class="packet-detail">
           <summary>詳細JSONを見る</summary>
           <pre>${escapeHtml(JSON.stringify(raw, null, 2))}</pre>
         </details>
       `;
+    }
+
+    function buildPromptSuggestions(packet, drum, namima, openclaw) {
+      const session = packet.session_id || "Music packet";
+      const mode = packet.mode || "unknown";
+      const energy = packet.ucm?.energy ?? "n/a";
+      const voidness = packet.ucm?.void ?? "n/a";
+      const drumProfile = drum.profile || "drum-floor profile";
+      const drumFrame = drum.frame || "frame";
+      const namimaMood = namima.mood || "namima mood";
+      const promotion = openclaw.promotion_status || "draft";
+      return [
+        {
+          title: "Musicを磨く",
+          body: "今の音色と間をMusic側で育てる。",
+          prompt: `このMusic packetを基準に、Music側を小さく磨いて。session=${session}, mode=${mode}, energy=${energy}, void=${voidness}。音数を増やすより、音色差、間、低域安全、producer habitsを優先して。実装するなら小PRで、音声ファイル/サンプル/歌詞/依存追加なし。`
+        },
+        {
+          title: "drum-floorへ",
+          body: `${drumProfile} / ${drumFrame}寄りでドラム候補へ。`,
+          prompt: `このMusic packetをdrum-floorへ渡す前提で、${drumProfile} / ${drumFrame}寄りのドラム候補設計に進めて。density=${drum.controls?.density}, pressure=${drum.pressure}, bpm=${drum.controls?.bpm}。自動arm/録音/uploadなし、候補生成やPRは人間確認つきで。`
+        },
+        {
+          title: "namimaへ",
+          body: `${namimaMood}として安全な空気へ。`,
+          prompt: `このMusic packetのmoodをnamimaへ翻訳して、${namimaMood}寄りのfamily-safe ambientとして磨いて。water=${namima.intent?.water_motion}, brightness=${namima.intent?.brightness}, energy_cap=${namima.intent?.energy_cap}。暗いglitchや低域圧は足さず、音声/サンプル/生trace保存なし。`
+        },
+        {
+          title: "OpenClawに任せる",
+          body: `promotion=${promotion}のまま安全に次PRを切る。`,
+          prompt: `このpacketでOpenClaw制作卓として次の小PRを切って。session=${session}, promotion=${promotion}。まず対象repoと狙いを整理し、必要最小変更で進めて。生成/録音/arm/upload/mergeは人間確認つき、秘密や音声ファイルはGitHubへ載せない。`
+        }
+      ];
+    }
+
+    function renderPromptCards(cards) {
+      return cards.map((card) => {
+        const encoded = encodeURIComponent(card.prompt);
+        return `
+          <div class="packet-next-card">
+            <strong>${escapeHtml(card.title)}</strong>
+            <span>${escapeHtml(card.body)}</span>
+            <button class="packet-copy-button" type="button" data-copy-prompt="${escapeHtml(encoded)}">指示文をコピー</button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (error) {
+        // 古いブラウザ向けのローカルコピー経路へ進みます。
+      }
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      let ok = false;
+      try {
+        ok = document.execCommand("copy");
+      } catch (error) {
+        ok = false;
+      }
+      textarea.remove();
+      return ok;
     }
 
     function asObject(value) {

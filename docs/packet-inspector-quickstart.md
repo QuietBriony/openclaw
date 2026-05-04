@@ -11,6 +11,7 @@ namima に渡すための短い地図です。
 4. OpenClaw を開く: <https://quietbriony.github.io/openclaw/>
 5. `Packet Inspector` で保存した JSON を選ぶ。
 6. `OK` が出たら、下の `Next` を読む。
+7. やりたい方向の `指示文をコピー` を押して、このチャットへ貼る。
 
 ## 結果の見方
 
@@ -18,6 +19,7 @@ namima に渡すための短い地図です。
 - `drum-floorへ`: ドラムに渡すなら profile、frame、kit、bpm がどうなるか。
 - `namimaへ`: 水面/庭/家族向け ambient に渡すなら mood がどうなるか。
 - `Next`: 次に人間が何を頼むか。
+- `このチャットへ投げる`: そのまま貼れる指示文。
 
 ## このチャットで言うこと
 
@@ -44,6 +46,8 @@ OpenClaw に任せるなら:
 ```text
 このpacketで次PR切って。生成や録音はまだしないで
 ```
+
+画面上では、上のような文を `指示文をコピー` で作れます。
 
 ## やらないこと
 
