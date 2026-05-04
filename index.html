@@ -735,10 +735,10 @@
     <nav class="topbar" aria-label="OpenClaw links">
       <div class="brand">
         <strong>OpenClaw 制作卓</strong>
-        <span>Music JSONを読み、次の制作指示に変える入口</span>
+        <span>Music SYNCを読み、次の制作指示に変える入口</span>
       </div>
       <div class="links">
-        <a class="pill" href="docs/packet-inspector-quickstart.md">JSON最短</a>
+        <a class="pill" href="docs/packet-inspector-quickstart.md">SYNC最短</a>
         <a class="pill" href="docs/manual.md">使い方</a>
         <a class="pill" href="README.md">README</a>
         <a class="pill" href="docs/session-runbook.md">手順</a>
@@ -750,13 +750,13 @@
     <section class="hero">
       <div class="intro">
         <div>
-          <h1>Music JSONを、次の制作指示にする。</h1>
+          <h1>Music SYNCを、次の制作指示にする。</h1>
           <p class="summary">
-            Musicで良い瞬間を見つけたら`JSON`を押す。そのJSONをここで読むと、drum-floorならどんなドラムへ、namimaならどんな空気へ渡すかが見えます。ここでは実行しません。判断だけを軽くします。
+            Musicで良い瞬間を見つけたら`SYNC`を押す。ここではdrum-floorならどんなドラムへ、namimaならどんな空気へ、chillならどんなtrioへ渡すかが見えます。ここでは実行しません。判断だけを軽くします。
           </p>
         </div>
         <div class="hero-actions">
-          <a class="hero-action primary" href="#packet-inspector">JSONを読む</a>
+          <a class="hero-action primary" href="#packet-inspector">SYNCを読む</a>
           <a class="hero-action" href="https://quietbriony.github.io/Music/">Musicを開く</a>
           <a class="hero-action" href="docs/packet-inspector-quickstart.md">最短手順</a>
         </div>
@@ -779,32 +779,32 @@
 
     <section class="wide-panel primary-panel" id="packet-inspector" aria-label="Packet Inspector">
       <div class="soft-section-title">
-        <h2>JSONを読む</h2>
+        <h2>SYNCを読む</h2>
         <span>Musicの状態を、次の制作判断に翻訳します。</span>
       </div>
-      <p class="muted">Musicの状態を読むだけの入口です。JSONを選ぶと「ドラムならこう」「namimaならこう」「次はこう聴く」が出ます。アップロード、録音、arm、生成はしません。</p>
+      <p class="muted">Musicの状態を読むだけの入口です。SYNC済みなら自動で表示します。JSON選択/貼り付けはfallbackです。アップロード、録音、arm、生成はしません。</p>
       <div class="packet-guide">
         <div class="packet-mini-step">
-          <strong>1. MusicでJSON</strong>
-          <span>Musicを聴いて、良い瞬間で`JSON`を押す。</span>
+          <strong>1. MusicでSYNC</strong>
+          <span>Musicを聴いて、良い瞬間で`SYNC`を押す。</span>
         </div>
         <div class="packet-mini-step">
           <strong>2. ここで読む</strong>
-          <span>ファイルを選ぶか、JSONを貼って「読む」。</span>
+          <span>latest SYNCを自動表示。届かない時だけJSON fallback。</span>
         </div>
         <div class="packet-mini-step">
           <strong>3. 次を決める</strong>
-          <span>Musicを磨く、drum-floorへ渡す、namimaへ渡す、のどれかを選ぶ。</span>
+          <span>Musicを磨く、drum-floorへ渡す、namimaへ渡す、chillで弾く、のどれかを選ぶ。</span>
         </div>
       </div>
       <div class="packet-panel">
         <div class="packet-controls">
           <label for="packet-file">
-            MusicのJSONファイル
+            MusicのJSONファイル fallback
             <input id="packet-file" type="file" accept=".json,application/json">
           </label>
           <label for="packet-input">
-            JSONを貼る
+            JSONを貼る fallback
             <textarea id="packet-input" spellcheck="false" placeholder="{ &quot;source_repo&quot;: &quot;Music&quot;, ... }"></textarea>
           </label>
           <div class="packet-actions">
@@ -813,7 +813,7 @@
           </div>
         </div>
         <div class="packet-output" id="packet-inspect-output" aria-live="polite">
-          <div class="packet-status">ここに結果が出ます。まずはMusicのJSONを選んでください。</div>
+          <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。JSON選択はfallbackです。</div>
           <div class="packet-next-grid">
             <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
             <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>
@@ -858,8 +858,8 @@
           <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
         </a>
         <a class="manual-link" href="docs/packet-inspector-quickstart.md">
-          <strong>JSON最短手順</strong>
-          <span>Music JSONを貼った後、何を見るか、次に何を言うか。</span>
+          <strong>SYNC最短手順</strong>
+          <span>Music SYNCの後、何を見るか、次に何を言うか。</span>
         </a>
         <a class="manual-link" href="docs/surface-local-producer.md">
           <strong>Surfaceローカル</strong>
@@ -1008,7 +1008,7 @@
       const chillUrl = manifest.connectors?.chill?.runtime_url;
       const musicUrl = manifest.connectors?.music?.runtime_url || "https://quietbriony.github.io/Music/";
       const musicPacketBoard = manifest.session_mode === "music_orchestra_mission_board"
-        ? commandBlock("Music JSON", "MusicでJSONを作り、このページで読むのが基本です。CLIは予備です。", `${musicUrl}\nMusicでJSONを押す\nOpenClaw -> JSONを読む -> ファイル選択\nCLI予備: python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
+        ? commandBlock("Music SYNC", "MusicでSYNCし、このページでlatestを読むのが基本です。JSONファイルとCLIは予備です。", `${musicUrl}\nMusicでSYNCを押す\nOpenClaw -> SYNCを読む -> 自動表示\nFallback: JSONファイル選択 / python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
         : "";
       const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
         ? commandBlock("Chill Trioを開く", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
@@ -1112,7 +1112,7 @@
       const runInspect = () => {
         const raw = textInput.value.trim();
         if (!raw) {
-          output.innerHTML = `<div class="packet-status error">Music packet JSONを選ぶか貼り付けてください。</div>`;
+          output.innerHTML = `<div class="packet-status error">MusicでSYNCするか、fallbackのJSONを選ぶ/貼るかしてください。</div>`;
           return;
         }
         try {
@@ -1174,7 +1174,7 @@
         fileInput.value = "";
         textInput.value = "";
         output.innerHTML = `
-          <div class="packet-status">ここに結果が出ます。まずはMusicのJSONを選んでください。</div>
+          <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。JSON選択はfallbackです。</div>
           <div class="packet-next-grid">
             <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
             <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>

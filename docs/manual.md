@@ -91,13 +91,14 @@ Music packet board の流れを見る:
 python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.example.json
 ```
 
-Music で `JSON` を押して保存した packet を読む:
+Music で `SYNC` した packet を読む:
 
 Pagesで簡単に見る:
 
 1. OpenClaw Main Desk を開く。
-2. `Packet Inspector` の file chooser で Music の JSON を選ぶ。
-3. drum-floor / namima / OpenClaw の review-only translation を読む。
+2. Music Pagesで `SYNC` 済みなら latest packet が自動表示される。
+3. `drum-floorへ` / `namimaへ` / `chillへ` / `OpenClaw` の review-only translation を読む。
+4. JSON file chooser と貼り付け欄は、localhostの別portなどでSYNCが届かない時だけ使う。
 
 Surface PC の CLI で見る:
 
@@ -105,7 +106,7 @@ Surface PC の CLI で見る:
 python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 ```
 
-これは drum-floor / namima への翻訳を表示するだけで、ブラウザ音声、録音、
+これは drum-floor / namima / chill への翻訳を表示するだけで、ブラウザ音声、録音、
 候補生成、arm、upload は実行しません。
 
 候補を生成して inspect する:
@@ -168,11 +169,17 @@ python .\openclaw_cli.py local-generate sessions\examples\raw-drum-candidate-exp
 
 `Music Orchestra Mission Board`
 
-- `Music`: human clicks `JSON` and reviews metadata-only packet
+- `Music`: human clicks `SYNC` and reviews metadata-only packet
 - `drum-floor`: translates `routing.drum_floor` to preview controls
 - `namima`: translates `routing.namima` to family-safe mood
-- `chill`: observe-only trio context
+- `chill`: translates `routing.chill` to quiet piano/bass/trio stance
 - no local-generate; use raw drum export only after human review
+
+## drum-floor の3役
+
+- `drum-floor standalone`: drum-floor Pagesで合成ドラムを手動previewする。Music SYNCでcontrolsが寄り、`再生` は人間が押す。
+- `chill DRUMS`: chill/session内のsoft pocket。chillがピアノ、ベース、flow、START/PANICを所有する。
+- `OpenClaw raw candidate`: Surface CLIでMIDI候補を生成/inspectする別導線。live arm、録音、uploadはしない。
 
 `Soft Piano + Raw Drums`
 
