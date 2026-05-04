@@ -1242,6 +1242,7 @@
         packet: packetSummary(packet),
         drum_floor: translateDrumFloor(packet),
         namima: translateNamima(packet),
+        chill: translateChill(packet),
         openclaw: openclawSummary(packet),
         warnings,
         errors
@@ -1274,7 +1275,7 @@
       });
 
       const routing = asObject(packet.routing);
-      ["drum_floor", "namima", "openclaw"].forEach((key) => {
+      ["drum_floor", "namima", "chill", "openclaw"].forEach((key) => {
         if (!(key in routing)) warnings.push(`routing.${key} is missing`);
       });
       if (asObject(routing.openclaw).human_review_required !== true) {
@@ -1397,6 +1398,51 @@
       };
     }
 
+    function translateChill(packet) {
+      const routing = asObject(packet.routing);
+      const chill = asObject(routing.chill);
+      const intent = asObject(chill.trio_intent);
+      const gradient = asObject(asObject(packet.reference_gradient).weights);
+      const ucm = asObject(packet.ucm_state);
+      const energy = percent(ucm.energy, 32) / 100;
+      const creation = percent(ucm.creation, 28) / 100;
+      const voidness = percent(ucm.void, 24) / 100;
+      const observer = percent(ucm.observer, 48) / 100;
+      const memory = unit(gradient.memory, 0.34);
+      const haze = unit(gradient.haze, 0.38);
+      const micro = unit(gradient.micro, 0.24);
+      const ghost = unit(gradient.ghost, 0.24);
+      const referenceText = String(intent.reference_id || intent.referenceId || "").toLowerCase();
+      const reference = ["piano-jazz-chill", "rainy-lofi-room", "soft-solo-drift"].includes(referenceText)
+        ? referenceText
+        : memory > 0.5
+          ? "soft-solo-drift"
+          : haze > 0.52 || unit(gradient.chrome) > 0.46
+            ? "rainy-lofi-room"
+            : "piano-jazz-chill";
+      const touch = unit(intent.touch, clamp(0.16 + energy * 0.24 + micro * 0.12 - voidness * 0.1, 0.08, 0.68));
+      const phrase = unit(intent.phrase, clamp(0.12 + creation * 0.22 + memory * 0.16 + ghost * 0.08, 0.08, 0.72));
+      const room = unit(intent.room, clamp(0.54 + voidness * 0.2 + observer * 0.12 + haze * 0.12 - energy * 0.12, 0.42, 0.94));
+      const drumSupport = unit(chill.drum_support, energy * 0.28 + ghost * 0.2 + micro * 0.12 - voidness * 0.18);
+      return {
+        enabled: chill.enabled !== false,
+        review_only: true,
+        reference,
+        trio: {
+          touch: round3(touch),
+          phrase: round3(phrase),
+          room: round3(room),
+          bass_on: intent.bass_on !== false,
+          flow_on: intent.flow_on !== false,
+          drums_suggested: Boolean(intent.drums_suggested ?? (drumSupport > 0.34 && voidness < 0.58)),
+          pressure_target: ["safe", "warm", "full"].includes(intent.pressure_target) ? intent.pressure_target : energy > 0.58 ? "safe" : "warm"
+        },
+        piano_memory: round3(unit(chill.piano_memory, memory * 0.45 + haze * 0.22)),
+        drum_support: round3(drumSupport),
+        next: "open chill session; START remains human-operated"
+      };
+    }
+
     function openclawSummary(packet) {
       const openclaw = asObject(asObject(packet.routing).openclaw);
       return {
@@ -1467,6 +1513,7 @@
     function renderPacketInspection(inspection, options = {}) {
       const drum = inspection.drum_floor;
       const namima = inspection.namima;
+      const chill = inspection.chill;
       const packet = inspection.packet;
       const statusText = inspection.ok
         ? `OK: ${packet.session_id || "Music packet"} を安全に読みました。`
@@ -1478,11 +1525,12 @@
         packet,
         drum_floor: drum,
         namima,
+        chill,
         openclaw: inspection.openclaw,
         warnings: inspection.warnings,
         errors: inspection.errors
       };
-      const promptCards = renderPromptCards(buildPromptSuggestions(packet, drum, namima, inspection.openclaw));
+      const promptCards = renderPromptCards(buildPromptSuggestions(packet, drum, namima, chill, inspection.openclaw));
       return `
         <div class="packet-status ${inspection.ok ? "ok" : "error"}">
           <strong>${escapeHtml(statusText)}</strong>
@@ -1509,6 +1557,12 @@
             <p>water ${escapeHtml(namima.intent.water_motion)} / brightness ${escapeHtml(namima.intent.brightness)}</p>
             <p>family-safe: ${escapeHtml(namima.family_safe ? "yes" : "no")}</p>
           </div>
+          <div class="packet-result-card">
+            <h3>chillへ</h3>
+            <p>${escapeHtml(chill.reference)} / piano memory ${escapeHtml(chill.piano_memory)}</p>
+            <p>touch ${escapeHtml(chill.trio.touch)} / phrase ${escapeHtml(chill.trio.phrase)} / room ${escapeHtml(chill.trio.room)}</p>
+            <p>bass ${escapeHtml(chill.trio.bass_on ? "on" : "off")} / drums ${escapeHtml(chill.trio.drums_suggested ? "ready" : "off")}</p>
+          </div>
         </div>
         <div class="packet-next-grid">
           <div class="packet-next-card">
@@ -1522,6 +1576,10 @@
           <div class="packet-next-card">
             <strong>namimaへ流す</strong>
             <span>「namimaを${escapeHtml(namima.mood)}寄りに」と言う。水面/庭/家族向けに翻訳する。</span>
+          </div>
+          <div class="packet-next-card">
+            <strong>chillで弾く</strong>
+            <span>chill/sessionを開くと、ピアノ/ベース/trioの構えがこのpacketに寄る。STARTは人間が押す。</span>
           </div>
           <div class="packet-next-card">
             <strong>OpenClawに任せる</strong>
@@ -1542,7 +1600,7 @@
       `;
     }
 
-    function buildPromptSuggestions(packet, drum, namima, openclaw) {
+    function buildPromptSuggestions(packet, drum, namima, chill, openclaw) {
       const session = packet.session_id || "Music packet";
       const mode = packet.mode || "unknown";
       const energy = packet.ucm?.energy ?? "n/a";
@@ -1550,6 +1608,7 @@
       const drumProfile = drum.profile || "drum-floor profile";
       const drumFrame = drum.frame || "frame";
       const namimaMood = namima.mood || "namima mood";
+      const chillReference = chill.reference || "chill reference";
       const promotion = openclaw.promotion_status || "draft";
       return [
         {
@@ -1566,6 +1625,11 @@
           title: "namimaへ",
           body: `${namimaMood}として安全な空気へ。`,
           prompt: `このMusic packetのmoodをnamimaへ翻訳して、${namimaMood}寄りのfamily-safe ambientとして磨いて。water=${namima.intent?.water_motion}, brightness=${namima.intent?.brightness}, energy_cap=${namima.intent?.energy_cap}。暗いglitchや低域圧は足さず、音声/サンプル/生trace保存なし。`
+        },
+        {
+          title: "chillへ",
+          body: `${chillReference}でピアノ/ベース/trioへ。`,
+          prompt: `このMusic packetをchillのQuiet Piano Trioへ渡す前提で、${chillReference}寄りのピアノ/ベース/soft drumsを磨いて。touch=${chill.trio?.touch}, phrase=${chill.trio?.phrase}, room=${chill.trio?.room}, drums=${chill.trio?.drums_suggested ? "ready" : "off"}。STARTは人間操作、録音/uploadなし、音声ファイル/サンプル/歌詞/依存追加なし。`
         },
         {
           title: "OpenClawに任せる",
