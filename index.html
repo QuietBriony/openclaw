@@ -612,6 +612,13 @@
       font-size: 0.88rem;
     }
 
+    .packet-route-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
     .packet-next-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1546,6 +1553,28 @@
       return mapping[String(value || "").toLowerCase()] || "verse";
     }
 
+    function nextActionUrl(destination) {
+      const mapping = {
+        music: "https://quietbriony.github.io/Music/",
+        chill: "https://quietbriony.github.io/chill/session.html",
+        drum_floor: "https://quietbriony.github.io/drum-floor/",
+        namima: "https://quietbriony.github.io/namima/",
+        openclaw: "#packet-inspector"
+      };
+      return mapping[String(destination || "").trim()] || "#packet-inspector";
+    }
+
+    function nextActionButtonLabel(destination) {
+      const mapping = {
+        music: "Musicを開く",
+        chill: "chillを開く",
+        drum_floor: "drum-floorを開く",
+        namima: "namimaを開く",
+        openclaw: "このまま見る"
+      };
+      return mapping[String(destination || "").trim()] || "開く";
+    }
+
     function renderPacketInspection(inspection, options = {}) {
       const drum = inspection.drum_floor;
       const namima = inspection.namima;
@@ -1582,6 +1611,9 @@
             <p>${escapeHtml(nextAction.reason)}</p>
             <p>${escapeHtml(nextAction.action)}</p>
             <p>confidence: ${escapeHtml(nextAction.confidence)} / 手動開始: ${escapeHtml(nextAction.manual_start_required ? "yes" : "no")}</p>
+            <div class="packet-route-actions">
+              <a class="packet-button primary" href="${escapeHtml(nextActionUrl(nextAction.destination))}">${escapeHtml(nextActionButtonLabel(nextAction.destination))}</a>
+            </div>
           </div>
           <div class="packet-result-card">
             <h3>Musicの今</h3>
@@ -1613,6 +1645,7 @@
           <div class="packet-next-card">
             <strong>推奨: ${escapeHtml(nextAction.label)}</strong>
             <span>${escapeHtml(nextAction.action)}</span>
+            <a class="packet-button primary" href="${escapeHtml(nextActionUrl(nextAction.destination))}">${escapeHtml(nextActionButtonLabel(nextAction.destination))}</a>
           </div>
           <div class="packet-next-card">
             <strong>ドラムを育てる</strong>
