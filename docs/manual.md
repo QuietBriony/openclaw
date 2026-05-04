@@ -83,6 +83,12 @@ raw drum candidate export の流れを見る:
 python .\openclaw_cli.py plan sessions\examples\raw-drum-candidate-export.example.json
 ```
 
+Music packet board の流れを見る:
+
+```powershell
+python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.example.json
+```
+
 候補を生成して inspect する:
 
 ```powershell
@@ -140,6 +146,14 @@ python .\openclaw_cli.py local-generate sessions\examples\raw-drum-candidate-exp
 - `drum-floor`: `raw_live_drum_drive` + `raw_live_break_drive`
 - output: `.openclaw-local/candidates/`
 - no Ableton / EP-133 / chill transport auto-arm
+
+`Music Orchestra Mission Board`
+
+- `Music`: human clicks `JSON` and reviews metadata-only packet
+- `drum-floor`: translates `routing.drum_floor` to preview controls
+- `namima`: translates `routing.namima` to family-safe mood
+- `chill`: observe-only trio context
+- no local-generate; use raw drum export only after human review
 
 `Soft Piano + Raw Drums`
 

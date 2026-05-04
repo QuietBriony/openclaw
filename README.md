@@ -8,6 +8,8 @@ Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
 Manual: [docs/manual.md](docs/manual.md)
 
+Music Orchestra Mission Board: [docs/music-orchestra-mission-board.md](docs/music-orchestra-mission-board.md)
+
 ## Stack Roles
 
 - `Music`: final integrated runtime and internal producer.
@@ -24,6 +26,7 @@ Run from this directory:
 python -m openclaw validate sessions/examples/music-stack-session.example.json
 python -m openclaw doctor
 python -m openclaw plan sessions/examples/music-stack-session.example.json
+python -m openclaw plan sessions/examples/music-orchestra-mission-board.example.json
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/soft-piano-raw-drum-drive.example.json
@@ -39,6 +42,7 @@ $py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"
 python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py doctor --python $py
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
+python .\openclaw_cli.py plan sessions/examples/music-orchestra-mission-board.example.json
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
 python .\openclaw_cli.py plan sessions/examples/chill-trio-live.example.json
 python .\openclaw_cli.py plan sessions/examples/raw-drum-candidate-export.example.json

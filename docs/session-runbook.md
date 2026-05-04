@@ -25,6 +25,14 @@ Producer desk routing: [producer-desk-routing.md](producer-desk-routing.md)
 - Keep `chill` behind Music as low-density piano room, or skip it.
 - Use `namima` as mood and interaction context, not as a raw performance recorder.
 
+## Music Orchestra Mission Board
+
+- Click `JSON` in Music to create a metadata-only packet.
+- Review `routing.drum_floor` through drum-floor translation before exporting any raw candidate.
+- Review `routing.namima` through Namima mood translation before changing public ambient behavior.
+- Keep `chill` observe-only unless the session is explicitly `Chill Trio Live`.
+- Use this board for routing decisions; use `raw-drum-candidate-export.example.json` only after the human wants a drum MIDI candidate.
+
 ## Soft Piano + Raw Drum Drive Session
 
 - `Music` stays the main producer and low-end safety source.
