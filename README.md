@@ -11,6 +11,8 @@ to review drum-floor / namima routing without upload, recording, arm, or generat
 
 Manual: [docs/manual.md](docs/manual.md)
 
+Packet Inspector Quickstart: [docs/packet-inspector-quickstart.md](docs/packet-inspector-quickstart.md)
+
 Music Orchestra Mission Board: [docs/music-orchestra-mission-board.md](docs/music-orchestra-mission-board.md)
 
 ## Stack Roles

@@ -383,6 +383,36 @@
       align-items: stretch;
     }
 
+    .packet-guide {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .packet-mini-step,
+    .packet-next-card {
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+
+    .packet-mini-step strong,
+    .packet-next-card strong {
+      color: var(--accent);
+      font-size: 0.88rem;
+    }
+
+    .packet-mini-step span,
+    .packet-next-card span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.42;
+    }
+
     .packet-controls,
     .packet-output {
       border: 1px solid var(--line);
@@ -498,6 +528,12 @@
       font-size: 0.88rem;
     }
 
+    .packet-next-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
     .guard {
       min-height: 62px;
       border: 1px solid var(--line);
@@ -526,6 +562,8 @@
       .guardrails,
       .start-grid,
       .packet-panel,
+      .packet-guide,
+      .packet-next-grid,
       .manual-list {
         grid-template-columns: 1fr 1fr;
       }
@@ -550,7 +588,9 @@
       .guardrails,
       .start-grid,
       .packet-panel,
+      .packet-guide,
       .packet-result-grid,
+      .packet-next-grid,
       .manual-list,
       .status-row {
         grid-template-columns: 1fr;
@@ -588,6 +628,7 @@
       </div>
       <div class="links">
         <a class="pill" href="docs/manual.md">Manual</a>
+        <a class="pill" href="docs/packet-inspector-quickstart.md">Packet Quickstart</a>
         <a class="pill" href="README.md">README</a>
         <a class="pill" href="docs/session-runbook.md">Runbook</a>
         <a class="pill" href="docs/producer-desk-routing.md">Producer Desk</a>
@@ -649,24 +690,42 @@
 
     <section class="wide-panel" aria-label="Packet Inspector">
       <h2>Packet Inspector</h2>
-      <p class="muted">Musicで`JSON`を押して保存したpacketを選ぶだけ。ここでdrum-floor / namima / OpenClawへの翻訳をローカル表示します。アップロード、録音、arm、生成はしません。</p>
+      <p class="muted">Musicの状態を読むだけの入口です。JSONを選ぶと「ドラムならこう」「namimaならこう」「次はこう聴く」が出ます。アップロード、録音、arm、生成はしません。</p>
+      <div class="packet-guide">
+        <div class="packet-mini-step">
+          <strong>1. MusicでJSON</strong>
+          <span>Musicを聴いて、良い瞬間で`JSON`を押す。</span>
+        </div>
+        <div class="packet-mini-step">
+          <strong>2. ここで読む</strong>
+          <span>ファイルを選ぶか、JSONを貼って`読む / Inspect`。</span>
+        </div>
+        <div class="packet-mini-step">
+          <strong>3. 次を決める</strong>
+          <span>Musicを磨く、drum-floorへ渡す、namimaへ渡す、のどれかを選ぶ。</span>
+        </div>
+      </div>
       <div class="packet-panel">
         <div class="packet-controls">
           <label for="packet-file">
-            Music packet file
+            Music JSON file
             <input id="packet-file" type="file" accept=".json,application/json">
           </label>
           <label for="packet-input">
-            Paste or edit JSON
+            Paste JSON
             <textarea id="packet-input" spellcheck="false" placeholder="{ &quot;source_repo&quot;: &quot;Music&quot;, ... }"></textarea>
           </label>
           <div class="packet-actions">
-            <button class="packet-button primary" id="packet-inspect-button" type="button">Inspect Packet</button>
+            <button class="packet-button primary" id="packet-inspect-button" type="button">読む / Inspect</button>
             <button class="packet-button secondary" id="packet-clear-button" type="button">Clear</button>
           </div>
         </div>
         <div class="packet-output" id="packet-inspect-output" aria-live="polite">
-          <div class="packet-status">MusicのJSONを選ぶと、routing translationがここに出ます。</div>
+          <div class="packet-status">ここに結果が出ます。まずはMusicのJSONを選んでください。</div>
+          <div class="packet-next-grid">
+            <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
+            <div class="packet-next-card"><strong>その後</strong><span>このチャットで「このpacketでdrum強め」みたいに言えば進められます。</span></div>
+          </div>
         </div>
       </div>
     </section>
@@ -679,6 +738,10 @@
         <a class="manual-link" href="docs/manual.md">
           <strong>Full Manual</strong>
           <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
+        </a>
+        <a class="manual-link" href="docs/packet-inspector-quickstart.md">
+          <strong>Packet Quickstart</strong>
+          <span>Music JSONを貼った後、何を見るか、次に何を言うか。</span>
         </a>
         <a class="manual-link" href="docs/surface-local-producer.md">
           <strong>Surface Local</strong>
@@ -957,7 +1020,13 @@
       clearButton.addEventListener("click", () => {
         fileInput.value = "";
         textInput.value = "";
-        output.innerHTML = `<div class="packet-status">MusicのJSONを選ぶと、routing translationがここに出ます。</div>`;
+        output.innerHTML = `
+          <div class="packet-status">ここに結果が出ます。まずはMusicのJSONを選んでください。</div>
+          <div class="packet-next-grid">
+            <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
+            <div class="packet-next-card"><strong>その後</strong><span>このチャットで「このpacketでdrum強め」みたいに言えば進められます。</span></div>
+          </div>
+        `;
       });
     }
 
@@ -1217,22 +1286,40 @@
         </div>
         <div class="packet-result-grid">
           <div class="packet-result-card">
-            <h3>Packet</h3>
+            <h3>Musicの今</h3>
             <p>mode: ${escapeHtml(packet.mode || "n/a")}</p>
             <p>energy: ${escapeHtml(packet.ucm.energy)} / void: ${escapeHtml(packet.ucm.void)}</p>
             <p>haze: ${escapeHtml(packet.reference_gradient.haze)} / micro: ${escapeHtml(packet.reference_gradient.micro)}</p>
           </div>
           <div class="packet-result-card">
-            <h3>drum-floor</h3>
+            <h3>drum-floorへ</h3>
             <p>${escapeHtml(drum.profile)} / ${escapeHtml(drum.frame)}</p>
             <p>bpm ${escapeHtml(drum.controls.bpm)} / density ${escapeHtml(drum.controls.density)} / pressure ${escapeHtml(drum.pressure)}</p>
             <p>kit: ${escapeHtml(drum.controls.kit)}</p>
           </div>
           <div class="packet-result-card">
-            <h3>namima</h3>
+            <h3>namimaへ</h3>
             <p>mood: ${escapeHtml(namima.mood)}</p>
             <p>water ${escapeHtml(namima.intent.water_motion)} / brightness ${escapeHtml(namima.intent.brightness)}</p>
             <p>family-safe: ${escapeHtml(namima.family_safe ? "yes" : "no")}</p>
+          </div>
+        </div>
+        <div class="packet-next-grid">
+          <div class="packet-next-card">
+            <strong>まず聴く</strong>
+            <span>Musicに戻って、同じ方向を3〜5分聴く。良ければそのpacketを基準にする。</span>
+          </div>
+          <div class="packet-next-card">
+            <strong>ドラムを育てる</strong>
+            <span>このチャットで「drum-floorを${escapeHtml(drum.profile)}寄りで候補生成して」と言う。</span>
+          </div>
+          <div class="packet-next-card">
+            <strong>namimaへ流す</strong>
+            <span>「namimaを${escapeHtml(namima.mood)}寄りに」と言う。水面/庭/家族向けに翻訳する。</span>
+          </div>
+          <div class="packet-next-card">
+            <strong>OpenClawに任せる</strong>
+            <span>「このpacketで次PR切って」と言う。OpenClawは候補と手順だけ作る。</span>
           </div>
         </div>
         <pre>${escapeHtml(JSON.stringify(raw, null, 2))}</pre>
