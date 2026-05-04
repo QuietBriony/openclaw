@@ -1,13 +1,14 @@
 # OpenClaw
 
-OpenClaw is the human-gated session control plane for the QuietBriony music stack.
+OpenClaw は QuietBriony music stack のための、人間確認つき制作卓です。
 
-It does not make sound in v1. It reads contracts, prints safe dry-run steps, and keeps `Music`, `drum-floor`, `chill`, and `namima` in their own lanes.
+v1では音を鳴らしません。Music の `JSON` を読み、`drum-floor` / `namima`
+へ渡す制作判断を整理し、必要ならローカルCLIの予備手順も出します。
 
 Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
-The dashboard includes a local Packet Inspector: choose a Music `JSON` download
-to review drum-floor / namima routing without upload, recording, arm, or generate.
+Pages dashboard では、Music の `JSON` を選ぶだけで drum-floor / namima
+へのroutingを確認できます。アップロード、録音、arm、生成はしません。
 
 Manual: [docs/manual.md](docs/manual.md)
 

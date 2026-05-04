@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OpenClaw Main Desk</title>
+  <title>OpenClaw 制作卓</title>
   <style>
     :root {
       color-scheme: dark;
@@ -92,7 +92,7 @@
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
       gap: 18px;
       align-items: stretch;
       padding: 22px 0 18px;
@@ -143,6 +143,7 @@
       display: grid;
       align-content: space-between;
       gap: 20px;
+      min-height: 360px;
     }
 
     h1,
@@ -177,6 +178,32 @@
       color: var(--muted);
       font-size: 1rem;
       line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-action {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 7px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .hero-action.primary {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #172117;
     }
 
     .status-row {
@@ -220,8 +247,19 @@
     }
 
     .command-block {
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 8px;
+      padding: 10px;
       display: grid;
       gap: 6px;
+    }
+
+    .command-block summary {
+      cursor: pointer;
+      color: var(--accent);
+      font-size: 0.92rem;
+      font-weight: 700;
     }
 
     .command-block h3 {
@@ -271,6 +309,10 @@
       word-break: break-word;
     }
 
+    details pre {
+      margin-top: 8px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -311,6 +353,11 @@
       padding: 18px;
       display: grid;
       gap: 14px;
+    }
+
+    .primary-panel {
+      border-color: #5d7657;
+      background: #182018;
     }
 
     .steps {
@@ -378,7 +425,7 @@
 
     .packet-panel {
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+      grid-template-columns: minmax(320px, 0.86fr) minmax(0, 1.14fr);
       gap: 14px;
       align-items: stretch;
     }
@@ -450,7 +497,7 @@
     }
 
     .packet-controls textarea {
-      min-height: 180px;
+      min-height: 210px;
       resize: vertical;
       padding: 10px;
       color: #d9ead2;
@@ -474,6 +521,7 @@
       border-color: var(--accent);
       background: #172117;
       color: var(--accent);
+      font-size: 1rem;
     }
 
     .packet-button.secondary {
@@ -532,6 +580,29 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
+    }
+
+    .packet-detail summary {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      color: var(--blue);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .soft-section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .soft-section-title span {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
 
     .guard {
@@ -607,6 +678,10 @@
         flex: 1 1 auto;
       }
 
+      .intro {
+        min-height: 0;
+      }
+
       .intro,
       .command-panel,
       .wide-panel {
@@ -623,27 +698,31 @@
   <main class="shell">
     <nav class="topbar" aria-label="OpenClaw links">
       <div class="brand">
-        <strong>OpenClaw Main Desk</strong>
-        <span>Surface local producer + public session manual</span>
+        <strong>OpenClaw 制作卓</strong>
+        <span>Music JSONを読み、次の制作指示に変える入口</span>
       </div>
       <div class="links">
-        <a class="pill" href="docs/manual.md">Manual</a>
-        <a class="pill" href="docs/packet-inspector-quickstart.md">Packet Quickstart</a>
+        <a class="pill" href="docs/packet-inspector-quickstart.md">JSON最短</a>
+        <a class="pill" href="docs/manual.md">使い方</a>
         <a class="pill" href="README.md">README</a>
-        <a class="pill" href="docs/session-runbook.md">Runbook</a>
-        <a class="pill" href="docs/producer-desk-routing.md">Producer Desk</a>
-        <a class="pill" href="docs/surface-local-producer.md">Surface Local</a>
-        <a class="pill" href="connectors/registry.json">Registry</a>
+        <a class="pill" href="docs/session-runbook.md">手順</a>
+        <a class="pill" href="docs/producer-desk-routing.md">制作ルート</a>
+        <a class="pill" href="connectors/registry.json">接続一覧</a>
       </div>
     </nav>
 
     <section class="hero">
       <div class="intro">
         <div>
-          <h1>OpenClawにつなぐ入口。</h1>
+          <h1>Music JSONを、次の制作指示にする。</h1>
           <p class="summary">
-            このページは公開用の操作卓です。Surface PC の OpenClaw CLI で候補を生成し、Music / chill / drum-floor / namima へ戻す流れを、人間確認つきで迷わず回すための入口です。
+            Musicで良い瞬間を見つけたら`JSON`を押す。そのJSONをここで読むと、drum-floorならどんなドラムへ、namimaならどんな空気へ渡すかが見えます。ここでは実行しません。判断だけを軽くします。
           </p>
+        </div>
+        <div class="hero-actions">
+          <a class="hero-action primary" href="#packet-inspector">JSONを読む</a>
+          <a class="hero-action" href="https://quietbriony.github.io/Music/">Musicを開く</a>
+          <a class="hero-action" href="docs/packet-inspector-quickstart.md">最短手順</a>
         </div>
         <div class="status-row" id="session-metrics" aria-label="Manifest summary">
           <div class="metric"><span>Session</span><strong>loading</strong></div>
@@ -653,8 +732,8 @@
       </div>
 
       <aside class="command-panel" aria-label="Dry-run commands">
-        <h2>Command Desk</h2>
-        <p class="muted">Pages は実行しません。Surface PC の terminal で確認してから実行します。</p>
+        <h2>セッション選択</h2>
+        <p class="muted">通常は`Music Orchestra Board`を選べばOK。CLIは予備ルートとして下に出します。</p>
         <div class="session-switcher" id="session-switcher" aria-label="Session examples"></div>
         <div class="command-list" id="commands">
           <pre>Loading manifest...</pre>
@@ -662,34 +741,11 @@
       </aside>
     </section>
 
-    <section class="wide-panel" aria-label="Start Here">
-      <h2>Start Here</h2>
-      <div class="start-grid">
-        <div class="start-card">
-          <strong>1</strong>
-          <h3>Pagesで方向を見る</h3>
-          <p class="muted">セッションを選び、BPM/energy/gate と各repoの役割を確認します。</p>
-        </div>
-        <div class="start-card">
-          <strong>2</strong>
-          <h3>Surfaceでplan</h3>
-          <p class="muted">`openclaw_cli.py plan` で生成前の流れと安全ゲートを読みます。</p>
-        </div>
-        <div class="start-card">
-          <strong>3</strong>
-          <h3>local-generate</h3>
-          <p class="muted">候補は `.openclaw-local/` にだけ生成。GitHubやPagesには出ません。</p>
-        </div>
-        <div class="start-card">
-          <strong>4</strong>
-          <h3>聴いて磨く</h3>
-          <p class="muted">良ければこのチャットから Music/chill/drum-floor/namima の小PRへ戻します。</p>
-        </div>
+    <section class="wide-panel primary-panel" id="packet-inspector" aria-label="Packet Inspector">
+      <div class="soft-section-title">
+        <h2>JSONを読む</h2>
+        <span>Musicの状態を、次の制作判断に翻訳します。</span>
       </div>
-    </section>
-
-    <section class="wide-panel" aria-label="Packet Inspector">
-      <h2>Packet Inspector</h2>
       <p class="muted">Musicの状態を読むだけの入口です。JSONを選ぶと「ドラムならこう」「namimaならこう」「次はこう聴く」が出ます。アップロード、録音、arm、生成はしません。</p>
       <div class="packet-guide">
         <div class="packet-mini-step">
@@ -698,7 +754,7 @@
         </div>
         <div class="packet-mini-step">
           <strong>2. ここで読む</strong>
-          <span>ファイルを選ぶか、JSONを貼って`読む / Inspect`。</span>
+          <span>ファイルを選ぶか、JSONを貼って`読む`。</span>
         </div>
         <div class="packet-mini-step">
           <strong>3. 次を決める</strong>
@@ -708,16 +764,16 @@
       <div class="packet-panel">
         <div class="packet-controls">
           <label for="packet-file">
-            Music JSON file
+            MusicのJSONファイル
             <input id="packet-file" type="file" accept=".json,application/json">
           </label>
           <label for="packet-input">
-            Paste JSON
+            JSONを貼る
             <textarea id="packet-input" spellcheck="false" placeholder="{ &quot;source_repo&quot;: &quot;Music&quot;, ... }"></textarea>
           </label>
           <div class="packet-actions">
-            <button class="packet-button primary" id="packet-inspect-button" type="button">読む / Inspect</button>
-            <button class="packet-button secondary" id="packet-clear-button" type="button">Clear</button>
+            <button class="packet-button primary" id="packet-inspect-button" type="button">読む</button>
+            <button class="packet-button secondary" id="packet-clear-button" type="button">消す</button>
           </div>
         </div>
         <div class="packet-output" id="packet-inspect-output" aria-live="polite">
@@ -730,25 +786,51 @@
       </div>
     </section>
 
+    <section class="wide-panel" aria-label="Start Here">
+      <h2>全体の流れ</h2>
+      <div class="start-grid">
+        <div class="start-card">
+          <strong>1</strong>
+          <h3>Musicを聴く</h3>
+          <p class="muted">良い瞬間、崩れた瞬間、方向が見えた瞬間で`JSON`。</p>
+        </div>
+        <div class="start-card">
+          <strong>2</strong>
+          <h3>ここで読む</h3>
+          <p class="muted">ドラム、空気、次の制作PRの方向だけを見る。</p>
+        </div>
+        <div class="start-card">
+          <strong>3</strong>
+          <h3>このチャットへ</h3>
+          <p class="muted">「このpacketでdrum-floor育てて」みたいに言う。</p>
+        </div>
+        <div class="start-card">
+          <strong>4</strong>
+          <h3>小さく反映</h3>
+          <p class="muted">必要なrepoだけ磨いて、Pagesで聴き直す。</p>
+        </div>
+      </div>
+    </section>
+
     <section class="grid" id="connectors" aria-label="Connectors"></section>
 
     <section class="wide-panel" aria-label="Manual">
-      <h2>Manual</h2>
+      <h2>資料</h2>
       <div class="manual-list">
         <a class="manual-link" href="docs/manual.md">
-          <strong>Full Manual</strong>
+          <strong>全体マニュアル</strong>
           <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
         </a>
         <a class="manual-link" href="docs/packet-inspector-quickstart.md">
-          <strong>Packet Quickstart</strong>
+          <strong>JSON最短手順</strong>
           <span>Music JSONを貼った後、何を見るか、次に何を言うか。</span>
         </a>
         <a class="manual-link" href="docs/surface-local-producer.md">
-          <strong>Surface Local</strong>
+          <strong>Surfaceローカル</strong>
           <span>このPCで生成する手順と `.openclaw-local/` の扱い。</span>
         </a>
         <a class="manual-link" href="docs/producer-desk-routing.md">
-          <strong>Producer Desk</strong>
+          <strong>制作ルート</strong>
           <span>このMusicチャットから各repoへ指示を切る運用。</span>
         </a>
         <a class="manual-link" href="docs/music-orchestra-mission-board.md">
@@ -759,68 +841,68 @@
     </section>
 
     <section class="wide-panel" aria-label="Runbook">
-      <h2>Session Loop</h2>
+      <h2>セッションの考え方</h2>
       <div class="steps">
         <div class="step">
           <small>Observe</small>
-          <h3>Read runtime state</h3>
-          <p>Music producerHabits, genreTimbreKits, signatureCells, humanGroove, chill preview state, and namima mood traces.</p>
+          <h3>状態を見る</h3>
+          <p>MusicのproducerHabits、genreTimbreKits、signatureCells、humanGrooveを見る。</p>
         </div>
         <div class="step">
-          <small>Generate</small>
-          <h3>Print candidate command</h3>
-          <p>drum-floor can generate into live/candidates only. OpenClaw v1 prints the command and waits.</p>
+          <small>Translate</small>
+          <h3>方向へ翻訳</h3>
+          <p>drum-floorならgroove、namimaならmoodへ。音や録音は保存しません。</p>
         </div>
         <div class="step">
-          <small>Inspect</small>
-          <h3>Check before arm</h3>
-          <p>Candidate inspection is read-only. Ableton, EP-133, live slots, and Music REC stay manual.</p>
+          <small>Listen</small>
+          <h3>人間が聴く</h3>
+          <p>Music、chill、drum-floor、namimaを開く操作と録音は人間が決めます。</p>
         </div>
         <div class="step">
           <small>Merge</small>
-          <h3>Turn listening into PRs</h3>
-          <p>Human listening notes become small repo-specific tuning changes, with copy and asset safety checked.</p>
+          <h3>小PRへ戻す</h3>
+          <p>聴感メモを小さなrepo別PRに変え、Pagesで聴き直します。</p>
         </div>
       </div>
     </section>
 
     <section class="wide-panel" aria-label="Producer Desk">
-      <h2>Producer Desk Routing</h2>
+      <h2>このチャットからの回し方</h2>
       <div class="steps">
         <div class="step">
           <small>Music Chat</small>
-          <h3>Intent source</h3>
-          <p>This chat names the musical direction, acceptance gates, and which organ should change.</p>
+          <h3>方向を言う</h3>
+          <p>「もっと生ドラム」「namimaへ柔らかく」など、耳の方向をここで言います。</p>
         </div>
         <div class="step">
           <small>OpenClaw</small>
-          <h3>Session contract</h3>
-          <p>OpenClaw turns the direction into manifest, dry-run commands, and human-gated runbooks.</p>
+          <h3>制作卓</h3>
+          <p>JSON、manifest、手順、安全ゲートを整理します。隠れて演奏はしません。</p>
         </div>
         <div class="step">
-          <small>Repo Agents</small>
-          <h3>Small patches</h3>
-          <p>Each repo gets one bounded role: Music, chill, drum-floor, or namima. No cross-repo sprawl.</p>
+          <small>Repo</small>
+          <h3>役割ごとに磨く</h3>
+          <p>Music、chill、drum-floor、namimaのうち、必要な場所だけ触ります。</p>
         </div>
         <div class="step">
           <small>Human</small>
-          <h3>Listen and approve</h3>
-          <p>Arm, record, merge, release, and reference-copy checks stay human decisions.</p>
+          <h3>聴いて決める</h3>
+          <p>arm、record、merge、releaseは人間の確認が最後です。</p>
         </div>
       </div>
     </section>
 
     <section class="wide-panel" aria-label="Guardrails">
-      <h2>Guardrails</h2>
+      <h2>安全ルール</h2>
       <div class="guardrails">
-        <div class="guard"><strong>No auto arm.</strong> Candidates never move into armed or device state by themselves.</div>
-        <div class="guard"><strong>No audio capture.</strong> No samples, microphones, waveform excerpts, lyrics, or uploads.</div>
-        <div class="guard"><strong>No copy engine.</strong> References become production judgment, not melodies, chords, or song forms.</div>
+        <div class="guard"><strong>自動armなし。</strong> Ableton、EP-133、live slot、Music RECは勝手に触りません。</div>
+        <div class="guard"><strong>音声保存なし。</strong> サンプル、マイク、波形、歌詞、アップロードは扱いません。</div>
+        <div class="guard"><strong>コピーなし。</strong> 参照は制作判断へ翻訳し、メロディやコード進行は移しません。</div>
       </div>
     </section>
 
     <p class="footer">
-      OpenClaw v1 is intentionally boring infrastructure: JSON manifest, connector registry, dry-run CLI, browser runtime state, local trace references, and PR review gates.
+      OpenClaw v1は、音を鳴らす主役ではなく制作卓です。JSON、接続一覧、予備CLI、ローカルtrace、PRレビューゲートを整理します。
     </p>
   </main>
 
@@ -853,7 +935,7 @@
         url: "sessions/examples/raw-drum-candidate-export.example.json"
       }
     ];
-    let activeManifest = manifests[0];
+    let activeManifest = manifests[1];
     let registryCache = null;
 
     Promise.all([
@@ -866,7 +948,7 @@
       renderCommands(manifest);
       renderConnectors(registry.connectors || {});
     }).catch((error) => {
-      document.getElementById("commands").innerHTML = `<pre>Unable to load OpenClaw JSON: ${String(error)}</pre>`;
+      document.getElementById("commands").innerHTML = `<pre>OpenClaw JSONを読み込めません: ${String(error)}</pre>`;
     });
     setupPacketInspector();
 
@@ -875,9 +957,9 @@
       const target = manifest.duration_target?.minutes ? `${manifest.duration_target.minutes} min` : "n/a";
       const bpm = manifest.bpm_range ? `${manifest.bpm_range.min}-${manifest.bpm_range.max} bpm` : "n/a";
       document.getElementById("session-metrics").innerHTML = `
-        <div class="metric"><span>Session</span><strong>${escapeHtml(manifest.session_id || "n/a")}</strong></div>
-        <div class="metric"><span>Target</span><strong>${escapeHtml(target)} / ${escapeHtml(bpm)}</strong></div>
-        <div class="metric"><span>Gates</span><strong>${gates} required</strong></div>
+        <div class="metric"><span>セッション</span><strong>${escapeHtml(manifest.session_id || "n/a")}</strong></div>
+        <div class="metric"><span>目安</span><strong>${escapeHtml(target)} / ${escapeHtml(bpm)}</strong></div>
+        <div class="metric"><span>確認</span><strong>${gates} gates</strong></div>
       `;
     }
 
@@ -888,12 +970,12 @@
       const chillUrl = manifest.connectors?.chill?.runtime_url;
       const musicUrl = manifest.connectors?.music?.runtime_url || "https://quietbriony.github.io/Music/";
       const musicPacketBoard = manifest.session_mode === "music_orchestra_mission_board"
-        ? commandBlock("Music Packet", "MusicでJSONを作り、このページのPacket Inspectorでrouting translationをreviewします。", `${musicUrl}\nClick JSON\nOpen this page -> Packet Inspector -> choose the JSON file\nCLI fallback: python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
+        ? commandBlock("Music JSON", "MusicでJSONを作り、このページで読むのが基本です。CLIは予備です。", `${musicUrl}\nMusicでJSONを押す\nOpenClaw -> JSONを読む -> ファイル選択\nCLI予備: python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
         : "";
       const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
-        ? commandBlock("Open Chill Trio", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
+        ? commandBlock("Chill Trioを開く", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
         : "";
-      const observeOnly = generation ? "" : commandBlock("No Local Generate", "このmanifestは観測用です。候補生成は Raw Drum Candidate Export を選びます。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate sessions\\examples\\raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py`);
+      const observeOnly = generation ? "" : commandBlock("生成しないセッション", "このmanifestは観測用です。候補生成は Raw Drum Candidate Export を選びます。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate sessions\\examples\\raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py`);
       let generateBlocks = "";
       if (generation) {
         const root = (drum.candidate_root || "../drum-floor/live/candidates").replace(/\/$/, "");
@@ -910,13 +992,13 @@
         if (intent.frame) parts.push(`--frame ${intent.frame}`);
         parts.push(`--out ${out}`);
         generateBlocks = `
-          ${commandBlock("Local Generate", "Surface PCで実生成。候補は .openclaw-local に保存され、GitHubには出ません。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}
-          ${commandBlock("Raw drum-floor command", "OpenClawを通さず確認したい時の元コマンド。通常は local-generate を使います。", parts.join(" "))}
-          ${commandBlock("Inspect", "生成候補の安全確認。local-generate はこれも自動で実行します。", `python -m drum_floor inspect ${out}`)}
+          ${commandBlock("ローカル生成", "Surface PCで実生成。候補は .openclaw-local に保存され、GitHubには出ません。", `$py = "$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe"\npython .\\openclaw_cli.py local-generate ${activeManifest.url.replaceAll("/", "\\")} --execute --python $py`)}
+          ${commandBlock("drum-floor直接コマンド", "OpenClawを通さず確認したい時の元コマンド。通常は local-generate を使います。", parts.join(" "))}
+          ${commandBlock("候補確認", "生成候補の安全確認。local-generate はこれも自動で実行します。", `python -m drum_floor inspect ${out}`)}
         `;
       }
       document.getElementById("commands").innerHTML = `
-        ${commandBlock("Plan", "最初に読む。実行前のセッション流れと human gate を確認します。", `python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}
+        ${commandBlock("CLI plan", "Surfaceで確認したい時だけ開く。実行前の流れとhuman gateを表示します。", `python .\\openclaw_cli.py plan ${activeManifest.url.replaceAll("/", "\\")}`)}
         ${musicPacketBoard}
         ${openTrio}
         ${observeOnly}
@@ -934,11 +1016,11 @@
 
     function commandBlock(title, description, command) {
       return `
-        <div class="command-block">
-          <h3>${escapeHtml(title)}</h3>
+        <details class="command-block">
+          <summary>${escapeHtml(title)}</summary>
           <p>${escapeHtml(description)}</p>
           <pre>${escapeHtml(command)}</pre>
-        </div>
+        </details>
       `;
     }
 
@@ -1266,8 +1348,8 @@
       const namima = inspection.namima;
       const packet = inspection.packet;
       const statusText = inspection.ok
-        ? `OK: ${packet.session_id || "Music packet"} をreview-onlyで翻訳しました。`
-        : `Review needed: ${inspection.errors.length} error(s)。`;
+        ? `OK: ${packet.session_id || "Music packet"} を安全に読みました。`
+        : `確認が必要です: ${inspection.errors.length}件のerror。`;
       const warningText = inspection.warnings.length ? `<p>Warnings: ${escapeHtml(inspection.warnings.join(" / "))}</p>` : "";
       const errorText = inspection.errors.length ? `<p>Errors: ${escapeHtml(inspection.errors.join(" / "))}</p>` : "";
       const raw = {
@@ -1322,7 +1404,10 @@
             <span>「このpacketで次PR切って」と言う。OpenClawは候補と手順だけ作る。</span>
           </div>
         </div>
-        <pre>${escapeHtml(JSON.stringify(raw, null, 2))}</pre>
+        <details class="packet-detail">
+          <summary>詳細JSONを見る</summary>
+          <pre>${escapeHtml(JSON.stringify(raw, null, 2))}</pre>
+        </details>
       `;
     }
 
