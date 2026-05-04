@@ -98,11 +98,24 @@ Pagesで簡単に見る:
 1. OpenClaw Main Desk を開く。
 2. Music Pagesで `SYNC` 済みなら latest packet が自動表示される。
 3. `drum-floorへ` / `namimaへ` / `chillへ` / `OpenClaw` の review-only translation を読む。
-4. JSON file chooser と貼り付け欄は、localhostの別portなどでSYNCが届かない時だけ使う。
+4. Surface CLIへ渡す時は `Surfaceへ保存` を押し、Downloadsへpacketを保存する。
+5. JSON file chooser と貼り付け欄は、localhostの別portなどでSYNCが届かない時だけ使う。
 
 Surface PC の CLI で見る:
 
 ```powershell
+python .\openclaw_cli.py packet-import --latest-download
+python .\openclaw_cli.py packet-inspect --latest
+```
+
+`packet-import` は最新のMusic packetをDownloadsから探し、
+`.openclaw-local/inbox/latest-music-session-packet.json` と
+`.openclaw-local/inbox/history/` にコピーします。`.openclaw-local/` はgitに載せません。
+
+直接ファイルを指定するfallback:
+
+```powershell
+python .\openclaw_cli.py packet-import "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 ```
 

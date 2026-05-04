@@ -15,6 +15,11 @@ from .doctor import doctor_summary, run_doctor
 from .local_runner import list_local_candidates, run_local_drum_floor
 from .packet_inspector import inspect_music_session_packet, inspection_to_dict
 from .planner import build_session_plan
+from .surface_inbox import (
+    find_latest_download_packet,
+    import_music_packet,
+    latest_music_packet_path,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -66,8 +71,16 @@ def build_parser() -> argparse.ArgumentParser:
         "packet-inspect",
         help="Inspect a local Music session packet and print review-only routing translations.",
     )
-    packet.add_argument("packet", type=Path, help="Path to a Music session packet JSON file.")
+    packet.add_argument("packet", nargs="?", type=Path, help="Path to a Music session packet JSON file.")
+    packet.add_argument("--latest", action="store_true", help="Inspect .openclaw-local/inbox/latest-music-session-packet.json.")
     packet.add_argument("--json", action="store_true", help="Emit inspection as JSON.")
+
+    packet_import = subparsers.add_parser(
+        "packet-import",
+        help="Import a Music session packet into the Surface .openclaw-local inbox.",
+    )
+    packet_import.add_argument("packet", nargs="?", type=Path, help="Path to a Music session packet JSON file.")
+    packet_import.add_argument("--latest-download", action="store_true", help="Import the newest valid Music packet from Downloads.")
 
     return parser
 
@@ -199,15 +212,40 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if ok else 1
 
     if args.command == "packet-inspect":
-        inspection = inspect_music_session_packet(args.packet)
+        packet_path = _packet_path_from_args(parser, args)
+        inspection = inspect_music_session_packet(packet_path)
         if args.json:
             print(json.dumps(inspection_to_dict(inspection), indent=2, ensure_ascii=False))
             return 0 if inspection.ok else 1
         _print_packet_inspection(inspection_to_dict(inspection))
         return 0 if inspection.ok else 1
 
+    if args.command == "packet-import":
+        if args.latest_download and args.packet:
+            parser.error("packet-import accepts either --latest-download or <packet>, not both")
+        packet_path = find_latest_download_packet() if args.latest_download else args.packet
+        if not packet_path:
+            parser.error("packet-import requires <packet> or --latest-download with a valid Music packet in Downloads")
+        result = import_music_packet(packet_path)
+        _print_packet_import(result)
+        return 0 if result.ok else 1
+
     parser.error("unknown command")
     return 2
+
+
+def _packet_path_from_args(parser: argparse.ArgumentParser, args: argparse.Namespace) -> Path:
+    if args.latest and args.packet:
+        parser.error("packet-inspect accepts either --latest or <packet>, not both")
+    if args.latest:
+        latest = latest_music_packet_path()
+        if not latest.exists():
+            parser.error(f"latest packet not found: {latest}; run packet-import first")
+        return latest
+    if args.packet:
+        return args.packet
+    parser.error("packet-inspect requires <packet> or --latest")
+    raise AssertionError("unreachable")
 
 
 def _print_validation(summary: dict[str, object], warnings: list[str], errors: list[str]) -> None:
@@ -252,11 +290,39 @@ def _important_lines(output: str) -> list[str]:
     return [line for line in output.splitlines() if line.startswith(prefixes)]
 
 
+def _print_packet_import(result: object) -> None:
+    inspection = result.inspection
+    inspection_dict = inspection_to_dict(inspection) if inspection else {}
+    packet = inspection_dict.get("packet") if isinstance(inspection_dict.get("packet"), dict) else {}
+    openclaw = inspection_dict.get("openclaw") if isinstance(inspection_dict.get("openclaw"), dict) else {}
+    next_action = openclaw.get("next_action") if isinstance(openclaw.get("next_action"), dict) else {}
+    print(f"ok: {str(bool(result.ok)).lower()}")
+    print(f"source: {result.source_path or '-'}")
+    print(f"latest: {result.latest_path}")
+    print(f"history: {result.history_path or '-'}")
+    print(f"packet: {packet.get('session_id') or '-'}")
+    print(f"next_action: {next_action.get('label') or '-'}")
+    print(f"destination: {next_action.get('destination') or '-'}")
+    if next_action.get("action"):
+        print(f"action: {next_action.get('action')}")
+    print("surface_next:")
+    print("  python .\\openclaw_cli.py packet-inspect --latest")
+    if next_action.get("destination") == "drum_floor":
+        print("  $py = \"$env:LOCALAPPDATA\\Programs\\Python\\Python313\\python.exe\"")
+        print("  python .\\openclaw_cli.py local-generate sessions\\examples\\raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py")
+    for warning in result.warnings:
+        print(f"warning: {warning}")
+    for error in result.errors:
+        print(f"error: {error}")
+
+
 def _print_packet_inspection(inspection: dict[str, object]) -> None:
     packet = inspection.get("packet") if isinstance(inspection.get("packet"), dict) else {}
     drum = inspection.get("drum_floor") if isinstance(inspection.get("drum_floor"), dict) else {}
     namima = inspection.get("namima") if isinstance(inspection.get("namima"), dict) else {}
+    chill = inspection.get("chill") if isinstance(inspection.get("chill"), dict) else {}
     openclaw = inspection.get("openclaw") if isinstance(inspection.get("openclaw"), dict) else {}
+    next_action = openclaw.get("next_action") if isinstance(openclaw.get("next_action"), dict) else {}
     print(f"ok: {str(bool(inspection.get('ok'))).lower()}")
     print(f"packet: {packet.get('session_id') or '-'}")
     print(f"mode: {packet.get('mode') or '-'}")
@@ -283,9 +349,22 @@ def _print_packet_inspection(inspection: dict[str, object]) -> None:
     print(f"  intent: {intent_text or '-'}")
     print(f"  next: {namima.get('next') or '-'}")
     print("")
+    print("chill:")
+    print(f"  enabled: {str(bool(chill.get('enabled'))).lower()}")
+    print(f"  reference: {chill.get('reference') or '-'}")
+    trio = chill.get("trio") if isinstance(chill.get("trio"), dict) else {}
+    trio_text = ", ".join(f"{key}={value}" for key, value in trio.items())
+    print(f"  trio: {trio_text or '-'}")
+    print(f"  piano_memory: {chill.get('piano_memory')}")
+    print(f"  drum_support: {chill.get('drum_support')}")
+    print(f"  next: {chill.get('next') or '-'}")
+    print("")
     print("openclaw:")
     print(f"  promotion_status: {openclaw.get('promotion_status') or '-'}")
     print(f"  human_review_required: {str(bool(openclaw.get('human_review_required'))).lower()}")
+    print(f"  next_action: {next_action.get('label') or '-'}")
+    print(f"  destination: {next_action.get('destination') or '-'}")
+    print(f"  action: {next_action.get('action') or '-'}")
     print(f"  next: {openclaw.get('next') or '-'}")
     for warning in inspection.get("warnings") or []:
         print(f"warning: {warning}")

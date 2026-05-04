@@ -35,6 +35,8 @@ python -m openclaw validate sessions/examples/music-stack-session.example.json
 python -m openclaw doctor
 python -m openclaw plan sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/music-orchestra-mission-board.example.json
+python -m openclaw packet-import --latest-download
+python -m openclaw packet-inspect --latest
 python -m openclaw packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
@@ -52,6 +54,8 @@ python .\openclaw_cli.py validate sessions/examples/music-stack-session.example.
 python .\openclaw_cli.py doctor --python $py
 python .\openclaw_cli.py plan sessions/examples/music-stack-session.example.json
 python .\openclaw_cli.py plan sessions/examples/music-orchestra-mission-board.example.json
+python .\openclaw_cli.py packet-import --latest-download
+python .\openclaw_cli.py packet-inspect --latest
 python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
 python .\openclaw_cli.py plan sessions/examples/chill-trio-live.example.json
@@ -74,6 +78,16 @@ not arm, record, upload, or push.
 `packet-inspect` is the Surface CLI fallback for a downloaded Music packet.
 The usual browser flow is `MusicでSYNC -> OpenClawを開く -> latestを自動表示`.
 Neither path executes the translations.
+
+Use `Surfaceへ保存` on the Pages inspector, then import it locally:
+
+```powershell
+python .\openclaw_cli.py packet-import --latest-download
+python .\openclaw_cli.py packet-inspect --latest
+```
+
+Imported packets are copied to `.openclaw-local/inbox/`, which is ignored by
+git. The latest pointer is `.openclaw-local/inbox/latest-music-session-packet.json`.
 
 ## V1 Contract
 
