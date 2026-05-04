@@ -27,8 +27,8 @@ Producer desk routing: [producer-desk-routing.md](producer-desk-routing.md)
 
 ## Music Orchestra Mission Board
 
-- Click `JSON` in Music to create a metadata-only packet.
-- Open OpenClaw Pages and choose the JSON in `Packet Inspector`.
+- Click `SYNC` in Music to share a metadata-only packet.
+- Open OpenClaw Pages and let `Packet Inspector` read the latest SYNC automatically.
 - Use `python .\openclaw_cli.py packet-inspect <packet.json>` only as the Surface CLI fallback.
 - Review `routing.drum_floor` through drum-floor translation before exporting any raw candidate.
 - Review `routing.namima` through Namima mood translation before changing public ambient behavior.

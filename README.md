@@ -2,13 +2,15 @@
 
 OpenClaw は QuietBriony music stack のための、人間確認つき制作卓です。
 
-v1では音を鳴らしません。Music の `JSON` を読み、`drum-floor` / `namima`
+v1では音を鳴らしません。Music の `SYNC` を読み、`drum-floor` / `namima`
 へ渡す制作判断を整理し、必要ならローカルCLIの予備手順も出します。
 
 Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
-Pages dashboard では、Music の `JSON` を選ぶだけで drum-floor / namima
-へのroutingを確認できます。アップロード、録音、arm、生成はしません。
+Pages dashboard では、Music で `SYNC` した最新packetを自動で読み、
+drum-floor / namima / chill へのroutingを確認できます。アップロード、
+録音、arm、生成はしません。JSON選択はlocalhostなどでSYNCが届かない時の
+fallbackです。
 
 Manual: [docs/manual.md](docs/manual.md)
 
@@ -69,8 +71,9 @@ visible without printing secret values.
 and run traces under `.openclaw-local/`, which is ignored by git. It still does
 not arm, record, upload, or push.
 
-`packet-inspect` reads a Music `JSON` download and prints review-only
-drum-floor / namima routing translations. It does not execute the translations.
+`packet-inspect` is the Surface CLI fallback for a downloaded Music packet.
+The usual browser flow is `MusicでSYNC -> OpenClawを開く -> latestを自動表示`.
+Neither path executes the translations.
 
 ## V1 Contract
 
