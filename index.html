@@ -973,6 +973,8 @@
     ];
     let activeManifest = manifests[1];
     let registryCache = null;
+    const MUSIC_STACK_PACKET_STORAGE_KEY = "qb:music-stack:latest-packet:v1";
+    const MUSIC_STACK_CHANNEL_NAME = "qb:music-stack:v1";
 
     Promise.all([
       fetch(registryUrl).then((response) => response.json()),
@@ -1124,6 +1126,39 @@
         }
       };
 
+      const packetFromStackPayload = (payload) => {
+        if (!payload || typeof payload !== "object") return null;
+        if (payload.packet && typeof payload.packet === "object" && payload.packet.source_repo === "Music") return payload.packet;
+        if (payload.source_repo === "Music") return payload;
+        return null;
+      };
+
+      const receiveStackPacket = (payload, source = "sync") => {
+        const packet = packetFromStackPayload(payload);
+        if (!packet) return false;
+        try {
+          textInput.value = JSON.stringify(packet, null, 2);
+          output.innerHTML = renderPacketInspection(inspectMusicSessionPacket(packet), {
+            prefix: `SYNC受信 (${source})`
+          });
+          return true;
+        } catch (error) {
+          output.innerHTML = `<div class="packet-status error">SYNC packetを読めません: ${escapeHtml(error.message || error)}</div>`;
+          return false;
+        }
+      };
+
+      const readLatestStackPacket = () => {
+        try {
+          const raw = window.localStorage?.getItem(MUSIC_STACK_PACKET_STORAGE_KEY);
+          if (!raw) return false;
+          return receiveStackPacket(JSON.parse(raw), "latest");
+        } catch (error) {
+          output.innerHTML = `<div class="packet-status error">latest SYNCを読めません: ${escapeHtml(error.message || error)}</div>`;
+          return false;
+        }
+      };
+
       fileInput.addEventListener("change", async () => {
         const file = fileInput.files?.[0];
         if (!file) return;
@@ -1164,6 +1199,24 @@
           button.textContent = "指示文をコピー";
         }, 1600);
       });
+
+      try {
+        if (typeof window.BroadcastChannel === "function") {
+          const channel = new window.BroadcastChannel(MUSIC_STACK_CHANNEL_NAME);
+          channel.addEventListener("message", (event) => receiveStackPacket(event.data, "broadcast"));
+        }
+      } catch (error) {
+        console.warn("[OpenClaw] Music stack BroadcastChannel unavailable:", error);
+      }
+      window.addEventListener("storage", (event) => {
+        if (event.key !== MUSIC_STACK_PACKET_STORAGE_KEY || !event.newValue) return;
+        try {
+          receiveStackPacket(JSON.parse(event.newValue), "storage");
+        } catch (error) {
+          output.innerHTML = `<div class="packet-status error">storage SYNCを読めません: ${escapeHtml(error.message || error)}</div>`;
+        }
+      });
+      readLatestStackPacket();
     }
 
     function showCopyFallback(card, prompt) {
@@ -1411,13 +1464,14 @@
       return mapping[String(value || "").toLowerCase()] || "verse";
     }
 
-    function renderPacketInspection(inspection) {
+    function renderPacketInspection(inspection, options = {}) {
       const drum = inspection.drum_floor;
       const namima = inspection.namima;
       const packet = inspection.packet;
       const statusText = inspection.ok
         ? `OK: ${packet.session_id || "Music packet"} を安全に読みました。`
         : `確認が必要です: ${inspection.errors.length}件のerror。`;
+      const prefix = options.prefix ? `<p>${escapeHtml(options.prefix)}</p>` : "";
       const warningText = inspection.warnings.length ? `<p>Warnings: ${escapeHtml(inspection.warnings.join(" / "))}</p>` : "";
       const errorText = inspection.errors.length ? `<p>Errors: ${escapeHtml(inspection.errors.join(" / "))}</p>` : "";
       const raw = {
@@ -1432,6 +1486,7 @@
       return `
         <div class="packet-status ${inspection.ok ? "ok" : "error"}">
           <strong>${escapeHtml(statusText)}</strong>
+          ${prefix}
           ${warningText}
           ${errorText}
         </div>
