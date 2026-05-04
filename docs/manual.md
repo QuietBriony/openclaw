@@ -89,6 +89,15 @@ Music packet board の流れを見る:
 python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.example.json
 ```
 
+Music で `JSON` を押して保存した packet を読む:
+
+```powershell
+python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
+```
+
+これは drum-floor / namima への翻訳を表示するだけで、ブラウザ音声、録音、
+候補生成、arm、upload は実行しません。
+
 候補を生成して inspect する:
 
 ```powershell

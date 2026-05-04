@@ -13,6 +13,7 @@ from .connectors import (
 from .contracts import load_manifest, validate_manifest
 from .doctor import doctor_summary, run_doctor
 from .local_runner import list_local_candidates, run_local_drum_floor
+from .packet_inspector import inspect_music_session_packet, inspection_to_dict
 from .planner import build_session_plan
 
 
@@ -60,6 +61,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Check local Surface producer readiness and external OpenClaw subscription/auth hints.",
     )
     doctor.add_argument("--python", default="python", help="Python executable to use for drum-floor checks.")
+
+    packet = subparsers.add_parser(
+        "packet-inspect",
+        help="Inspect a local Music session packet and print review-only routing translations.",
+    )
+    packet.add_argument("packet", type=Path, help="Path to a Music session packet JSON file.")
+    packet.add_argument("--json", action="store_true", help="Emit inspection as JSON.")
 
     return parser
 
@@ -190,6 +198,14 @@ def main(argv: list[str] | None = None) -> int:
         print("subscription_note: external OpenClaw subscription/auth cannot be verified unless its CLI or token is installed; repo-local OpenClaw works without a subscription.")
         return 0 if ok else 1
 
+    if args.command == "packet-inspect":
+        inspection = inspect_music_session_packet(args.packet)
+        if args.json:
+            print(json.dumps(inspection_to_dict(inspection), indent=2, ensure_ascii=False))
+            return 0 if inspection.ok else 1
+        _print_packet_inspection(inspection_to_dict(inspection))
+        return 0 if inspection.ok else 1
+
     parser.error("unknown command")
     return 2
 
@@ -234,3 +250,44 @@ def _important_lines(output: str) -> list[str]:
         "event_count:",
     )
     return [line for line in output.splitlines() if line.startswith(prefixes)]
+
+
+def _print_packet_inspection(inspection: dict[str, object]) -> None:
+    packet = inspection.get("packet") if isinstance(inspection.get("packet"), dict) else {}
+    drum = inspection.get("drum_floor") if isinstance(inspection.get("drum_floor"), dict) else {}
+    namima = inspection.get("namima") if isinstance(inspection.get("namima"), dict) else {}
+    openclaw = inspection.get("openclaw") if isinstance(inspection.get("openclaw"), dict) else {}
+    print(f"ok: {str(bool(inspection.get('ok'))).lower()}")
+    print(f"packet: {packet.get('session_id') or '-'}")
+    print(f"mode: {packet.get('mode') or '-'}")
+    print(f"created_at: {packet.get('created_at') or '-'}")
+    print("")
+    print("drum_floor:")
+    print(f"  enabled: {str(bool(drum.get('enabled'))).lower()}")
+    print(f"  profile: {drum.get('profile') or '-'}")
+    print(f"  frame: {drum.get('frame') or '-'}")
+    print(f"  style: {drum.get('style') or '-'}")
+    print(f"  density: {drum.get('density')}")
+    print(f"  pressure: {drum.get('pressure')}")
+    controls = drum.get("controls") if isinstance(drum.get("controls"), dict) else {}
+    control_text = ", ".join(f"{key}={value}" for key, value in controls.items())
+    print(f"  controls: {control_text or '-'}")
+    print(f"  next: {drum.get('next') or '-'}")
+    print("")
+    print("namima:")
+    print(f"  enabled: {str(bool(namima.get('enabled'))).lower()}")
+    print(f"  mood: {namima.get('mood') or '-'}")
+    print(f"  family_safe: {str(bool(namima.get('family_safe'))).lower()}")
+    intent = namima.get("intent") if isinstance(namima.get("intent"), dict) else {}
+    intent_text = ", ".join(f"{key}={value}" for key, value in intent.items())
+    print(f"  intent: {intent_text or '-'}")
+    print(f"  next: {namima.get('next') or '-'}")
+    print("")
+    print("openclaw:")
+    print(f"  promotion_status: {openclaw.get('promotion_status') or '-'}")
+    print(f"  human_review_required: {str(bool(openclaw.get('human_review_required'))).lower()}")
+    print(f"  next: {openclaw.get('next') or '-'}")
+    for warning in inspection.get("warnings") or []:
+        print(f"warning: {warning}")
+    for error in inspection.get("errors") or []:
+        print(f"error: {error}")

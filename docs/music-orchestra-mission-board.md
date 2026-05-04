@@ -18,12 +18,18 @@ listening results into repo-specific PRs.
 
 1. Human opens Music and listens.
 2. Human clicks `JSON` in Music to download a metadata-only packet.
-3. OpenClaw records the packet as review context, not as an execution command.
+3. Human runs `packet-inspect <packet.json>` in OpenClaw to review routing.
 4. `drum-floor` and `namima` can preview translations from the packet.
 5. Human listens, chooses arm/skip/record manually, and writes notes.
 6. Approved changes become small PRs in the owning repo.
 
 ## Review-Only Rules
+
+Surface command:
+
+```powershell
+python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
+```
 
 - No automatic browser `START`, `STOP`, `REC`, OUTPUT, or mood control.
 - No automatic Ableton, EP-133, MIDI arm, live slot, or upload.
