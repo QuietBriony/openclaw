@@ -38,6 +38,7 @@ python -m openclaw plan sessions/examples/music-orchestra-mission-board.example.
 python -m openclaw packet-import --latest-download
 python -m openclaw packet-inspect --latest
 python -m openclaw packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
+python -m openclaw harvest-inspect ..\Music\docs\examples\repo-harvest-sidecars\chill.sidecar.json
 python -m openclaw inspect-connectors
 python -m openclaw drum-floor-command sessions/examples/music-stack-session.example.json
 python -m openclaw plan sessions/examples/soft-piano-raw-drum-drive.example.json
@@ -57,6 +58,7 @@ python .\openclaw_cli.py plan sessions/examples/music-orchestra-mission-board.ex
 python .\openclaw_cli.py packet-import --latest-download
 python .\openclaw_cli.py packet-inspect --latest
 python .\openclaw_cli.py packet-inspect "$env:USERPROFILE\Downloads\<music-session-packet>.json"
+python .\openclaw_cli.py harvest-inspect ..\Music\docs\examples\repo-harvest-sidecars\chill.sidecar.json
 python .\openclaw_cli.py plan sessions/examples/soft-piano-raw-drum-drive.example.json
 python .\openclaw_cli.py plan sessions/examples/chill-trio-live.example.json
 python .\openclaw_cli.py plan sessions/examples/raw-drum-candidate-export.example.json
@@ -78,6 +80,11 @@ not arm, record, upload, or push.
 `packet-inspect` is the Surface CLI fallback for a downloaded Music packet.
 The usual browser flow is `MusicでSYNC -> OpenClawを開く -> latestを自動表示`.
 Neither path executes the translations.
+
+`harvest-inspect` reads a repo harvest sidecar, such as the examples under
+`../Music/docs/examples/repo-harvest-sidecars/`, and prints what to harvest,
+what not to copy, target repos, safety flags, and the next small PR. It is
+review-only and does not import code, dependencies, audio, samples, or workflows.
 
 Use `Surfaceへ保存` on the Pages inspector, then import it locally:
 

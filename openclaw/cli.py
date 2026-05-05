@@ -12,6 +12,7 @@ from .connectors import (
 )
 from .contracts import load_manifest, validate_manifest
 from .doctor import doctor_summary, run_doctor
+from .harvest_inspector import harvest_inspection_to_dict, inspect_repo_harvest_sidecar
 from .local_runner import list_local_candidates, run_local_drum_floor
 from .packet_inspector import inspect_music_session_packet, inspection_to_dict
 from .planner import build_session_plan
@@ -81,6 +82,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     packet_import.add_argument("packet", nargs="?", type=Path, help="Path to a Music session packet JSON file.")
     packet_import.add_argument("--latest-download", action="store_true", help="Import the newest valid Music packet from Downloads.")
+
+    harvest = subparsers.add_parser(
+        "harvest-inspect",
+        help="Inspect a repo harvest sidecar and print review-only promotion routing.",
+    )
+    harvest.add_argument("sidecar", type=Path, help="Path to a repo harvest sidecar JSON file.")
+    harvest.add_argument("--json", action="store_true", help="Emit inspection as JSON.")
 
     return parser
 
@@ -230,6 +238,14 @@ def main(argv: list[str] | None = None) -> int:
         _print_packet_import(result)
         return 0 if result.ok else 1
 
+    if args.command == "harvest-inspect":
+        inspection = inspect_repo_harvest_sidecar(args.sidecar)
+        if args.json:
+            print(json.dumps(harvest_inspection_to_dict(inspection), indent=2, ensure_ascii=False))
+            return 0 if inspection.ok else 1
+        _print_harvest_inspection(harvest_inspection_to_dict(inspection))
+        return 0 if inspection.ok else 1
+
     parser.error("unknown command")
     return 2
 
@@ -366,6 +382,52 @@ def _print_packet_inspection(inspection: dict[str, object]) -> None:
     print(f"  destination: {next_action.get('destination') or '-'}")
     print(f"  action: {next_action.get('action') or '-'}")
     print(f"  next: {openclaw.get('next') or '-'}")
+    for warning in inspection.get("warnings") or []:
+        print(f"warning: {warning}")
+    for error in inspection.get("errors") or []:
+        print(f"error: {error}")
+
+
+def _print_harvest_inspection(inspection: dict[str, object]) -> None:
+    source = inspection.get("source") if isinstance(inspection.get("source"), dict) else {}
+    classification = inspection.get("classification") if isinstance(inspection.get("classification"), dict) else {}
+    evaluation = inspection.get("evaluation") if isinstance(inspection.get("evaluation"), dict) else {}
+    harvest = inspection.get("harvest") if isinstance(inspection.get("harvest"), dict) else {}
+    routing = inspection.get("routing") if isinstance(inspection.get("routing"), dict) else {}
+    safety = inspection.get("safety") if isinstance(inspection.get("safety"), dict) else {}
+    promotion = inspection.get("promotion") if isinstance(inspection.get("promotion"), dict) else {}
+    print(f"ok: {str(bool(inspection.get('ok'))).lower()}")
+    print(f"repo: {source.get('repo_full_name') or '-'}")
+    print(f"url: {source.get('repo_url') or '-'}")
+    print(f"role: {classification.get('current_role') or '-'}")
+    print(f"category: {classification.get('category') or '-'}")
+    print(f"risk: {classification.get('risk_level') or '-'}")
+    targets = classification.get("target_repos") if isinstance(classification.get("target_repos"), list) else []
+    print(f"targets: {', '.join(str(item) for item in targets) or '-'}")
+    print(f"dependency_weight: {evaluation.get('dependency_weight') or '-'}")
+    risk_flags = evaluation.get("risk_flags") if isinstance(evaluation.get("risk_flags"), list) else []
+    print(f"risk_flags: {', '.join(str(item) for item in risk_flags) or '-'}")
+    print("")
+    print("useful_ideas:")
+    for idea in harvest.get("useful_ideas") or []:
+        print(f"  - {idea}")
+    print("do_not_copy:")
+    for item in harvest.get("do_not_copy") or []:
+        print(f"  - {item}")
+    print("")
+    print("routing:")
+    for key in ("music", "drum_floor", "namima", "chill", "openclaw"):
+        route = routing.get(key) if isinstance(routing.get(key), dict) else {}
+        enabled = "on" if route.get("enabled") else "off"
+        print(f"  {key}: {enabled} - {route.get('intent') or '-'}")
+    print("")
+    print("safety:")
+    safety_text = ", ".join(f"{key}={str(bool(value)).lower()}" for key, value in safety.items())
+    print(f"  {safety_text or '-'}")
+    print("promotion:")
+    print(f"  status: {promotion.get('status') or '-'}")
+    print(f"  next_pr: {harvest.get('recommended_next_pr') or '-'}")
+    print(f"  rollback: {promotion.get('rollback_plan') or '-'}")
     for warning in inspection.get("warnings") or []:
         print(f"warning: {warning}")
     for error in inspection.get("errors") or []:
