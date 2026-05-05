@@ -128,6 +128,28 @@
       font-size: 0.92rem;
     }
 
+    .stack-link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .stack-link-row a {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #111711;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
     .intro,
     .command-panel,
     .card,
@@ -947,6 +969,11 @@
           <strong>3</strong>
           <h3>開いて聴く</h3>
           <p class="muted">drum-floorは再生、namimaはTap、chillはSTART。</p>
+          <div class="stack-link-row" aria-label="Listening destinations">
+            <a href="https://quietbriony.github.io/drum-floor/">drum-floor</a>
+            <a href="https://quietbriony.github.io/namima/">namima</a>
+            <a href="https://quietbriony.github.io/chill/session.html">chill</a>
+          </div>
         </div>
       </div>
     </section>
