@@ -463,7 +463,7 @@
     }
 
     .harvest-card {
-      min-height: 260px;
+      min-height: 230px;
       border: 1px solid var(--line);
       background: var(--panel-2);
       border-radius: 8px;
@@ -500,6 +500,22 @@
       color: var(--muted);
       line-height: 1.42;
       font-size: 0.92rem;
+    }
+
+    .harvest-detail {
+      border: 1px solid var(--line);
+      background: #111711;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .harvest-detail summary {
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      color: var(--blue);
+      cursor: pointer;
+      font-weight: 700;
     }
 
     .packet-panel {
@@ -1303,17 +1319,14 @@
             <h3>拾う</h3>
             <ul class="harvest-list">${useful.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
           </div>
-          <div>
-            <h3>拾わない</h3>
-            <ul class="harvest-list">${forbidden.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-          </div>
           <p class="muted">routes: ${escapeHtml(enabledRoutes.join(", ") || "-")} / flags: ${escapeHtml(riskFlags.join(", ") || "none")}</p>
-          <details class="packet-detail">
-            <summary>Surface CLI</summary>
-            <pre>${escapeHtml(`python .\\openclaw_cli.py harvest-inspect ${cliPath}`)}</pre>
-          </details>
           <button class="packet-copy-button" type="button" data-copy-prompt="${escapeHtml(encodedPrompt)}">このネタで次PR</button>
           <p class="muted">next: ${escapeHtml(harvest.recommended_next_pr || promotion.status || "review-only")}</p>
+          <details class="harvest-detail">
+            <summary>拾わない / CLI</summary>
+            <ul class="harvest-list">${forbidden.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+            <pre>${escapeHtml(`python .\\openclaw_cli.py harvest-inspect ${cliPath}`)}</pre>
+          </details>
         </article>
       `;
     }
