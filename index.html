@@ -1709,7 +1709,7 @@
       const micro = unit(gradient.micro, 0.24);
       const ghost = unit(gradient.ghost, 0.24);
       const referenceText = String(intent.reference_id || intent.referenceId || "").toLowerCase();
-      const reference = ["piano-jazz-chill", "rainy-lofi-room", "soft-solo-drift"].includes(referenceText)
+      const reference = ["piano-jazz-chill", "rainy-lofi-room", "soft-solo-drift", "soft-melody-piano"].includes(referenceText)
         ? referenceText
         : memory > 0.5
           ? "soft-solo-drift"
@@ -1724,6 +1724,7 @@
         enabled: chill.enabled !== false,
         review_only: true,
         reference,
+        reference_label: chillReferenceLabel(reference),
         trio: {
           touch: round3(touch),
           phrase: round3(phrase),
@@ -1737,6 +1738,17 @@
         drum_support: round3(drumSupport),
         next: "open chill session; START remains human-operated"
       };
+    }
+
+    function chillReferenceLabel(referenceId) {
+      const labels = {
+        "piano-jazz-chill": "Quiet Piano",
+        "rainy-lofi-room": "Glass Piano",
+        "soft-solo-drift": "Memory Piano",
+        "soft-melody-piano": "Soft Melody"
+      };
+      const normalized = String(referenceId || "").toLowerCase();
+      return labels[normalized] || String(referenceId || "Quiet Piano");
     }
 
     function openclawSummary(packet) {
@@ -1922,7 +1934,8 @@
           </div>
           <div class="packet-result-card">
             <h3>chillへ</h3>
-            <p>${escapeHtml(chill.reference)} / piano memory ${escapeHtml(chill.piano_memory)}</p>
+            <p>${escapeHtml(chill.reference_label || chill.reference)} (${escapeHtml(chill.reference)})</p>
+            <p>piano memory ${escapeHtml(chill.piano_memory)}</p>
             <p>touch ${escapeHtml(chill.trio.touch)} / phrase ${escapeHtml(chill.trio.phrase)} / room ${escapeHtml(chill.trio.room)}</p>
             <p>bass ${escapeHtml(chill.trio.bass_on ? "on" : "off")} / drums ${escapeHtml(chill.trio.drums_suggested ? "ready" : "off")}</p>
           </div>
@@ -1973,6 +1986,7 @@
       const drumFrame = drum.frame || "frame";
       const namimaMood = namima.mood || "namima mood";
       const chillReference = chill.reference || "chill reference";
+      const chillReferenceName = chill.reference_label || chillReferenceLabel(chillReference);
       const promotion = openclaw.promotion_status || "draft";
       return [
         {
@@ -1992,8 +2006,8 @@
         },
         {
           title: "chillへ",
-          body: `${chillReference}でピアノ/ベース/trioへ。`,
-          prompt: `このMusic packetをchillのQuiet Piano Trioへ渡す前提で、${chillReference}寄りのピアノ/ベース/soft drumsを磨いて。touch=${chill.trio?.touch}, phrase=${chill.trio?.phrase}, room=${chill.trio?.room}, drums=${chill.trio?.drums_suggested ? "ready" : "off"}。STARTは人間操作、録音/uploadなし、音声ファイル/サンプル/歌詞/依存追加なし。`
+          body: `${chillReferenceName} (${chillReference}) でピアノ/ベース/trioへ。`,
+          prompt: `このMusic packetをchillのQuiet Piano Trioへ渡す前提で、${chillReferenceName} (${chillReference}) 寄りのピアノ/ベース/soft drumsを磨いて。touch=${chill.trio?.touch}, phrase=${chill.trio?.phrase}, room=${chill.trio?.room}, drums=${chill.trio?.drums_suggested ? "ready" : "off"}。STARTは人間操作、録音/uploadなし、音声ファイル/サンプル/歌詞/依存追加なし。`
         },
         {
           title: "OpenClawに任せる",
