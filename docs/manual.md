@@ -91,6 +91,17 @@ Music packet board の流れを見る:
 python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.example.json
 ```
 
+repo harvest sidecar を見る:
+
+```powershell
+python .\openclaw_cli.py harvest-inspect ..\Music\docs\examples\repo-harvest-sidecars\chill.sidecar.json
+python .\openclaw_cli.py harvest-inspect ..\Music\docs\examples\repo-harvest-sidecars\test.sidecar.json
+python .\openclaw_cli.py harvest-inspect ..\Music\docs\examples\repo-harvest-sidecars\namima-lab.sidecar.json
+```
+
+これは「何を拾うか」「何をコピーしないか」「どのrepoへ渡すか」を読むだけです。
+code、dependency、audio、sample、workflowはimportしません。
+
 Music で `SYNC` した packet を読む:
 
 Pagesで簡単に見る:
