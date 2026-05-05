@@ -455,6 +455,53 @@
       line-height: 1.4;
     }
 
+    .harvest-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .harvest-card {
+      min-height: 260px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .harvest-card h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .harvest-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .harvest-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .harvest-list li {
+      border-left: 2px solid var(--line);
+      padding-left: 8px;
+      color: var(--muted);
+      line-height: 1.42;
+      font-size: 0.92rem;
+    }
+
     .packet-panel {
       display: grid;
       grid-template-columns: minmax(320px, 0.86fr) minmax(0, 1.14fr);
@@ -707,6 +754,7 @@
       .steps,
       .guardrails,
       .start-grid,
+      .harvest-grid,
       .packet-panel,
       .packet-guide,
       .packet-next-grid,
@@ -737,6 +785,7 @@
       .packet-guide,
       .packet-result-grid,
       .packet-next-grid,
+      .harvest-grid,
       .manual-list,
       .status-row {
         grid-template-columns: 1fr;
@@ -778,6 +827,7 @@
       </div>
       <div class="links">
         <a class="pill" href="docs/packet-inspector-quickstart.md">SYNC最短</a>
+        <a class="pill" href="#repo-harvest">Harvest</a>
         <a class="pill" href="https://quietbriony.github.io/Music/">Music</a>
         <a class="pill" href="docs/manual.md">使い方</a>
       </div>
@@ -794,7 +844,7 @@
         <div class="hero-actions">
           <a class="hero-action" href="https://quietbriony.github.io/Music/">1. Musicを開く</a>
           <a class="hero-action primary" href="#packet-inspector">2. SYNCを読む</a>
-          <a class="hero-action" href="#packet-inspector">3. 次を開く</a>
+          <a class="hero-action" href="#repo-harvest">3. ネタを拾う</a>
         </div>
       </div>
 
@@ -882,6 +932,22 @@
           <h3>開いて聴く</h3>
           <p class="muted">drum-floorは再生、namimaはTap、chillはSTART。</p>
         </div>
+      </div>
+    </section>
+
+    <section class="wide-panel" id="repo-harvest" aria-label="Repo Harvest">
+      <div class="soft-section-title">
+        <h2>Repo Harvest</h2>
+        <span>外部/内部ネタを、コピーではなく制作判断へ翻訳します。</span>
+      </div>
+      <p class="muted">
+        ここは「拾うもの」「拾わないもの」「渡すrepo」を見る場所です。音声、sample、dependency、workflowは取り込みません。
+      </p>
+      <div class="harvest-grid" id="harvest-sidecars">
+        <article class="harvest-card">
+          <h3>読み込み中</h3>
+          <p class="muted">Music側のharvest sidecarを読んでいます。</p>
+        </article>
       </div>
     </section>
 
@@ -1025,6 +1091,23 @@
     let registryCache = null;
     const MUSIC_STACK_PACKET_STORAGE_KEY = "qb:music-stack:latest-packet:v1";
     const MUSIC_STACK_CHANNEL_NAME = "qb:music-stack:v1";
+    const harvestSidecars = [
+      {
+        id: "chill",
+        label: "chill",
+        url: "../Music/docs/examples/repo-harvest-sidecars/chill.sidecar.json"
+      },
+      {
+        id: "test",
+        label: "test",
+        url: "../Music/docs/examples/repo-harvest-sidecars/test.sidecar.json"
+      },
+      {
+        id: "namima-lab",
+        label: "namima-lab",
+        url: "../Music/docs/examples/repo-harvest-sidecars/namima-lab.sidecar.json"
+      }
+    ];
 
     Promise.all([
       fetch(registryUrl).then((response) => response.json()),
@@ -1039,6 +1122,7 @@
       document.getElementById("commands").innerHTML = `<pre>OpenClaw JSONを読み込めません: ${String(error)}</pre>`;
     });
     setupPacketInspector();
+    renderHarvestSidecars();
 
     function renderMetrics(manifest) {
       const gates = Object.keys(manifest.human_gates || {}).length;
@@ -1149,6 +1233,80 @@
           </article>
         `;
       }).join("");
+    }
+
+    async function renderHarvestSidecars() {
+      const node = document.getElementById("harvest-sidecars");
+      if (!node) return;
+      const results = await Promise.allSettled(
+        harvestSidecars.map((sidecar) => fetch(sidecar.url).then((response) => {
+          if (!response.ok) throw new Error(`${sidecar.label}: ${response.status}`);
+          return response.json().then((data) => ({ sidecar, data }));
+        }))
+      );
+      const loaded = results
+        .filter((result) => result.status === "fulfilled")
+        .map((result) => result.value);
+      if (!loaded.length) {
+        const errors = results
+          .filter((result) => result.status === "rejected")
+          .map((result) => String(result.reason));
+        node.innerHTML = `
+          <article class="harvest-card">
+            <h3>読み込めません</h3>
+            <p class="muted">Music側のsidecarが見つからない時は、ローカルroot serverかGitHub Pagesで開いてください。</p>
+            <p class="muted">${escapeHtml(errors.join(" / ") || "unknown error")}</p>
+          </article>
+        `;
+        return;
+      }
+      node.innerHTML = loaded.map(({ sidecar, data }) => renderHarvestCard(sidecar, data)).join("");
+    }
+
+    function renderHarvestCard(sidecar, data) {
+      const source = asObject(data.source);
+      const classification = asObject(data.classification);
+      const evaluation = asObject(data.evaluation);
+      const harvest = asObject(data.harvest);
+      const routing = asObject(data.routing);
+      const promotion = asObject(data.promotion);
+      const useful = stringList(harvest.useful_ideas).slice(0, 3);
+      const forbidden = stringList(harvest.do_not_copy).slice(0, 3);
+      const targets = Array.isArray(classification.target_repos) ? classification.target_repos : [];
+      const enabledRoutes = Object.entries(routing)
+        .filter(([, route]) => asObject(route).enabled === true)
+        .map(([key]) => key);
+      const riskFlags = ["has_audio_files", "has_samples", "has_model_weights", "has_github_actions"]
+        .filter((key) => evaluation[key] === true);
+      const cliPath = `..\\Music\\docs\\examples\\repo-harvest-sidecars\\${sidecar.id}.sidecar.json`;
+      return `
+        <article class="harvest-card">
+          <h3>
+            <span>${escapeHtml(sidecar.label)}</span>
+            <a class="badge" href="${escapeHtml(sidecar.url)}">JSON</a>
+          </h3>
+          <div class="harvest-meta">
+            <span class="badge">${escapeHtml(classification.current_role || "review-only")}</span>
+            <span class="badge">${escapeHtml(classification.category || "harvest")}</span>
+            <span class="badge">risk ${escapeHtml(classification.risk_level || "unknown")}</span>
+          </div>
+          <p class="muted">${escapeHtml(source.repo_full_name || sidecar.label)} -> ${escapeHtml(targets.join(", ") || "target未設定")}</p>
+          <div>
+            <h3>拾う</h3>
+            <ul class="harvest-list">${useful.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          </div>
+          <div>
+            <h3>拾わない</h3>
+            <ul class="harvest-list">${forbidden.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          </div>
+          <p class="muted">routes: ${escapeHtml(enabledRoutes.join(", ") || "-")} / flags: ${escapeHtml(riskFlags.join(", ") || "none")}</p>
+          <details class="packet-detail">
+            <summary>Surface CLI</summary>
+            <pre>${escapeHtml(`python .\\openclaw_cli.py harvest-inspect ${cliPath}`)}</pre>
+          </details>
+          <p class="muted">next: ${escapeHtml(harvest.recommended_next_pr || promotion.status || "review-only")}</p>
+        </article>
+      `;
     }
 
     function setupPacketInspector() {
@@ -1836,6 +1994,10 @@
       }
       textarea.remove();
       return ok;
+    }
+
+    function stringList(value) {
+      return Array.isArray(value) ? value.map((item) => String(item)) : [];
     }
 
     function asObject(value) {

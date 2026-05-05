@@ -91,6 +91,14 @@ Music packet board の流れを見る:
 python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.example.json
 ```
 
+repo harvest をPagesで見る:
+
+1. OpenClaw Main Desk を開く。
+2. `Repo Harvest` までスクロールする。
+3. `chill / test / namima-lab` のカードで、`拾う` と `拾わない` を見る。
+4. `JSON` はMusic側のreview-only sidecar、`Surface CLI` はローカル確認用。
+5. 良さそうなら、このチャットで「このsidecarで次PR」と言う。
+
 repo harvest sidecar を見る:
 
 ```powershell
