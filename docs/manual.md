@@ -96,8 +96,8 @@ repo harvest をPagesで見る:
 1. OpenClaw Main Desk を開く。
 2. `Repo Harvest` までスクロールする。
 3. `chill / test / namima-lab` のカードで、`拾う` と `拾わない` を見る。
-4. `JSON` はMusic側のreview-only sidecar、`Surface CLI` はローカル確認用。
-5. 良さそうなら、このチャットで「このsidecarで次PR」と言う。
+4. 良さそうなら `このネタで次PR` を押し、コピーされた文をこのチャットへ貼る。
+5. `JSON` はMusic側のreview-only sidecar、`Surface CLI` はローカル確認用。
 
 repo harvest sidecar を見る:
 

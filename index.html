@@ -1279,6 +1279,14 @@
       const riskFlags = ["has_audio_files", "has_samples", "has_model_weights", "has_github_actions"]
         .filter((key) => evaluation[key] === true);
       const cliPath = `..\\Music\\docs\\examples\\repo-harvest-sidecars\\${sidecar.id}.sidecar.json`;
+      const prompt = buildHarvestPrompt(sidecar, data, {
+        useful,
+        forbidden,
+        targets,
+        enabledRoutes,
+        riskFlags
+      });
+      const encodedPrompt = encodeURIComponent(prompt);
       return `
         <article class="harvest-card">
           <h3>
@@ -1304,9 +1312,23 @@
             <summary>Surface CLI</summary>
             <pre>${escapeHtml(`python .\\openclaw_cli.py harvest-inspect ${cliPath}`)}</pre>
           </details>
+          <button class="packet-copy-button" type="button" data-copy-prompt="${escapeHtml(encodedPrompt)}">このネタで次PR</button>
           <p class="muted">next: ${escapeHtml(harvest.recommended_next_pr || promotion.status || "review-only")}</p>
         </article>
       `;
+    }
+
+    function buildHarvestPrompt(sidecar, data, summary) {
+      const source = asObject(data.source);
+      const classification = asObject(data.classification);
+      const harvest = asObject(data.harvest);
+      const promotion = asObject(data.promotion);
+      const useful = summary.useful.join(" / ") || "sidecarのuseful_ideas";
+      const forbidden = summary.forbidden.join(" / ") || "音声、sample、direct copy";
+      const targets = summary.targets.join(", ") || "target repo未設定";
+      const routes = summary.enabledRoutes.join(", ") || "review-only";
+      const flags = summary.riskFlags.join(", ") || "none";
+      return `OpenClaw Repo Harvestとして、このsidecarから次の小PRを切って。source=${source.repo_full_name || sidecar.label}, role=${classification.current_role || "review-only"}, category=${classification.category || "harvest"}, targets=${targets}, routes=${routes}, risk_flags=${flags}。拾うもの: ${useful}。拾わないもの: ${forbidden}。recommended_next_pr=${harvest.recommended_next_pr || promotion.status || "review-only"}。直接コードコピー、音声ファイル、サンプル、モデルweights、歌詞、依存追加、workflow追加なし。まず対象repoと達成ゴール/現状/スライスを短く提示し、実装するなら小さくhuman-gatedで進めて。`;
     }
 
     function setupPacketInspector() {
@@ -1410,21 +1432,7 @@
           return;
         }
         const button = target.closest("[data-copy-prompt]");
-        if (!button) return;
-        const prompt = decodeURIComponent(button.dataset.copyPrompt || "");
-        if (!prompt) return;
-        const copied = await copyText(prompt);
-        const card = button.closest(".packet-next-card");
-        card?.querySelector(".packet-copy-fallback")?.remove();
-        if (!copied && card) {
-          showCopyFallback(card, prompt);
-        }
-        button.classList.toggle("is-copied", copied);
-        button.textContent = copied ? "コピー済み" : "コピーできません";
-        window.setTimeout(() => {
-          button.classList.remove("is-copied");
-          button.textContent = "指示文をコピー";
-        }, 1600);
+        if (button) await handlePromptCopy(button);
       });
 
       try {
@@ -1444,6 +1452,31 @@
         }
       });
       readLatestStackPacket();
+    }
+
+    document.addEventListener("click", async (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const button = target?.closest("#harvest-sidecars [data-copy-prompt]");
+      if (button) await handlePromptCopy(button);
+    });
+
+    async function handlePromptCopy(button) {
+      const prompt = decodeURIComponent(button.dataset.copyPrompt || "");
+      if (!prompt) return;
+      const copied = await copyText(prompt);
+      const card = button.closest(".packet-next-card, .harvest-card");
+      card?.querySelector(".packet-copy-fallback")?.remove();
+      if (!copied && card) {
+        showCopyFallback(card, prompt);
+      }
+      button.classList.toggle("is-copied", copied);
+      const originalText = button.dataset.originalText || button.textContent || "指示文をコピー";
+      button.dataset.originalText = originalText;
+      button.textContent = copied ? "コピー済み" : "コピーできません";
+      window.setTimeout(() => {
+        button.classList.remove("is-copied");
+        button.textContent = originalText;
+      }, 1600);
     }
 
     function downloadSurfacePacket(packet) {
