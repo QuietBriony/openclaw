@@ -337,6 +337,7 @@ def _print_packet_inspection(inspection: dict[str, object]) -> None:
     drum = inspection.get("drum_floor") if isinstance(inspection.get("drum_floor"), dict) else {}
     namima = inspection.get("namima") if isinstance(inspection.get("namima"), dict) else {}
     chill = inspection.get("chill") if isinstance(inspection.get("chill"), dict) else {}
+    mic = inspection.get("mic_follow") if isinstance(inspection.get("mic_follow"), dict) else {}
     openclaw = inspection.get("openclaw") if isinstance(inspection.get("openclaw"), dict) else {}
     next_action = openclaw.get("next_action") if isinstance(openclaw.get("next_action"), dict) else {}
     print(f"ok: {str(bool(inspection.get('ok'))).lower()}")
@@ -374,6 +375,14 @@ def _print_packet_inspection(inspection: dict[str, object]) -> None:
     print(f"  piano_memory: {chill.get('piano_memory')}")
     print(f"  drum_support: {chill.get('drum_support')}")
     print(f"  next: {chill.get('next') or '-'}")
+    print("")
+    print("mic_follow:")
+    print(f"  enabled: {str(bool(mic.get('enabled'))).lower()}")
+    print(f"  gesture: {mic.get('gesture') or '-'}")
+    print(f"  drive: {mic.get('drive')}")
+    print(f"  confidence: {mic.get('confidence')}")
+    print(f"  bpm_lock: {mic.get('bpm_lock')}")
+    print(f"  next: {mic.get('next') or '-'}")
     print("")
     print("openclaw:")
     print(f"  promotion_status: {openclaw.get('promotion_status') or '-'}")

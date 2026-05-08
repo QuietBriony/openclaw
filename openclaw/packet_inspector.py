@@ -13,6 +13,7 @@ class PacketInspection:
     drum_floor: dict[str, Any]
     namima: dict[str, Any]
     chill: dict[str, Any]
+    mic_follow: dict[str, Any]
     openclaw: dict[str, Any]
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
@@ -26,6 +27,7 @@ def inspect_music_session_packet(path: str | Path) -> PacketInspection:
     drum_floor = _translate_drum_floor(packet)
     namima = _translate_namima(packet)
     chill = _translate_chill(packet)
+    mic_follow = _mic_follow_summary(packet)
     openclaw = _openclaw_summary(packet)
     return PacketInspection(
         ok=not errors,
@@ -33,6 +35,7 @@ def inspect_music_session_packet(path: str | Path) -> PacketInspection:
         drum_floor=drum_floor,
         namima=namima,
         chill=chill,
+        mic_follow=mic_follow,
         openclaw=openclaw,
         warnings=warnings,
         errors=errors,
@@ -46,6 +49,7 @@ def inspection_to_dict(inspection: PacketInspection) -> dict[str, Any]:
         "drum_floor": inspection.drum_floor,
         "namima": inspection.namima,
         "chill": inspection.chill,
+        "mic_follow": inspection.mic_follow,
         "openclaw": inspection.openclaw,
         "warnings": inspection.warnings,
         "errors": inspection.errors,
@@ -97,6 +101,13 @@ def _validate_packet(packet: dict[str, Any], warnings: list[str], errors: list[s
             warnings.append(f"routing.{key} is missing")
     if _obj(routing.get("openclaw")).get("human_review_required") is not True:
         warnings.append("routing.openclaw.human_review_required should be true")
+
+    mic = _obj(_obj(packet.get("performance_state")).get("mic_follow"))
+    if mic:
+        if mic.get("metadata_only") is not True:
+            warnings.append("performance_state.mic_follow.metadata_only should be true")
+        if mic.get("stores_audio") is not False:
+            warnings.append("performance_state.mic_follow.stores_audio should be false")
 
 
 def _packet_summary(packet: dict[str, Any]) -> dict[str, Any]:
@@ -214,6 +225,27 @@ def _translate_namima(packet: dict[str, Any]) -> dict[str, Any]:
             "foreground_energy": round(min(energy, 0.52), 3),
         },
         "next": "review safe mood only; no dark glitch, bass pressure, upload, or raw trace",
+    }
+
+
+def _mic_follow_summary(packet: dict[str, Any]) -> dict[str, Any]:
+    mic = _obj(_obj(packet.get("performance_state")).get("mic_follow"))
+    confidence = _unit(mic.get("confidence"))
+    enabled = mic.get("enabled") is True and confidence > 0.08
+    return {
+        "enabled": enabled,
+        "gesture": str(mic.get("gesture") or "silent"),
+        "drive": round(_unit(mic.get("drive")), 3),
+        "pulse": round(_unit(mic.get("pulse")), 3),
+        "phrase": round(_unit(mic.get("phrase")), 3),
+        "hum": round(_unit(mic.get("hum")), 3),
+        "air": round(_unit(mic.get("air")), 3),
+        "noisy": round(_unit(mic.get("noisy")), 3),
+        "bpm_lock": _tempo(mic.get("bpm_lock")),
+        "confidence": round(confidence, 3),
+        "metadata_only": mic.get("metadata_only") is True,
+        "stores_audio": False if mic.get("stores_audio") is False else True,
+        "next": "use as a production hint only; never record, upload, or auto-start audio",
     }
 
 
@@ -385,6 +417,13 @@ def _percent(value: Any, fallback: float = 0.0) -> float:
         return _clamp(float(value), 0, 100)
     except (TypeError, ValueError):
         return fallback
+
+
+def _tempo(value: Any) -> int:
+    try:
+        return round(_clamp(float(value), 0, 240))
+    except (TypeError, ValueError):
+        return 0
 
 
 def _clamp(value: float, minimum: float, maximum: float) -> float:

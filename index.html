@@ -849,6 +849,22 @@
         min-height: 0;
       }
 
+      h1 {
+        font-size: clamp(1.65rem, 8vw, 2.1rem);
+        line-height: 1.05;
+        overflow-wrap: anywhere;
+        word-break: break-all;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .hero-action {
+        width: 100%;
+      }
+
       .intro,
       .command-panel,
       .wide-panel {
@@ -1570,6 +1586,7 @@
         drum_floor: translateDrumFloor(packet),
         namima: translateNamima(packet),
         chill: translateChill(packet),
+        mic_follow: micFollowSummary(packet),
         openclaw: openclawSummary(packet),
         warnings,
         errors
@@ -1607,6 +1624,11 @@
       });
       if (asObject(routing.openclaw).human_review_required !== true) {
         warnings.push("routing.openclaw.human_review_required should be true");
+      }
+      const mic = asObject(asObject(packet.performance_state).mic_follow);
+      if (Object.keys(mic).length) {
+        if (mic.metadata_only !== true) warnings.push("performance_state.mic_follow.metadata_only should be true");
+        if (mic.stores_audio !== false) warnings.push("performance_state.mic_follow.stores_audio should be false");
       }
     }
 
@@ -1772,6 +1794,26 @@
       };
     }
 
+    function micFollowSummary(packet) {
+      const mic = asObject(asObject(packet.performance_state).mic_follow);
+      const confidence = unit(mic.confidence);
+      return {
+        enabled: mic.enabled === true && confidence > 0.08,
+        gesture: String(mic.gesture || "silent"),
+        drive: round3(unit(mic.drive)),
+        pulse: round3(unit(mic.pulse)),
+        phrase: round3(unit(mic.phrase)),
+        hum: round3(unit(mic.hum)),
+        air: round3(unit(mic.air)),
+        noisy: round3(unit(mic.noisy)),
+        bpm_lock: Math.round(clamp(Number(mic.bpm_lock) || 0, 0, 240)),
+        confidence: round3(confidence),
+        metadata_only: mic.metadata_only === true,
+        stores_audio: mic.stores_audio === false ? false : true,
+        next: "制作判断のヒントだけ。録音、upload、自動再生はしない。"
+      };
+    }
+
     function chillReferenceLabel(referenceId) {
       const labels = {
         "piano-jazz-chill": "Quiet Piano",
@@ -1908,6 +1950,7 @@
       const drum = inspection.drum_floor;
       const namima = inspection.namima;
       const chill = inspection.chill;
+      const mic = inspection.mic_follow;
       const packet = inspection.packet;
       const nextAction = inspection.openclaw.next_action;
       const statusText = inspection.ok
@@ -1921,11 +1964,12 @@
         drum_floor: drum,
         namima,
         chill,
+        mic_follow: mic,
         openclaw: inspection.openclaw,
         warnings: inspection.warnings,
         errors: inspection.errors
       };
-      const promptCards = renderPromptCards(buildPromptSuggestions(packet, drum, namima, chill, inspection.openclaw));
+      const promptCards = renderPromptCards(buildPromptSuggestions(packet, drum, namima, chill, inspection.openclaw, mic));
       return `
         <div class="packet-status ${inspection.ok ? "ok" : "error"}">
           <strong>${escapeHtml(statusText)}</strong>
@@ -1950,6 +1994,12 @@
             <p>mode: ${escapeHtml(packet.mode || "n/a")}</p>
             <p>energy: ${escapeHtml(packet.ucm.energy)} / void: ${escapeHtml(packet.ucm.void)}</p>
             <p>haze: ${escapeHtml(packet.reference_gradient.haze)} / micro: ${escapeHtml(packet.reference_gradient.micro)}</p>
+          </div>
+          <div class="packet-result-card">
+            <h3>MIC Jam</h3>
+            <p>${escapeHtml(mic.enabled ? `${String(mic.gesture).toUpperCase()} / drive ${Math.round((mic.drive || 0) * 100)}%` : "off / metadata only")}</p>
+            <p>confidence ${escapeHtml(mic.confidence)} / bpm ${escapeHtml(mic.bpm_lock || "-")}</p>
+            <p>${escapeHtml(mic.next)}</p>
           </div>
           <div class="packet-result-card">
             <h3>drum-floorへ</h3>
@@ -2009,7 +2059,7 @@
       `;
     }
 
-    function buildPromptSuggestions(packet, drum, namima, chill, openclaw) {
+    function buildPromptSuggestions(packet, drum, namima, chill, openclaw, mic = {}) {
       const session = packet.session_id || "Music packet";
       const mode = packet.mode || "unknown";
       const energy = packet.ucm?.energy ?? "n/a";
@@ -2020,26 +2070,29 @@
       const chillReference = chill.reference || "chill reference";
       const chillReferenceName = chill.reference_label || chillReferenceLabel(chillReference);
       const promotion = openclaw.promotion_status || "draft";
+      const micText = mic.enabled
+        ? `MIC=${String(mic.gesture || "mic").toUpperCase()} drive=${Math.round((mic.drive || 0) * 100)} confidence=${Math.round((mic.confidence || 0) * 100)} bpm_lock=${mic.bpm_lock || "-"}。`
+        : "MIC=off。";
       return [
         {
           title: "Musicを磨く",
           body: "今の音色と間をMusic側で育てる。",
-          prompt: `このMusic packetを基準に、Music側を小さく磨いて。session=${session}, mode=${mode}, energy=${energy}, void=${voidness}。音数を増やすより、音色差、間、低域安全、producer habitsを優先して。実装するなら小PRで、音声ファイル/サンプル/歌詞/依存追加なし。`
+          prompt: `このMusic packetを基準に、Music側を小さく磨いて。session=${session}, mode=${mode}, energy=${energy}, void=${voidness}, ${micText} 音数を増やすより、音色差、間、低域安全、producer habitsを優先して。実装するなら小PRで、音声ファイル/サンプル/歌詞/依存追加なし。`
         },
         {
           title: "drum-floorへ",
           body: `${drumProfile} / ${drumFrame}寄りでドラム候補へ。`,
-          prompt: `このMusic packetをdrum-floorへ渡す前提で、${drumProfile} / ${drumFrame}寄りのドラム候補設計に進めて。density=${drum.controls?.density}, pressure=${drum.pressure}, bpm=${drum.controls?.bpm}。自動arm/録音/uploadなし、候補生成やPRは人間確認つきで。`
+          prompt: `このMusic packetをdrum-floorへ渡す前提で、${drumProfile} / ${drumFrame}寄りのドラム候補設計に進めて。density=${drum.controls?.density}, pressure=${drum.pressure}, bpm=${drum.controls?.bpm}, ${micText} 自動arm/録音/uploadなし、候補生成やPRは人間確認つきで。`
         },
         {
           title: "namimaへ",
           body: `${namimaMood}として安全な空気へ。`,
-          prompt: `このMusic packetのmoodをnamimaへ翻訳して、${namimaMood}寄りのfamily-safe ambientとして磨いて。water=${namima.intent?.water_motion}, brightness=${namima.intent?.brightness}, energy_cap=${namima.intent?.energy_cap}。暗いglitchや低域圧は足さず、音声/サンプル/生trace保存なし。`
+          prompt: `このMusic packetのmoodをnamimaへ翻訳して、${namimaMood}寄りのfamily-safe ambientとして磨いて。water=${namima.intent?.water_motion}, brightness=${namima.intent?.brightness}, energy_cap=${namima.intent?.energy_cap}, ${micText} 暗いglitchや低域圧は足さず、音声/サンプル/生trace保存なし。`
         },
         {
           title: "chillへ",
           body: `${chillReferenceName} (${chillReference}) でピアノ/ベース/trioへ。`,
-          prompt: `このMusic packetをchillのQuiet Piano Trioへ渡す前提で、${chillReferenceName} (${chillReference}) 寄りのピアノ/ベース/soft drumsを磨いて。touch=${chill.trio?.touch}, phrase=${chill.trio?.phrase}, room=${chill.trio?.room}, drums=${chill.trio?.drums_suggested ? "ready" : "off"}。STARTは人間操作、録音/uploadなし、音声ファイル/サンプル/歌詞/依存追加なし。`
+          prompt: `このMusic packetをchillのQuiet Piano Trioへ渡す前提で、${chillReferenceName} (${chillReference}) 寄りのピアノ/ベース/soft drumsを磨いて。touch=${chill.trio?.touch}, phrase=${chill.trio?.phrase}, room=${chill.trio?.room}, drums=${chill.trio?.drums_suggested ? "ready" : "off"}, ${micText} STARTは人間操作、録音/uploadなし、音声ファイル/サンプル/歌詞/依存追加なし。`
         },
         {
           title: "OpenClawに任せる",

@@ -28,6 +28,7 @@ python .\openclaw_cli.py packet-inspect --latest
 ## 結果の見方
 
 - `Musicの今`: その瞬間の energy、void、haze、micro。まずここで雰囲気を見る。
+- `MIC Jam`: MICがONなら gesture、drive、confidence、bpm hint。これは制作判断のmetadataだけで、録音ではありません。
 - `drum-floorへ`: ドラムに渡すなら profile、frame、kit、bpm がどうなるか。
 - `namimaへ`: 水面/庭/家族向け ambient に渡すなら mood がどうなるか。
 - `chillへ`: ピアノ/ベース/trioに渡すなら reference、Touch、Phrase、Room がどうなるか。
