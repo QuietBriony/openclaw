@@ -809,6 +809,7 @@
     @media (max-width: 640px) {
       .shell {
         width: min(100% - 18px, 560px);
+        overflow-x: hidden;
         padding-top: 12px;
       }
 
@@ -850,10 +851,15 @@
       }
 
       h1 {
-        font-size: clamp(1.65rem, 8vw, 2.1rem);
-        line-height: 1.05;
+        max-width: 100%;
+        font-size: 1.45rem;
+        line-height: 1.12;
         overflow-wrap: anywhere;
         word-break: break-all;
+      }
+
+      .summary {
+        font-size: 0.92rem;
       }
 
       .hero-actions {
@@ -903,7 +909,6 @@
         <div class="hero-actions">
           <a class="hero-action" href="https://quietbriony.github.io/Music/">1. Musicを開く</a>
           <a class="hero-action primary" href="#packet-inspector">2. SYNCを読む</a>
-          <a class="hero-action" href="#packet-inspector">3. 行き先で再生</a>
         </div>
       </div>
 
@@ -931,20 +936,6 @@
         <span>Musicの状態を、次の制作判断に翻訳します。</span>
       </div>
       <p class="muted">MusicでSYNCしたら、ここに最新の翻訳が自動で出ます。アップロード、録音、arm、生成はしません。</p>
-      <div class="packet-guide">
-        <div class="packet-mini-step">
-          <strong>1. MusicでSYNC</strong>
-          <span>Musicを聴いて、良い瞬間でSYNCを押す。</span>
-        </div>
-        <div class="packet-mini-step">
-          <strong>2. ここで読む</strong>
-          <span>latest SYNCを自動表示。</span>
-        </div>
-        <div class="packet-mini-step">
-          <strong>3. 行き先で再生</strong>
-          <span>chillはSTART、drum-floorは再生、namimaはTap。OpenClawは見るだけ。</span>
-        </div>
-      </div>
       <div class="packet-panel">
         <div class="packet-controls">
           <details class="packet-detail">
@@ -973,21 +964,11 @@
       </div>
     </section>
 
-    <section class="wide-panel" aria-label="Start Here">
-      <h2>これだけ</h2>
+    <section class="wide-panel" aria-label="Listening destinations">
+      <h2>行き先</h2>
       <div class="start-grid">
         <div class="start-card">
-          <strong>1</strong>
-          <h3>MusicでSYNC</h3>
-          <p class="muted">良い瞬間、崩れた瞬間、方向が見えた瞬間でSYNC。</p>
-        </div>
-        <div class="start-card">
-          <strong>2</strong>
-          <h3>ここで読む</h3>
-          <p class="muted">latestが自動表示。見るのはNextと行き先だけ。</p>
-        </div>
-        <div class="start-card">
-          <strong>3</strong>
+          <strong>Play</strong>
           <h3>開いて聴く</h3>
           <p class="muted">drum-floorは再生、namimaはTap、chillはSTART。</p>
           <div class="stack-link-row" aria-label="Listening destinations">
@@ -995,6 +976,11 @@
             <a href="https://quietbriony.github.io/namima/">namima</a>
             <a href="https://quietbriony.github.io/chill/session.html">chill</a>
           </div>
+        </div>
+        <div class="start-card">
+          <strong>Build</strong>
+          <h3>次PRにする</h3>
+          <p class="muted">Packet Inspectorの「指示文をコピー」をこのチャットへ貼るだけ。</p>
         </div>
       </div>
     </section>
