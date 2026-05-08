@@ -682,6 +682,11 @@
       color: var(--muted);
     }
 
+    .packet-button.surface-save {
+      min-height: 38px;
+      opacity: 0.82;
+    }
+
     .packet-status {
       border: 1px solid var(--line);
       background: #111711;
@@ -874,15 +879,15 @@
     <section class="hero">
       <div class="intro">
         <div>
-          <h1>Music SYNCを、次の制作指示にする。</h1>
+          <h1>Music SYNCから、次に聴く場所へ。</h1>
           <p class="summary">
-            やることは3つだけ。MusicでSYNC、ここでlatestを読む、出た行き先を開く。実行や生成は人間が選ぶまでしません。
+            やることは3つだけ。MusicでSYNC、ここでlatestを見る、出た行き先を開いて再生。録音、生成、armは人間が選ぶまでしません。
           </p>
         </div>
         <div class="hero-actions">
           <a class="hero-action" href="https://quietbriony.github.io/Music/">1. Musicを開く</a>
           <a class="hero-action primary" href="#packet-inspector">2. SYNCを読む</a>
-          <a class="hero-action" href="#repo-harvest">3. ネタを拾う</a>
+          <a class="hero-action" href="#packet-inspector">3. 行き先で再生</a>
         </div>
       </div>
 
@@ -920,8 +925,8 @@
           <span>latest SYNCを自動表示。</span>
         </div>
         <div class="packet-mini-step">
-          <strong>3. 次を決める</strong>
-          <span>Musicを磨く、drum-floorへ渡す、namimaへ渡す、chillで弾く、のどれかを選ぶ。</span>
+          <strong>3. 行き先で再生</strong>
+          <span>chillはSTART、drum-floorは再生、namimaはTap。OpenClawは見るだけ。</span>
         </div>
       </div>
       <div class="packet-panel">
@@ -1930,14 +1935,14 @@
         </div>
         <div class="packet-result-grid">
           <div class="packet-result-card">
-            <h3>今はこれ</h3>
+            <h3>次にやること</h3>
             <p><strong>${escapeHtml(nextAction.label)}</strong></p>
             <p>${escapeHtml(nextAction.reason)}</p>
             <p>${escapeHtml(nextAction.action)}</p>
             <p>confidence: ${escapeHtml(nextAction.confidence)} / 手動開始: ${escapeHtml(nextAction.manual_start_required ? "yes" : "no")}</p>
             <div class="packet-route-actions">
               <a class="packet-button primary" href="${escapeHtml(nextActionUrl(nextAction.destination))}">${escapeHtml(nextActionButtonLabel(nextAction.destination))}</a>
-              <button class="packet-button secondary" type="button" data-save-surface-packet>Surfaceへ保存</button>
+              <button class="packet-button secondary surface-save" type="button" data-save-surface-packet>Surfaceへ保存（CLI用）</button>
             </div>
           </div>
           <div class="packet-result-card">
