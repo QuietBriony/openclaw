@@ -3,6 +3,11 @@
 The public Music Stack OpenClaw Desk Pages site is a dashboard and contract surface. The actual
 producer run can live on this Surface PC.
 
+This repo is not the Umbrel OpenClaw runtime. It is the Surface-side desk for
+manual control, live-coding-style exploration, Music `SYNC` packet review, and
+local candidate generation before a human decides what to play, arm, record, or
+merge.
+
 ## Public vs Local
 
 Public:
