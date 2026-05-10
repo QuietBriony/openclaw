@@ -1,8 +1,14 @@
 # Music Stack OpenClaw Session OS
 
-This repo is the Music Stack OpenClaw Desk: a session operating surface for the
-QuietBriony Music Stack repo family, not a new instrument and not the global
-OpenClaw mothership/runtime lane.
+This repo is the Music Stack OpenClaw Desk: a Surface-side session operating
+desk for the QuietBriony Music Stack repo family. It is not a new instrument,
+not the Umbrel OpenClaw runtime, and not the global OpenClaw mothership/runtime
+lane.
+
+Its job is to help the human control the music stack from the Surface PC:
+review Music `SYNC` packets, prepare live-coding-style next moves, generate
+local candidates when explicitly requested, and keep arm / record / merge
+decisions human-gated.
 
 The guiding split:
 

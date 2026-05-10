@@ -1,10 +1,14 @@
 # Music Stack OpenClaw Desk Manual
 
 Music Stack OpenClaw Desk は、Music stack のための「人間確認つき制作卓」です。
-`openclaw-lab` 母艦、Umbrel OpenClaw runtime、finance / LINE 系の共有
+Umbrel 常駐 runtime ではなく、Surface PC で Music Stack を見ながら
+手元コントロール、live coding 的な試行、SYNC packet 確認、候補生成の
+段取りをまとめる入口です。`openclaw-lab` 母艦、finance / LINE 系の共有
 OpenClaw 導線そのものではありません。
 
-公開 Pages は見るための入口で、実際の生成は Surface PC のローカル CLI が行います。
+公開 Pages は見るための入口で、実際の生成や候補確認は Surface PC の
+ローカル CLI が行います。音を出す、録音する、armする、live coding する、
+mergeする、という最終操作は人間が選びます。
 
 ## まず開くページ
 
@@ -21,7 +25,7 @@ OpenClaw 導線そのものではありません。
 - `chill`: soft piano / sparse bass / やわらかメロディ / memory dots。
 - `drum-floor`: raw live drums / pocket / browser trio drum surface / MIDI candidate。
 - `namima`: mood / water interaction / coarse trace。
-- `Music Stack OpenClaw Desk`: manifest、local generate、inspect、human gate、repo横断の制作卓。
+- `Music Stack OpenClaw Desk`: Surface操作、live coding前の段取り、manifest、local generate、inspect、human gate、repo横断の制作卓。
 
 ## Public と Local
 

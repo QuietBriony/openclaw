@@ -2,8 +2,9 @@
 
 Music Stack OpenClaw Desk v1 uses a minimal connector contract for the
 QuietBriony Music Stack. The control plane can validate, plan, and print safe
-commands, but it does not take over audio runtime control or define the global
-OpenClaw runtime used by other domains.
+commands for Surface-side control and live-coding-style review, but it does not
+take over audio runtime control, run as the Umbrel OpenClaw runtime, or define
+the global OpenClaw runtime used by other domains.
 
 ## Common API Shape
 

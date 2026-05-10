@@ -1,13 +1,16 @@
 # Music Stack OpenClaw Desk
 
 この repo は QuietBriony Music Stack 用の OpenClaw Desk です。
-`openclaw-lab` 母艦、Umbrel OpenClaw runtime、finance / LINE 系の共有
-OpenClaw 導線そのものではありません。
+Umbrel 常駐 runtime ではなく、Surface PC で Music Stack を見ながら
+手元コントロール、live coding 的な試行、SYNC packet 確認、候補生成の
+段取りをまとめる制作卓です。`openclaw-lab` 母艦、finance / LINE 系の共有
+OpenClaw 導線そのものでもありません。
 
 Music Stack OpenClaw Desk は、Music stack のための、人間確認つき制作卓です。
 
-v1では音を鳴らしません。Music の `SYNC` を読み、`drum-floor` / `namima`
-へ渡す制作判断を整理し、必要ならローカルCLIの予備手順も出します。
+v1では自動で音を鳴らしません。Music の `SYNC` を読み、`drum-floor` /
+`namima` / `chill` へ渡す制作判断を整理し、Surface 上で人間が
+START、演奏、live coding、録音、merge を選ぶ前の安全な手順を出します。
 
 Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
@@ -16,6 +19,8 @@ drum-floor / namima / chill へのroutingを確認できます。Hazama FM か�
 `SYNC` した場合は、`techno balance` や `piano foreground` のような
 review cue も次の聴感タスクとして表示します。アップロード、録音、arm、
 生成はしません。JSON選択はlocalhostなどでSYNCが届かない時のfallbackです。
+Surface での手弾き、手動操作、live coding 的な調整を助ける入口ですが、
+勝手に Ableton、EP-133、ブラウザ音声、Music REC を操作するものではありません。
 
 Manual: [docs/manual.md](docs/manual.md)
 
