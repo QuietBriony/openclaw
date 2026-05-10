@@ -1,14 +1,14 @@
 # SYNC最短手順
 
 Music の `SYNC` は音ではありません。今の Music の状態を、drum-floor、
-namima、chill、OpenClaw に渡すための短い地図です。
+namima、chill、Music Stack OpenClaw Desk に渡すための短い地図です。
 
 ## いちばん簡単な使い方
 
 1. Music を開く: <https://quietbriony.github.io/Music/>
 2. `START` して、良い瞬間まで聴く。
 3. Music の `SYNC` を押す。
-4. OpenClaw を開く: <https://quietbriony.github.io/openclaw/>
+4. Music Stack OpenClaw Desk を開く: <https://quietbriony.github.io/openclaw/>
 5. `Packet Inspector` に latest SYNC が自動表示される。
 6. `drum-floorへ`、`namimaへ`、`chillへ` のどれで遊ぶか決める。
 7. 行き先を開いて、音を出すボタンだけ押す。
@@ -18,7 +18,7 @@ namima、chill、OpenClaw に渡すための短い地図です。
 
 JSONファイル選択と貼り付け欄は、localhostの別portなどでSYNCが届かない時のfallbackです。
 
-Surfaceローカル母艦へ渡す時は、OpenClaw画面の `Surfaceへ保存` を押してから:
+Surfaceローカル母艦へ渡す時は、Music Stack OpenClaw Desk 画面の `Surfaceへ保存` を押してから:
 
 ```powershell
 python .\openclaw_cli.py packet-import --latest-download
@@ -62,7 +62,7 @@ chill に渡すなら:
 このpacketで、chillのピアノ/ベース/trioを柔らかく磨いて
 ```
 
-OpenClaw に任せるなら:
+Music Stack OpenClaw Desk に任せるなら:
 
 ```text
 このpacketで次PR切って。生成や録音はまだしないで

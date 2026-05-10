@@ -1,7 +1,9 @@
-# Connector Contract
+# Music Stack OpenClaw Connector Contract
 
-OpenClaw v1 uses a minimal connector contract. The control plane can validate,
-plan, and print safe commands, but it does not take over audio runtime control.
+Music Stack OpenClaw Desk v1 uses a minimal connector contract for the
+QuietBriony Music Stack. The control plane can validate, plan, and print safe
+commands, but it does not take over audio runtime control or define the global
+OpenClaw runtime used by other domains.
 
 ## Common API Shape
 

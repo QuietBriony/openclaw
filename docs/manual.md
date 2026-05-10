@@ -1,12 +1,14 @@
-# OpenClaw Manual
+# Music Stack OpenClaw Desk Manual
 
-OpenClaw は、Music stack のための「人間確認つき制作卓」です。
+Music Stack OpenClaw Desk は、Music stack のための「人間確認つき制作卓」です。
+`openclaw-lab` 母艦、Umbrel OpenClaw runtime、finance / LINE 系の共有
+OpenClaw 導線そのものではありません。
 
 公開 Pages は見るための入口で、実際の生成は Surface PC のローカル CLI が行います。
 
 ## まず開くページ
 
-- OpenClaw Main Desk: <https://quietbriony.github.io/openclaw/>
+- Music Stack OpenClaw Desk: <https://quietbriony.github.io/openclaw/>
 - Packet Inspector Quickstart: [packet-inspector-quickstart.md](packet-inspector-quickstart.md)
 - Music: <https://quietbriony.github.io/Music/>
 - chill: <https://quietbriony.github.io/chill/>
@@ -19,7 +21,7 @@ OpenClaw は、Music stack のための「人間確認つき制作卓」です�
 - `chill`: soft piano / sparse bass / やわらかメロディ / memory dots。
 - `drum-floor`: raw live drums / pocket / browser trio drum surface / MIDI candidate。
 - `namima`: mood / water interaction / coarse trace。
-- `OpenClaw`: manifest、local generate、inspect、human gate、repo横断の制作卓。
+- `Music Stack OpenClaw Desk`: manifest、local generate、inspect、human gate、repo横断の制作卓。
 
 ## Public と Local
 
@@ -93,7 +95,7 @@ python .\openclaw_cli.py plan sessions\examples\music-orchestra-mission-board.ex
 
 repo harvest をPagesで見る:
 
-1. OpenClaw Main Desk を開く。
+1. Music Stack OpenClaw Desk を開く。
 2. `Repo Harvest` までスクロールする。
 3. `chill / test / namima-lab` のカードで、`拾う` と `拾わない` を見る。
 4. 良さそうなら `このネタで次PR` を押し、コピーされた文をこのチャットへ貼る。
@@ -114,7 +116,7 @@ Music で `SYNC` した packet を読む:
 
 Pagesで簡単に見る:
 
-1. OpenClaw Main Desk を開く。
+1. Music Stack OpenClaw Desk を開く。
 2. Music Pagesで `SYNC` 済みなら latest packet が自動表示される。
 3. `drum-floorへ` / `namimaへ` / `chillへ` / `OpenClaw` の review-only translation を読む。
 4. Hazama FM から `SYNC` した場合は `Hazama FM cue` を読み、`techno balance` / `piano foreground` などの短い聴感タスクを次PR候補として扱う。
@@ -175,7 +177,7 @@ python .\openclaw_cli.py local-generate sessions\examples\raw-drum-candidate-exp
 
 ## 聴く流れ
 
-1. OpenClaw Main Desk でセッションを選ぶ。
+1. Music Stack OpenClaw Desk でセッションを選ぶ。
 2. `plan` を読む。
 3. `local-generate --execute` で候補を作る。
 4. `preview.txt` と `drums.mid` を確認する。
@@ -249,7 +251,7 @@ python .\openclaw_cli.py local-generate sessions\examples\raw-drum-candidate-exp
 - merge
 - release
 
-OpenClaw は候補を作れますが、公開や録音や arm はしません。
+Music Stack OpenClaw Desk は候補を作れますが、公開や録音や arm はしません。
 
 ## Safety
 

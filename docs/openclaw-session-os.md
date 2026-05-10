@@ -1,6 +1,8 @@
-# OpenClaw Session OS
+# Music Stack OpenClaw Session OS
 
-OpenClaw is a session operating surface for a repo family, not a new instrument.
+This repo is the Music Stack OpenClaw Desk: a session operating surface for the
+QuietBriony Music Stack repo family, not a new instrument and not the global
+OpenClaw mothership/runtime lane.
 
 The guiding split:
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OpenClaw 制作卓</title>
+  <title>Music Stack OpenClaw Desk</title>
   <style>
     :root {
       color-scheme: dark;
@@ -885,10 +885,10 @@
 </head>
 <body>
   <main class="shell">
-    <nav class="topbar" aria-label="OpenClaw links">
+    <nav class="topbar" aria-label="Music Stack OpenClaw links">
       <div class="brand">
-        <strong>OpenClaw 制作卓</strong>
-        <span>Music SYNCを読み、次の制作指示に変える入口</span>
+        <strong>Music Stack OpenClaw Desk</strong>
+        <span>Music SYNC専用の制作指示入口</span>
       </div>
       <div class="links">
         <a class="pill" href="docs/packet-inspector-quickstart.md">SYNC最短</a>
@@ -1014,7 +1014,7 @@
         <div class="manual-list">
           <a class="manual-link" href="docs/manual.md">
             <strong>全体マニュアル</strong>
-            <span>OpenClaw の全体像、Surface CLI、repo磨き、mergeまで。</span>
+            <span>Music Stack OpenClaw Desk の全体像、Surface CLI、repo磨き、mergeまで。</span>
           </a>
           <a class="manual-link" href="docs/packet-inspector-quickstart.md">
             <strong>SYNC最短手順</strong>
@@ -1030,7 +1030,7 @@
           </a>
           <a class="manual-link" href="docs/music-orchestra-mission-board.md">
             <strong>Orchestra Board</strong>
-            <span>Music packetをdrum-floor / namima / chillへ流すreview-only制作卓。</span>
+            <span>Music packetをdrum-floor / namima / chillへ流すreview-only desk。</span>
           </a>
         </div>
       </details>
@@ -1074,7 +1074,7 @@
             <p>「もっと生ドラム」「namimaへ柔らかく」など、耳の方向をここで言います。</p>
           </div>
           <div class="step">
-            <small>OpenClaw</small>
+            <small>Music Stack OpenClaw</small>
             <h3>制作卓</h3>
             <p>JSON、manifest、手順、安全ゲートを整理します。隠れて演奏はしません。</p>
           </div>
@@ -1104,7 +1104,7 @@
     </section>
 
     <p class="footer">
-      OpenClaw v1は、音を鳴らす主役ではなく制作卓です。JSON、接続一覧、予備CLI、ローカルtrace、PRレビューゲートを整理します。
+      Music Stack OpenClaw Desk v1は、音を鳴らす主役ではなく制作卓です。JSON、接続一覧、予備CLI、ローカルtrace、PRレビューゲートを整理します。
     </p>
   </main>
 
@@ -1192,7 +1192,7 @@
       const chillUrl = manifest.connectors?.chill?.runtime_url;
       const musicUrl = manifest.connectors?.music?.runtime_url || "https://quietbriony.github.io/Music/";
       const musicPacketBoard = manifest.session_mode === "music_orchestra_mission_board"
-        ? commandBlock("Music SYNC", "MusicでSYNCし、このページでlatestを読むのが基本です。JSONファイルとCLIは予備です。", `${musicUrl}\nMusicでSYNCを押す\nOpenClaw -> SYNCを読む -> 自動表示\nFallback: JSONファイル選択 / python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
+        ? commandBlock("Music SYNC", "MusicでSYNCし、このページでlatestを読むのが基本です。JSONファイルとCLIは予備です。", `${musicUrl}\nMusicでSYNCを押す\nMusic Stack OpenClaw Desk -> SYNCを読む -> 自動表示\nFallback: JSONファイル選択 / python .\\openclaw_cli.py packet-inspect "$env:USERPROFILE\\Downloads\\<music-session-packet>.json"`)
         : "";
       const openTrio = String(manifest.session_mode || "").startsWith("chill_trio") && chillUrl
         ? commandBlock("Chill Trioを開く", "ブラウザで聴く入口。音は人間の START / BASS / DRUMS 操作で鳴らします。", `${chillUrl}\nSTART -> BASS ON -> DRUMS ON\nConsole: window.chillTrioSession.snapshot()`)
@@ -1375,7 +1375,7 @@
       const targets = summary.targets.join(", ") || "target repo未設定";
       const routes = summary.enabledRoutes.join(", ") || "review-only";
       const flags = summary.riskFlags.join(", ") || "none";
-      return `OpenClaw Repo Harvestとして、このsidecarから次の小PRを切って。source=${source.repo_full_name || sidecar.label}, role=${classification.current_role || "review-only"}, category=${classification.category || "harvest"}, targets=${targets}, routes=${routes}, risk_flags=${flags}。拾うもの: ${useful}。拾わないもの: ${forbidden}。recommended_next_pr=${harvest.recommended_next_pr || promotion.status || "review-only"}。直接コードコピー、音声ファイル、サンプル、モデルweights、歌詞、依存追加、workflow追加なし。まず対象repoと達成ゴール/現状/スライスを短く提示し、実装するなら小さくhuman-gatedで進めて。`;
+      return `Music Stack OpenClaw Repo Harvestとして、このsidecarから次の小PRを切って。source=${source.repo_full_name || sidecar.label}, role=${classification.current_role || "review-only"}, category=${classification.category || "harvest"}, targets=${targets}, routes=${routes}, risk_flags=${flags}。拾うもの: ${useful}。拾わないもの: ${forbidden}。recommended_next_pr=${harvest.recommended_next_pr || promotion.status || "review-only"}。直接コードコピー、音声ファイル、サンプル、モデルweights、歌詞、依存追加、workflow追加なし。まず対象repoと達成ゴール/現状/スライスを短く提示し、実装するなら小さくhuman-gatedで進めて。`;
     }
 
     function setupPacketInspector() {
@@ -2080,8 +2080,8 @@
             <span>chill/sessionを開くと、ピアノ/ベース/trioの構えがこのpacketに寄る。STARTは人間が押す。</span>
           </div>
           <div class="packet-next-card">
-            <strong>OpenClawに任せる</strong>
-            <span>「このpacketで次PR切って」と言う。OpenClawは候補と手順だけ作る。</span>
+            <strong>Deskに任せる</strong>
+            <span>「このpacketで次PR切って」と言う。Music Stack OpenClaw Deskは候補と手順だけ作る。</span>
           </div>
         </div>
         <div class="soft-section-title">
@@ -2135,9 +2135,9 @@
           prompt: `このMusic packetをchillのQuiet Piano Trioへ渡す前提で、${chillReferenceName} (${chillReference}) 寄りのピアノ/ベース/soft drumsを磨いて。touch=${chill.trio?.touch}, phrase=${chill.trio?.phrase}, room=${chill.trio?.room}, drums=${chill.trio?.drums_suggested ? "ready" : "off"}, ${micText} STARTは人間操作、録音/uploadなし、音声ファイル/サンプル/歌詞/依存追加なし。`
         },
         {
-          title: "OpenClawに任せる",
+          title: "Deskに任せる",
           body: `promotion=${promotion}のまま安全に次PRを切る。`,
-          prompt: `このpacketでOpenClaw制作卓として次の小PRを切って。session=${session}, promotion=${promotion}。まず対象repoと狙いを整理し、必要最小変更で進めて。生成/録音/arm/upload/mergeは人間確認つき、秘密や音声ファイルはGitHubへ載せない。`
+          prompt: `このpacketでMusic Stack OpenClaw Deskとして次の小PRを切って。session=${session}, promotion=${promotion}。まず対象repoと狙いを整理し、必要最小変更で進めて。生成/録音/arm/upload/mergeは人間確認つき、秘密や音声ファイルはGitHubへ載せない。`
         }
       ];
       if (fmCue) {
