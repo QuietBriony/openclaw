@@ -1,6 +1,6 @@
 # Surface Local Producer
 
-The public OpenClaw Pages site is a dashboard and contract surface. The actual
+The public Music Stack OpenClaw Desk Pages site is a dashboard and contract surface. The actual
 producer run can live on this Surface PC.
 
 ## Public vs Local

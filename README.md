@@ -1,6 +1,10 @@
-# OpenClaw
+# Music Stack OpenClaw Desk
 
-OpenClaw は QuietBriony music stack のための、人間確認つき制作卓です。
+この repo は QuietBriony Music Stack 用の OpenClaw Desk です。
+`openclaw-lab` 母艦、Umbrel OpenClaw runtime、finance / LINE 系の共有
+OpenClaw 導線そのものではありません。
+
+Music Stack OpenClaw Desk は、Music stack のための、人間確認つき制作卓です。
 
 v1では音を鳴らしません。Music の `SYNC` を読み、`drum-floor` / `namima`
 へ渡す制作判断を整理し、必要ならローカルCLIの予備手順も出します。
@@ -79,7 +83,7 @@ and run traces under `.openclaw-local/`, which is ignored by git. It still does
 not arm, record, upload, or push.
 
 `packet-inspect` is the Surface CLI fallback for a downloaded Music packet.
-The usual browser flow is `MusicでSYNC -> OpenClawを開く -> latestを自動表示`.
+The usual browser flow is `MusicでSYNC -> Music Stack OpenClaw Deskを開く -> latestを自動表示`.
 Neither path executes the translations.
 
 `harvest-inspect` reads a repo harvest sidecar, such as the examples under
@@ -124,7 +128,7 @@ Required connectors:
 - No automatic Ableton, EP-133, Music REC, or browser transport control.
 - No copied reference melodies, chords, structures, or sample gestures.
 
-OpenClaw is a conductor desk, not a hidden performer.
+Music Stack OpenClaw Desk is a conductor desk, not a hidden performer.
 
 ## Chill Trio
 
