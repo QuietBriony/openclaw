@@ -83,8 +83,48 @@ def sample_packet(session_id: str = "music-test-session") -> dict:
                     "label": "chillで聴く",
                     "action": "chill sessionを開いてSTART。",
                     "confidence": 0.64,
+                    "fm_review_cue": {
+                        "schema": "hazama-fm-review-cue.v1",
+                        "active_genre": "piano",
+                        "dominant_genre": "piano",
+                        "dwell_seconds": 7,
+                        "destination": "chill",
+                        "target_repo": "chill",
+                        "short_label": "piano foreground",
+                        "next_task": "piano-foreground-chill-reference-listening-pass",
+                        "reason": "FM piano was saved for quiet comparison.",
+                        "action": "chill sessionと比べてMusic側に残す成分を決める。",
+                        "cluster_reference": "Music",
+                        "confidence": 0.5,
+                        "metadata_only": True,
+                        "human_review_required": True,
+                    },
                 },
             },
+        },
+        "performance_state": {
+            "hazama_fm": {
+                "active": True,
+                "genre": "piano",
+                "review_cue": {
+                    "schema": "hazama-fm-review-cue.v1",
+                    "active_genre": "piano",
+                    "dominant_genre": "piano",
+                    "dwell_seconds": 7,
+                    "destination": "chill",
+                    "target_repo": "chill",
+                    "short_label": "piano foreground",
+                    "next_task": "piano-foreground-chill-reference-listening-pass",
+                    "reason": "FM piano was saved for quiet comparison.",
+                    "action": "chill sessionと比べてMusic側に残す成分を決める。",
+                    "cluster_reference": "Music",
+                    "confidence": 0.5,
+                    "metadata_only": True,
+                    "human_review_required": True,
+                },
+                "integration_mode": "metadata-only",
+                "review_only": True,
+            }
         },
         "safety": {
             "stores_audio": False,
@@ -142,6 +182,7 @@ class SurfaceInboxTests(unittest.TestCase):
                 text = inspect_out.getvalue()
                 self.assertIn("chill:", text)
                 self.assertIn("next_action: chillで聴く", text)
+                self.assertIn("fm_review_cue: piano foreground", text)
             finally:
                 surface_inbox.INBOX_ROOT = old_inbox
                 surface_inbox.HISTORY_ROOT = old_history
@@ -162,6 +203,8 @@ class SurfaceInboxTests(unittest.TestCase):
             inspection = inspection_to_dict(inspect_music_session_packet(packet_path))
             self.assertEqual(inspection["chill"]["reference"], "piano-jazz-chill")
             self.assertEqual(inspection["openclaw"]["next_action"]["destination"], "chill")
+            self.assertEqual(inspection["openclaw"]["fm_review_cue"]["short_label"], "piano foreground")
+            self.assertEqual(inspection["openclaw"]["next_action"]["fm_review_cue"]["target_repo"], "chill")
 
 
 if __name__ == "__main__":

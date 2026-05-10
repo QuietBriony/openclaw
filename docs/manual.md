@@ -117,8 +117,9 @@ Pagesで簡単に見る:
 1. OpenClaw Main Desk を開く。
 2. Music Pagesで `SYNC` 済みなら latest packet が自動表示される。
 3. `drum-floorへ` / `namimaへ` / `chillへ` / `OpenClaw` の review-only translation を読む。
-4. Surface CLIへ渡す時は `Surfaceへ保存` を押し、Downloadsへpacketを保存する。
-5. JSON file chooser と貼り付け欄は、localhostの別portなどでSYNCが届かない時だけ使う。
+4. Hazama FM から `SYNC` した場合は `Hazama FM cue` を読み、`techno balance` / `piano foreground` などの短い聴感タスクを次PR候補として扱う。
+5. Surface CLIへ渡す時は `Surfaceへ保存` を押し、Downloadsへpacketを保存する。
+6. JSON file chooser と貼り付け欄は、localhostの別portなどでSYNCが届かない時だけ使う。
 
 Surface PC の CLI で見る:
 

@@ -1616,6 +1616,9 @@
         if (mic.metadata_only !== true) warnings.push("performance_state.mic_follow.metadata_only should be true");
         if (mic.stores_audio !== false) warnings.push("performance_state.mic_follow.stores_audio should be false");
       }
+      const fmCue = extractFmReviewCue(packet);
+      if (fmCue && fmCue.metadata_only !== true) warnings.push("hazama fm review cue should be metadata-only");
+      if (fmCue && fmCue.human_review_required !== true) warnings.push("hazama fm review cue should require human review");
     }
 
     function packetSummary(packet) {
@@ -1813,13 +1816,16 @@
 
     function openclawSummary(packet) {
       const openclaw = asObject(asObject(packet.routing).openclaw);
+      const fmReviewCue = extractFmReviewCue(packet);
       const nextAction = normalizeNextAction(openclaw.next_action);
+      if (fmReviewCue) nextAction.fm_review_cue = fmReviewCue;
       const selfReview = asObject(openclaw.self_review);
       return {
         enabled: openclaw.enabled !== false,
         promotion_status: String(openclaw.promotion_status || "draft"),
         human_review_required: openclaw.human_review_required === true,
         next_action: nextAction,
+        fm_review_cue: fmReviewCue,
         self_review: {
           densityRisk: round3(unit(selfReview.densityRisk, 0)),
           lowEndRisk: round3(unit(selfReview.lowEndRisk, 0)),
@@ -1848,8 +1854,36 @@
         reason: String(action.reason || "Musicのpacketを安全に見立てる。"),
         action: String(action.action || "OpenClawで結果を見て、必要ならこのチャットへ投げる。"),
         confidence: round3(unit(action.confidence, 0.28)),
+        fm_review_cue: normalizeFmReviewCue(action.fm_review_cue),
         manual_start_required: action.manual_start_required !== false,
         metadata_only: action.metadata_only !== false
+      };
+    }
+
+    function extractFmReviewCue(packet) {
+      const routingCue = asObject(asObject(asObject(packet.routing).openclaw).next_action).fm_review_cue;
+      const hazamaCue = asObject(asObject(asObject(packet.performance_state).hazama_fm).review_cue);
+      return normalizeFmReviewCue(routingCue || hazamaCue);
+    }
+
+    function normalizeFmReviewCue(value) {
+      const cue = asObject(value);
+      if (!Object.keys(cue).length) return null;
+      return {
+        schema: String(cue.schema || "hazama-fm-review-cue.v1"),
+        active_genre: String(cue.active_genre || cue.dominant_genre || ""),
+        dominant_genre: String(cue.dominant_genre || cue.active_genre || ""),
+        dwell_seconds: Math.round(clamp(Number(cue.dwell_seconds) || 0, 0, 36000)),
+        destination: String(cue.destination || "openclaw"),
+        target_repo: String(cue.target_repo || ""),
+        short_label: String(cue.short_label || cue.label || "FM review"),
+        next_task: String(cue.next_task || ""),
+        reason: String(cue.reason || "Hazama FMで保存した聴感cue。"),
+        action: String(cue.action || "FMで聴き直し、人間が次の小PRにするか決める。"),
+        cluster_reference: String(cue.cluster_reference || ""),
+        confidence: round3(unit(cue.confidence, 0.28)),
+        metadata_only: cue.metadata_only !== false,
+        human_review_required: cue.human_review_required !== false
       };
     }
 
@@ -1939,6 +1973,7 @@
       const mic = inspection.mic_follow;
       const packet = inspection.packet;
       const nextAction = inspection.openclaw.next_action;
+      const fmCue = inspection.openclaw.fm_review_cue || nextAction.fm_review_cue || null;
       const statusText = inspection.ok
         ? `OK: ${packet.session_id || "Music packet"} を安全に読みました。`
         : `確認が必要です: ${inspection.errors.length}件のerror。`;
@@ -1956,6 +1991,22 @@
         errors: inspection.errors
       };
       const promptCards = renderPromptCards(buildPromptSuggestions(packet, drum, namima, chill, inspection.openclaw, mic));
+      const fmCueCard = fmCue ? `
+          <div class="packet-result-card">
+            <h3>Hazama FM cue</h3>
+            <p><strong>${escapeHtml(fmCue.short_label)}</strong> / ${escapeHtml(fmCue.active_genre || fmCue.dominant_genre || "genre")}</p>
+            <p>target: ${escapeHtml(fmCue.target_repo || fmCue.destination)} / dwell ${escapeHtml(fmCue.dwell_seconds)}s</p>
+            <p>${escapeHtml(fmCue.reason)}</p>
+            <p>next: ${escapeHtml(fmCue.next_task || "listening review")}</p>
+          </div>
+      ` : "";
+      const fmCueNextCard = fmCue ? `
+          <div class="packet-next-card">
+            <strong>FM cueを拾う</strong>
+            <span>${escapeHtml(fmCue.action)}</span>
+            <a class="packet-button primary" href="${escapeHtml(nextActionUrl(fmCue.destination))}">${escapeHtml(nextActionButtonLabel(fmCue.destination))}</a>
+          </div>
+      ` : "";
       return `
         <div class="packet-status ${inspection.ok ? "ok" : "error"}">
           <strong>${escapeHtml(statusText)}</strong>
@@ -1981,6 +2032,7 @@
             <p>energy: ${escapeHtml(packet.ucm.energy)} / void: ${escapeHtml(packet.ucm.void)}</p>
             <p>haze: ${escapeHtml(packet.reference_gradient.haze)} / micro: ${escapeHtml(packet.reference_gradient.micro)}</p>
           </div>
+          ${fmCueCard}
           <div class="packet-result-card">
             <h3>MIC Jam</h3>
             <p>${escapeHtml(mic.enabled ? `${String(mic.gesture).toUpperCase()} / drive ${Math.round((mic.drive || 0) * 100)}%` : "off / metadata only")}</p>
@@ -2014,6 +2066,7 @@
             <span>${escapeHtml(nextAction.action)}</span>
             <a class="packet-button primary" href="${escapeHtml(nextActionUrl(nextAction.destination))}">${escapeHtml(nextActionButtonLabel(nextAction.destination))}</a>
           </div>
+          ${fmCueNextCard}
           <div class="packet-next-card">
             <strong>ドラムを育てる</strong>
             <span>このチャットで「drum-floorを${escapeHtml(drum.profile)}寄りで候補生成して」と言う。</span>
@@ -2056,10 +2109,11 @@
       const chillReference = chill.reference || "chill reference";
       const chillReferenceName = chill.reference_label || chillReferenceLabel(chillReference);
       const promotion = openclaw.promotion_status || "draft";
+      const fmCue = openclaw.fm_review_cue || openclaw.next_action?.fm_review_cue || null;
       const micText = mic.enabled
         ? `MIC=${String(mic.gesture || "mic").toUpperCase()} drive=${Math.round((mic.drive || 0) * 100)} confidence=${Math.round((mic.confidence || 0) * 100)} bpm_lock=${mic.bpm_lock || "-"}。`
         : "MIC=off。";
-      return [
+      const cards = [
         {
           title: "Musicを磨く",
           body: "今の音色と間をMusic側で育てる。",
@@ -2086,6 +2140,14 @@
           prompt: `このpacketでOpenClaw制作卓として次の小PRを切って。session=${session}, promotion=${promotion}。まず対象repoと狙いを整理し、必要最小変更で進めて。生成/録音/arm/upload/mergeは人間確認つき、秘密や音声ファイルはGitHubへ載せない。`
         }
       ];
+      if (fmCue) {
+        cards.unshift({
+          title: "FM cueを拾う",
+          body: `${fmCue.short_label} -> ${fmCue.target_repo || fmCue.destination}`,
+          prompt: `Hazama FMで保存したreview cueを基準に次の小PR候補を整理して。cue=${fmCue.short_label}, genre=${fmCue.active_genre || fmCue.dominant_genre}, target=${fmCue.target_repo || fmCue.destination}, next_task=${fmCue.next_task || "listening-review"}, dwell=${fmCue.dwell_seconds}s。まず聴感チェック項目と対象repoを絞り、実装するなら小PRで。音声ファイル/サンプル/歌詞/依存追加なし、自動arm/録音/uploadなし、merge前に人間聴感確認。`
+        });
+      }
+      return cards;
     }
 
     function renderPromptCards(cards) {
