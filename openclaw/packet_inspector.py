@@ -251,11 +251,16 @@ def _mic_follow_summary(packet: dict[str, Any]) -> dict[str, Any]:
 
 def _openclaw_summary(packet: dict[str, Any]) -> dict[str, Any]:
     openclaw = _obj(_obj(packet.get("routing")).get("openclaw"))
+    fm_review_cue = _extract_fm_review_cue(packet)
+    next_action = _normalize_next_action(openclaw.get("next_action"))
+    if fm_review_cue:
+        next_action["fm_review_cue"] = fm_review_cue
     return {
         "enabled": openclaw.get("enabled") is not False,
         "promotion_status": str(openclaw.get("promotion_status") or "draft"),
         "human_review_required": openclaw.get("human_review_required") is True,
-        "next_action": _normalize_next_action(openclaw.get("next_action")),
+        "next_action": next_action,
+        "fm_review_cue": fm_review_cue,
         "next": "turn listening notes into a small repo-specific PR only after human approval",
     }
 
@@ -325,8 +330,37 @@ def _normalize_next_action(value: Any) -> dict[str, Any]:
         "reason": str(action.get("reason") or "Musicのpacketを安全に見立てる。"),
         "action": str(action.get("action") or "OpenClawで結果を見て、必要ならこのチャットへ投げる。"),
         "confidence": round(_unit(action.get("confidence"), 0.28), 3),
+        "fm_review_cue": _normalize_fm_review_cue(action.get("fm_review_cue")),
         "manual_start_required": action.get("manual_start_required") is not False,
         "metadata_only": action.get("metadata_only") is not False,
+    }
+
+
+def _extract_fm_review_cue(packet: dict[str, Any]) -> dict[str, Any] | None:
+    routing_cue = _obj(_obj(_obj(packet.get("routing")).get("openclaw")).get("next_action")).get("fm_review_cue")
+    hazama_cue = _obj(_obj(_obj(packet.get("performance_state")).get("hazama_fm")).get("review_cue"))
+    return _normalize_fm_review_cue(routing_cue or hazama_cue)
+
+
+def _normalize_fm_review_cue(value: Any) -> dict[str, Any] | None:
+    cue = _obj(value)
+    if not cue:
+        return None
+    return {
+        "schema": str(cue.get("schema") or "hazama-fm-review-cue.v1"),
+        "active_genre": str(cue.get("active_genre") or cue.get("dominant_genre") or ""),
+        "dominant_genre": str(cue.get("dominant_genre") or cue.get("active_genre") or ""),
+        "dwell_seconds": _duration_seconds(cue.get("dwell_seconds")),
+        "destination": str(cue.get("destination") or "openclaw"),
+        "target_repo": str(cue.get("target_repo") or ""),
+        "short_label": str(cue.get("short_label") or cue.get("label") or "FM review"),
+        "next_task": str(cue.get("next_task") or ""),
+        "reason": str(cue.get("reason") or "Hazama FMで保存した聴感cue。"),
+        "action": str(cue.get("action") or "FMで聴き直し、人間が次の小PRにするか決める。"),
+        "cluster_reference": str(cue.get("cluster_reference") or ""),
+        "confidence": round(_unit(cue.get("confidence"), 0.28), 3),
+        "metadata_only": cue.get("metadata_only") is not False,
+        "human_review_required": cue.get("human_review_required") is not False,
     }
 
 
@@ -422,6 +456,13 @@ def _percent(value: Any, fallback: float = 0.0) -> float:
 def _tempo(value: Any) -> int:
     try:
         return round(_clamp(float(value), 0, 240))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _duration_seconds(value: Any) -> int:
+    try:
+        return round(_clamp(float(value), 0, 36000))
     except (TypeError, ValueError):
         return 0
 

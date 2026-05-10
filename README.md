@@ -8,9 +8,10 @@ v1では音を鳴らしません。Music の `SYNC` を読み、`drum-floor` / `
 Pages dashboard: <https://quietbriony.github.io/openclaw/>
 
 Pages dashboard では、Music で `SYNC` した最新packetを自動で読み、
-drum-floor / namima / chill へのroutingを確認できます。アップロード、
-録音、arm、生成はしません。JSON選択はlocalhostなどでSYNCが届かない時の
-fallbackです。
+drum-floor / namima / chill へのroutingを確認できます。Hazama FM から
+`SYNC` した場合は、`techno balance` や `piano foreground` のような
+review cue も次の聴感タスクとして表示します。アップロード、録音、arm、
+生成はしません。JSON選択はlocalhostなどでSYNCが届かない時のfallbackです。
 
 Manual: [docs/manual.md](docs/manual.md)
 

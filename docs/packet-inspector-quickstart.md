@@ -32,6 +32,7 @@ python .\openclaw_cli.py packet-inspect --latest
 - `drum-floorへ`: ドラムに渡すなら profile、frame、kit、bpm がどうなるか。
 - `namimaへ`: 水面/庭/家族向け ambient に渡すなら mood がどうなるか。
 - `chillへ`: ピアノ/ベース/trioに渡すなら reference、Touch、Phrase、Room がどうなるか。
+- `Hazama FM cue`: FMからSYNCした時だけ出る聴感レビューcue。`techno balance` ならMusic側、`piano foreground`ならchill比較、というように次に聴く場所を短く示す。
 - `Next`: 次に人間が何を頼むか。
 - `このチャットへ投げる`: そのまま貼れる指示文。
 
