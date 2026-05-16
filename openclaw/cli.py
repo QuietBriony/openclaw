@@ -313,6 +313,7 @@ def _print_packet_import(result: object) -> None:
     openclaw = inspection_dict.get("openclaw") if isinstance(inspection_dict.get("openclaw"), dict) else {}
     next_action = openclaw.get("next_action") if isinstance(openclaw.get("next_action"), dict) else {}
     fm_cue = openclaw.get("fm_review_cue") if isinstance(openclaw.get("fm_review_cue"), dict) else {}
+    fm_conversation = openclaw.get("fm_conversation") if isinstance(openclaw.get("fm_conversation"), dict) else {}
     print(f"ok: {str(bool(result.ok)).lower()}")
     print(f"source: {result.source_path or '-'}")
     print(f"latest: {result.latest_path}")
@@ -322,6 +323,8 @@ def _print_packet_import(result: object) -> None:
     print(f"destination: {next_action.get('destination') or '-'}")
     if fm_cue:
         print(f"fm_review_cue: {fm_cue.get('short_label') or '-'} -> {fm_cue.get('target_repo') or fm_cue.get('destination') or '-'}")
+    if fm_conversation:
+        print(f"fm_conversation: {fm_conversation.get('role') or '-'} / {fm_conversation.get('motif') or '-'}")
     if next_action.get("action"):
         print(f"action: {next_action.get('action')}")
     print("surface_next:")
@@ -344,6 +347,7 @@ def _print_packet_inspection(inspection: dict[str, object]) -> None:
     openclaw = inspection.get("openclaw") if isinstance(inspection.get("openclaw"), dict) else {}
     next_action = openclaw.get("next_action") if isinstance(openclaw.get("next_action"), dict) else {}
     fm_cue = openclaw.get("fm_review_cue") if isinstance(openclaw.get("fm_review_cue"), dict) else {}
+    fm_conversation = openclaw.get("fm_conversation") if isinstance(openclaw.get("fm_conversation"), dict) else {}
     print(f"ok: {str(bool(inspection.get('ok'))).lower()}")
     print(f"packet: {packet.get('session_id') or '-'}")
     print(f"mode: {packet.get('mode') or '-'}")
@@ -397,6 +401,9 @@ def _print_packet_inspection(inspection: dict[str, object]) -> None:
         print(f"  fm_review_cue: {fm_cue.get('short_label') or '-'}")
         print(f"  fm_target: {fm_cue.get('target_repo') or fm_cue.get('destination') or '-'}")
         print(f"  fm_next_task: {fm_cue.get('next_task') or '-'}")
+    if fm_conversation:
+        print(f"  fm_conversation: {fm_conversation.get('role') or '-'} / {fm_conversation.get('motif') or '-'}")
+        print(f"  fm_conversation_bar: {fm_conversation.get('bar')}")
     print(f"  action: {next_action.get('action') or '-'}")
     print(f"  next: {openclaw.get('next') or '-'}")
     for warning in inspection.get("warnings") or []:

@@ -6,11 +6,11 @@ human-gated.
 
 ## Current Sources
 
-- `Music`: integrated producer and packet source. Hazama FM is at v172 groove
-  conversation, and Band Room has PWA/lifecycle, timeline seek, source-derived
-  part agents, and Drum Floor handoff.
+- `Music`: integrated producer and packet source. Hazama FM is at v173 packet
+  handoff for the v172 groove conversation, and Band Room has PWA/lifecycle,
+  timeline seek, source-derived part agents, and Drum Floor handoff.
 - `Hazama FM`: live listening surface. It exposes genre/source/role,
-  `review_cue`, listening trace, and v172 internal groove conversation for
+  `review_cue`, listening trace, and v172 groove conversation role/motif for
   human review. Other repos receive metadata only, not audio or melodies.
 - `Band Room`: album/stem room. It can hand a current song/frame to Drum Floor
   as a manual preview packet. It should not wake Namima unless Music explicitly
@@ -33,6 +33,9 @@ human-gated.
   only after human action.
 - `review_cue` from Hazama FM becomes a next listening task, not an automatic
   PR.
+- `performance_state.hazama_fm.conversation` is abstract role/motif/rest/density
+  metadata. It helps the desk know whether the band was calling, answering, or
+  leaving space, but it is not a melody or a groove to copy.
 - Band Room drum handoff targets Drum Floor unless Music explicitly says
   otherwise.
 - Namima must stay family-safe: no dark glitch, low-end pressure, raw trace,

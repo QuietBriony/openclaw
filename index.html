@@ -1871,6 +1871,7 @@
     function openclawSummary(packet) {
       const openclaw = asObject(asObject(packet.routing).openclaw);
       const fmReviewCue = extractFmReviewCue(packet);
+      const fmConversation = extractHazamaConversation(packet);
       const nextAction = normalizeNextAction(openclaw.next_action);
       if (fmReviewCue) nextAction.fm_review_cue = fmReviewCue;
       const selfReview = asObject(openclaw.self_review);
@@ -1880,6 +1881,7 @@
         human_review_required: openclaw.human_review_required === true,
         next_action: nextAction,
         fm_review_cue: fmReviewCue,
+        fm_conversation: fmConversation,
         self_review: {
           densityRisk: round3(unit(selfReview.densityRisk, 0)),
           lowEndRisk: round3(unit(selfReview.lowEndRisk, 0)),
@@ -1918,6 +1920,25 @@
       const routingCue = asObject(asObject(asObject(packet.routing).openclaw).next_action).fm_review_cue;
       const hazamaCue = asObject(asObject(asObject(packet.performance_state).hazama_fm).review_cue);
       return normalizeFmReviewCue(routingCue || hazamaCue);
+    }
+
+    function extractHazamaConversation(packet) {
+      const conversation = asObject(asObject(asObject(packet.performance_state).hazama_fm).conversation);
+      const role = String(conversation.role || "");
+      const motif = String(conversation.motif || "");
+      const allowedRoles = ["bass-call", "comp-answer", "drum-comment", "space", "lead-call", "bass-answer", "comp-lift", "recap"];
+      if (!allowedRoles.includes(role)) return null;
+      return {
+        version: Math.round(Number(conversation.version) || 1),
+        bar: Math.max(0, Math.round(Number(conversation.bar) || 0)),
+        role,
+        motif: ["up-third", "fall-fourth", "neighbor", "octave-skip"].includes(motif) ? motif : "neighbor",
+        transform: String(conversation.transform || "as-is"),
+        densityBias: round3(unit(conversation.densityBias)),
+        restGate: round3(unit(conversation.restGate)),
+        metadata_only: conversation.metadata_only !== false,
+        review_only: conversation.review_only !== false
+      };
     }
 
     function normalizeFmReviewCue(value) {
@@ -2028,6 +2049,7 @@
       const packet = inspection.packet;
       const nextAction = inspection.openclaw.next_action;
       const fmCue = inspection.openclaw.fm_review_cue || nextAction.fm_review_cue || null;
+      const fmConversation = inspection.openclaw.fm_conversation || null;
       const statusText = inspection.ok
         ? `OK: ${packet.session_id || "Music packet"} を安全に読みました。`
         : `確認が必要です: ${inspection.errors.length}件のerror。`;
@@ -2061,6 +2083,14 @@
             <a class="packet-button primary" href="${escapeHtml(nextActionUrl(fmCue.destination))}">${escapeHtml(nextActionButtonLabel(fmCue.destination))}</a>
           </div>
       ` : "";
+      const fmConversationCard = fmConversation ? `
+          <div class="packet-result-card">
+            <h3>Hazama conversation</h3>
+            <p><strong>${escapeHtml(fmConversation.role)}</strong> / ${escapeHtml(fmConversation.motif)}</p>
+            <p>bar ${escapeHtml(fmConversation.bar)} / transform ${escapeHtml(fmConversation.transform)}</p>
+            <p>density ${escapeHtml(fmConversation.densityBias)} / rest ${escapeHtml(fmConversation.restGate)}</p>
+          </div>
+      ` : "";
       return `
         <div class="packet-status ${inspection.ok ? "ok" : "error"}">
           <strong>${escapeHtml(statusText)}</strong>
@@ -2087,6 +2117,7 @@
             <p>haze: ${escapeHtml(packet.reference_gradient.haze)} / micro: ${escapeHtml(packet.reference_gradient.micro)}</p>
           </div>
           ${fmCueCard}
+          ${fmConversationCard}
           <div class="packet-result-card">
             <h3>MIC Jam</h3>
             <p>${escapeHtml(mic.enabled ? `${String(mic.gesture).toUpperCase()} / drive ${Math.round((mic.drive || 0) * 100)}%` : "off / metadata only")}</p>
@@ -2164,6 +2195,10 @@
       const chillReferenceName = chill.reference_label || chillReferenceLabel(chillReference);
       const promotion = openclaw.promotion_status || "draft";
       const fmCue = openclaw.fm_review_cue || openclaw.next_action?.fm_review_cue || null;
+      const fmConversation = openclaw.fm_conversation || null;
+      const conversationText = fmConversation
+        ? ` Hazama conversation=${fmConversation.role}/${fmConversation.motif}/bar${fmConversation.bar}。`
+        : "";
       const micText = mic.enabled
         ? `MIC=${String(mic.gesture || "mic").toUpperCase()} drive=${Math.round((mic.drive || 0) * 100)} confidence=${Math.round((mic.confidence || 0) * 100)} bpm_lock=${mic.bpm_lock || "-"}。`
         : "MIC=off。";
@@ -2198,7 +2233,7 @@
         cards.unshift({
           title: "FM cueを拾う",
           body: `${fmCue.short_label} -> ${fmCue.target_repo || fmCue.destination}`,
-          prompt: `Hazama FMで保存したreview cueを基準に次の小PR候補を整理して。cue=${fmCue.short_label}, genre=${fmCue.active_genre || fmCue.dominant_genre}, target=${fmCue.target_repo || fmCue.destination}, next_task=${fmCue.next_task || "listening-review"}, dwell=${fmCue.dwell_seconds}s。まず聴感チェック項目と対象repoを絞り、実装するなら小PRで。音声ファイル/サンプル/歌詞/依存追加なし、自動arm/録音/uploadなし、merge前に人間聴感確認。`
+          prompt: `Hazama FMで保存したreview cueを基準に次の小PR候補を整理して。cue=${fmCue.short_label}, genre=${fmCue.active_genre || fmCue.dominant_genre}, target=${fmCue.target_repo || fmCue.destination}, next_task=${fmCue.next_task || "listening-review"}, dwell=${fmCue.dwell_seconds}s。${conversationText}まず聴感チェック項目と対象repoを絞り、実装するなら小PRで。音声ファイル/サンプル/歌詞/依存追加なし、自動arm/録音/uploadなし、merge前に人間聴感確認。`
         });
       }
       return cards;

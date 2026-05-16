@@ -252,6 +252,7 @@ def _mic_follow_summary(packet: dict[str, Any]) -> dict[str, Any]:
 def _openclaw_summary(packet: dict[str, Any]) -> dict[str, Any]:
     openclaw = _obj(_obj(packet.get("routing")).get("openclaw"))
     fm_review_cue = _extract_fm_review_cue(packet)
+    fm_conversation = _extract_hazama_conversation(packet)
     next_action = _normalize_next_action(openclaw.get("next_action"))
     if fm_review_cue:
         next_action["fm_review_cue"] = fm_review_cue
@@ -261,6 +262,7 @@ def _openclaw_summary(packet: dict[str, Any]) -> dict[str, Any]:
         "human_review_required": openclaw.get("human_review_required") is True,
         "next_action": next_action,
         "fm_review_cue": fm_review_cue,
+        "fm_conversation": fm_conversation,
         "next": "turn listening notes into a small repo-specific PR only after human approval",
     }
 
@@ -340,6 +342,37 @@ def _extract_fm_review_cue(packet: dict[str, Any]) -> dict[str, Any] | None:
     routing_cue = _obj(_obj(_obj(packet.get("routing")).get("openclaw")).get("next_action")).get("fm_review_cue")
     hazama_cue = _obj(_obj(_obj(packet.get("performance_state")).get("hazama_fm")).get("review_cue"))
     return _normalize_fm_review_cue(routing_cue or hazama_cue)
+
+
+def _extract_hazama_conversation(packet: dict[str, Any]) -> dict[str, Any] | None:
+    conversation = _obj(_obj(_obj(packet.get("performance_state")).get("hazama_fm")).get("conversation"))
+    if not conversation:
+        return None
+    role = str(conversation.get("role") or "")
+    motif = str(conversation.get("motif") or "")
+    allowed_roles = {
+        "bass-call",
+        "comp-answer",
+        "drum-comment",
+        "space",
+        "lead-call",
+        "bass-answer",
+        "comp-lift",
+        "recap",
+    }
+    if role not in allowed_roles:
+        return None
+    return {
+        "version": int(conversation.get("version") or 1),
+        "bar": max(0, int(round(float(conversation.get("bar") or 0)))),
+        "role": role,
+        "motif": motif if motif in {"up-third", "fall-fourth", "neighbor", "octave-skip"} else "neighbor",
+        "transform": str(conversation.get("transform") or "as-is"),
+        "densityBias": round(_unit(conversation.get("densityBias")), 3),
+        "restGate": round(_unit(conversation.get("restGate")), 3),
+        "metadata_only": conversation.get("metadata_only") is not False,
+        "review_only": conversation.get("review_only") is not False,
+    }
 
 
 def _normalize_fm_review_cue(value: Any) -> dict[str, Any] | None:

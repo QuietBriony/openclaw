@@ -37,7 +37,8 @@ for (const icon of manifest.icons) {
 }
 
 assert(sw.includes('const CACHE_PREFIX = "openclaw-pwa";'), "sw.js cache prefix should be openclaw-pwa");
-assert(sw.includes("const VERSION = `${CACHE_PREFIX}-v2`;"), "sw.js version should be v2");
+assert(sw.includes("const VERSION = `${CACHE_PREFIX}-v3`;"), "sw.js version should be v3");
+assert(indexHtml.includes("Hazama conversation"), "index.html should render Hazama conversation metadata");
 assert(sw.includes("self.addEventListener(\"install\""), "sw.js must install");
 assert(sw.includes("self.addEventListener(\"fetch\""), "sw.js must handle fetch");
 

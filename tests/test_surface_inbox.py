@@ -123,6 +123,17 @@ def sample_packet(session_id: str = "music-test-session") -> dict:
                     "human_review_required": True,
                 },
                 "integration_mode": "metadata-only",
+                "conversation": {
+                    "version": 1,
+                    "bar": 5,
+                    "role": "lead-call",
+                    "motif": "neighbor",
+                    "transform": "expand",
+                    "densityBias": 0.66,
+                    "restGate": 0.18,
+                    "metadata_only": True,
+                    "review_only": True,
+                },
                 "review_only": True,
             }
         },
@@ -183,6 +194,7 @@ class SurfaceInboxTests(unittest.TestCase):
                 self.assertIn("chill:", text)
                 self.assertIn("next_action: chillで聴く", text)
                 self.assertIn("fm_review_cue: piano foreground", text)
+                self.assertIn("fm_conversation: lead-call / neighbor", text)
             finally:
                 surface_inbox.INBOX_ROOT = old_inbox
                 surface_inbox.HISTORY_ROOT = old_history
@@ -205,6 +217,8 @@ class SurfaceInboxTests(unittest.TestCase):
             self.assertEqual(inspection["openclaw"]["next_action"]["destination"], "chill")
             self.assertEqual(inspection["openclaw"]["fm_review_cue"]["short_label"], "piano foreground")
             self.assertEqual(inspection["openclaw"]["next_action"]["fm_review_cue"]["target_repo"], "chill")
+            self.assertEqual(inspection["openclaw"]["fm_conversation"]["role"], "lead-call")
+            self.assertEqual(inspection["openclaw"]["fm_conversation"]["motif"], "neighbor")
 
 
 if __name__ == "__main__":
