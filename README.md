@@ -22,6 +22,12 @@ review cue も次の聴感タスクとして表示します。アップロード
 Surface での手弾き、手動操作、live coding 的な調整を助ける入口ですが、
 勝手に Ableton、EP-133、ブラウザ音声、Music REC を操作するものではありません。
 
+PWA shell: dashboard は `manifest.webmanifest` と `sw.js` を持ち、
+`openclaw-pwa` cache に dashboard、manual、packet inspector quickstart、
+mission board、schema、connector registry、example session、install icon を
+保存します。PWAとして開いても review-only / human-gated は変わりません。
+URLボタンはブラウザ/PWAのどちらでも現在のshare link確認用です。
+
 Manual: [docs/manual.md](docs/manual.md)
 
 Packet Inspector Quickstart: [docs/packet-inspector-quickstart.md](docs/packet-inspector-quickstart.md)
@@ -74,6 +80,12 @@ python .\openclaw_cli.py plan sessions/examples/chill-trio-live.example.json
 python .\openclaw_cli.py plan sessions/examples/raw-drum-candidate-export.example.json
 python .\openclaw_cli.py local-list
 python .\openclaw_cli.py local-generate sessions/examples/raw-drum-candidate-export.example.json --candidate-id raw-drive-001 --execute --python $py
+```
+
+Static PWA check:
+
+```powershell
+node scripts/check-pwa-static.mjs
 ```
 
 The CLI is dry-run oriented. It does not arm live slots, start browser audio, record, upload, or write to GitHub.
