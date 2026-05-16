@@ -17,6 +17,15 @@ function assertExists(relativePath) {
   assert(fs.existsSync(path.join(root, relativePath)), `Missing ${relativePath}`);
 }
 
+function cliValue(name) {
+  const idx = process.argv.indexOf(name);
+  if (idx !== -1 && idx + 1 < process.argv.length) {
+    return process.argv[idx + 1];
+  }
+  const inline = process.argv.find((arg) => arg.startsWith(`${name}=`));
+  return inline ? inline.split("=").slice(1).join("=") : null;
+}
+
 const indexHtml = readText("index.html");
 const manifest = JSON.parse(readText("manifest.webmanifest"));
 const sw = readText("sw.js");
@@ -37,7 +46,13 @@ for (const icon of manifest.icons) {
 }
 
 assert(sw.includes('const CACHE_PREFIX = "openclaw-pwa";'), "sw.js cache prefix should be openclaw-pwa");
-assert(sw.includes("const VERSION = `${CACHE_PREFIX}-v3`;"), "sw.js version should be v3");
+const versionMatch = sw.match(/const VERSION = `\$\{CACHE_PREFIX\}-(v\d+)`;/);
+assert(versionMatch, "sw.js must define VERSION as `${CACHE_PREFIX}-v<N>`");
+const swVersion = `openclaw-pwa-${versionMatch[1]}`;
+const expectedVersion = cliValue("--expected-version");
+if (expectedVersion) {
+  assert(swVersion === expectedVersion, `sw.js version ${swVersion} != --expected-version ${expectedVersion}`);
+}
 assert(indexHtml.includes("Hazama conversation"), "index.html should render Hazama conversation metadata");
 assert(sw.includes("self.addEventListener(\"install\""), "sw.js must install");
 assert(sw.includes("self.addEventListener(\"fetch\""), "sw.js must handle fetch");
@@ -59,4 +74,4 @@ for (const url of precacheUrls) {
   assertExists(url);
 }
 
-console.log(`OpenClaw PWA static check passed (${precacheUrls.length} precache entries).`);
+console.log(`OpenClaw PWA static check passed (${swVersion}, ${precacheUrls.length} precache entries).`);
