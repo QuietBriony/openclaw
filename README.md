@@ -30,6 +30,8 @@ URLボタンはブラウザ/PWAのどちらでも現在のshare link確認用で
 
 Manual: [docs/manual.md](docs/manual.md)
 
+Current Stack Alignment: [docs/current-stack-alignment.md](docs/current-stack-alignment.md)
+
 Packet Inspector Quickstart: [docs/packet-inspector-quickstart.md](docs/packet-inspector-quickstart.md)
 
 Music Orchestra Mission Board: [docs/music-orchestra-mission-board.md](docs/music-orchestra-mission-board.md)

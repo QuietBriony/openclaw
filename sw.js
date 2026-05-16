@@ -1,11 +1,12 @@
 const CACHE_PREFIX = "openclaw-pwa";
-const VERSION = `${CACHE_PREFIX}-v1`;
+const VERSION = `${CACHE_PREFIX}-v2`;
 
 const PRECACHE_URLS = [
   "./",
   "index.html",
   "manifest.webmanifest",
   "docs/manual.md",
+  "docs/current-stack-alignment.md",
   "docs/packet-inspector-quickstart.md",
   "docs/music-orchestra-mission-board.md",
   "schemas/session-manifest.v1.schema.json",

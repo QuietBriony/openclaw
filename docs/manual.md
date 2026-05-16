@@ -14,6 +14,7 @@ mergeする、という最終操作は人間が選びます。
 
 - Music Stack OpenClaw Desk: <https://quietbriony.github.io/openclaw/>
 - Packet Inspector Quickstart: [packet-inspector-quickstart.md](packet-inspector-quickstart.md)
+- Current Stack Alignment: [current-stack-alignment.md](current-stack-alignment.md)
 - Music: <https://quietbriony.github.io/Music/>
 - chill: <https://quietbriony.github.io/chill/>
 - chill trio: <https://quietbriony.github.io/chill/session.html>
@@ -26,6 +27,8 @@ mergeする、という最終操作は人間が選びます。
 - `drum-floor`: raw live drums / pocket / browser trio drum surface / MIDI candidate。
 - `namima`: mood / water interaction / coarse trace。
 - `Music Stack OpenClaw Desk`: Surface操作、live coding前の段取り、manifest、local generate、inspect、human gate、repo横断の制作卓。
+
+今のalignmentは [current-stack-alignment.md](current-stack-alignment.md) を基準にします。
 
 ## Public と Local
 

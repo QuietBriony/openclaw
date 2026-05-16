@@ -37,7 +37,7 @@ for (const icon of manifest.icons) {
 }
 
 assert(sw.includes('const CACHE_PREFIX = "openclaw-pwa";'), "sw.js cache prefix should be openclaw-pwa");
-assert(sw.includes("const VERSION = `${CACHE_PREFIX}-v1`;"), "sw.js version should be v1");
+assert(sw.includes("const VERSION = `${CACHE_PREFIX}-v2`;"), "sw.js version should be v2");
 assert(sw.includes("self.addEventListener(\"install\""), "sw.js must install");
 assert(sw.includes("self.addEventListener(\"fetch\""), "sw.js must handle fetch");
 
@@ -48,6 +48,7 @@ const precacheUrls = [...precacheMatch[1].matchAll(/"([^"]+)"/g)].map((match) =>
 assert(precacheUrls.includes("./"), "precache should include the app root");
 assert(precacheUrls.includes("index.html"), "precache should include index.html");
 assert(precacheUrls.includes("manifest.webmanifest"), "precache should include manifest.webmanifest");
+assert(precacheUrls.includes("docs/current-stack-alignment.md"), "precache should include current stack alignment");
 assert(precacheUrls.includes("connectors/registry.json"), "precache should include connector registry");
 
 for (const url of precacheUrls) {
