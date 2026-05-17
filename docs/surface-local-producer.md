@@ -43,7 +43,7 @@ arm gear, or call an external OpenClaw subscription.
 
 ## Generate A Candidate
 
-From `C:\workspace\github-inventory\music-stack\openclaw`:
+From `C:\workspace\music-stack\openclaw`:
 
 ```powershell
 $py = "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe"

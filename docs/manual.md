@@ -56,7 +56,7 @@ Pages に secrets、録音、生成履歴、private trace は置きません。
 Surface PC の terminal で:
 
 ```powershell
-cd C:\workspace\github-inventory\music-stack\openclaw
+cd C:\workspace\music-stack\openclaw
 ```
 
 最初に doctor で環境を確認:
