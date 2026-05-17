@@ -267,6 +267,19 @@ def _openclaw_summary(packet: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+_CHILL_REFERENCE_LABELS = {
+    "piano-jazz-chill": "Quiet Piano",
+    "rainy-lofi-room": "Glass Piano",
+    "soft-solo-drift": "Memory Piano",
+    "soft-melody-piano": "Soft Melody",
+}
+
+
+def _chill_reference_label(reference_id: Any) -> str:
+    normalized = str(reference_id or "").lower()
+    return _CHILL_REFERENCE_LABELS.get(normalized) or str(reference_id or "Quiet Piano")
+
+
 def _translate_chill(packet: dict[str, Any]) -> dict[str, Any]:
     routing = _obj(packet.get("routing"))
     chill = _obj(routing.get("chill"))
@@ -282,7 +295,7 @@ def _translate_chill(packet: dict[str, Any]) -> dict[str, Any]:
     micro = _unit(gradient.get("micro"), 0.24)
     ghost = _unit(gradient.get("ghost"), 0.24)
     reference_text = str(intent.get("reference_id") or intent.get("referenceId") or "").lower()
-    if reference_text in ("piano-jazz-chill", "rainy-lofi-room", "soft-solo-drift"):
+    if reference_text in ("piano-jazz-chill", "rainy-lofi-room", "soft-solo-drift", "soft-melody-piano"):
         reference = reference_text
     elif memory > 0.5:
         reference = "soft-solo-drift"
@@ -301,6 +314,7 @@ def _translate_chill(packet: dict[str, Any]) -> dict[str, Any]:
         "enabled": chill.get("enabled") is not False,
         "review_only": True,
         "reference": reference,
+        "reference_label": _chill_reference_label(reference),
         "trio": {
             "touch": round(touch, 3),
             "phrase": round(phrase, 3),
