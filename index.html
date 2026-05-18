@@ -766,6 +766,95 @@
       font-weight: 700;
     }
 
+    .human-review-intro {
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 78ch;
+    }
+
+    .human-review-block {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .human-review-block h3 {
+      color: var(--accent);
+      font-size: 0.98rem;
+      letter-spacing: 0.04em;
+    }
+
+    .human-review-note {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .human-review-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #111711;
+    }
+
+    #human-review table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    #human-review th,
+    #human-review td {
+      border-bottom: 1px solid rgba(174, 187, 168, 0.16);
+      padding: 10px 8px;
+      vertical-align: top;
+      text-align: left;
+      line-height: 1.45;
+    }
+
+    #human-review tr:last-child td {
+      border-bottom: 0;
+    }
+
+    #human-review th {
+      color: var(--amber);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    #human-review code {
+      color: var(--amber);
+      background: rgba(211, 189, 127, 0.08);
+      border: 1px solid rgba(211, 189, 127, 0.18);
+      border-radius: 4px;
+      padding: 1px 4px;
+    }
+
+    .human-review-live-actions {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    #human-review .human-review-button {
+      width: auto;
+      min-height: 30px;
+      padding: 0 9px;
+      font-size: 0.78rem;
+    }
+
+    #human-review .human-review-live-list {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
     .soft-section-title {
       display: flex;
       align-items: baseline;
@@ -1008,14 +1097,265 @@
             </div>
           </details>
         </div>
-        <div class="packet-output" id="packet-inspect-output" aria-live="polite">
-          <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。</div>
-          <div class="packet-next-grid">
-            <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
-            <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>
+      <div class="packet-output" id="packet-inspect-output" aria-live="polite">
+        <div class="packet-status">ここに結果が出ます。まずはMusicでSYNCしてください。</div>
+        <div class="packet-next-grid">
+          <div class="packet-next-card"><strong>見るところ</strong><span>OK / error、drum-floor、namima、Next。</span></div>
+          <div class="packet-next-card"><strong>その後</strong><span>結果に出る「指示文をコピー」を押して、このチャットへ貼れば進められます。</span></div>
           </div>
         </div>
       </div>
+    </section>
+
+    <section class="wide-panel" id="human-review" aria-label="Human Review">
+      <div class="soft-section-title">
+        <h2>Human Review（試聴・確認）</h2>
+        <span>Music側の人間レビュー待ちを、Desk上でSYNC文脈と並べて確認します。</span>
+      </div>
+      <p class="human-review-intro">
+        実装で即断しないほうがよい聴感・導線・名称の確認待ちです。
+        <code>SYNC</code> や <code>Desk</code> は自動PR/自動mergeではなく、
+        人間が次の小PRを選ぶための地図として扱います。
+      </p>
+
+      <section class="human-review-block">
+        <h3>直近の出荷（試聴 / 実機で確認）</h3>
+        <p class="human-review-note">
+          今セッション（〜v188）で出した変更。ship-then-verify — Pages で聴いて / 実機で触って確認する。
+        </p>
+        <div class="human-review-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>変更</th>
+                <th>version</th>
+                <th>確認すること</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>音詰まり対策（BL-022）</td>
+                <td>v187</td>
+                <td><code>fm.html</code> を再生し、同時起動音（genre 切替・dense ambient・techno+acid）で詰まりが減ったか</td>
+              </tr>
+              <tr>
+                <td>40Hz depth A/B（BL-004）</td>
+                <td>v188</td>
+                <td><code>fm.html</code>（8%）↔ <code>fm.html?focusDepth=5</code>（5%）で <code>40HZ</code> を聴き比べ、default を決める</td>
+              </tr>
+              <tr>
+                <td>モバイル / PWA レイアウト</td>
+                <td>FM v186 / namima</td>
+                <td>実機スマホの PWA で、上下の見切れ解消・下部の操作子（<code>40HZ</code> 等）に到達できるか</td>
+              </tr>
+              <tr>
+                <td>engine.js モジュール化</td>
+                <td>v182–185</td>
+                <td>FM が従来どおり鳴るか通し試聴（挙動保存のはず・回帰確認）。mic / SYNC も動くか</td>
+              </tr>
+              <tr>
+                <td>chill 新 recipe ×2</td>
+                <td>chill #35</td>
+                <td>chill radio で <code>Midnight Whisper</code> / <code>Morning Light</code> を選んで試聴</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="human-review-block">
+        <h3>Human-gate backlog（待ち行列）</h3>
+        <p class="human-review-note">
+          自律実装で進められる作業は枯れました。残る backlog はすべて人間の耳・手・taste 判断待ちです。
+          正本は <code>docs/autonomy/BACKLOG.md</code>。
+        </p>
+        <div class="human-review-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>BL</th>
+                <th>内容</th>
+                <th>どこで / 手順</th>
+                <th>あなたが決めること</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BL-003<br />P1</td>
+                <td>hidden audio bridge の実機検証</td>
+                <td>実車 + Bluetooth 環境で Hazama FM / Band Room を再生</td>
+                <td>車側の volume / track ボタンがメディア音声として効くか。NG なら bridge 調整 PR を起票。</td>
+              </tr>
+              <tr>
+                <td>BL-004<br />P2・v188 機構出荷済</td>
+                <td>Hazama FM 40Hz focus depth A/B</td>
+                <td><code>fm.html</code>（8%）と <code>fm.html?focusDepth=5</code>（5%）を <code>40HZ</code> ON で聴き比べ。status に現 depth を表示</td>
+                <td>8% AM が耳に違和感を出すか。出るなら default を 5% に。</td>
+              </tr>
+              <tr>
+                <td>BL-006<br />P2</td>
+                <td>cross-repo listening review round</td>
+                <td><code>docs/cross-repo-listening-review-round.md</code> の手順で namima / chill / drum-floor を聴き比べ</td>
+                <td>次の tuning PR を 1 本だけ選ぶ。multi-repo 同時 tuning はしない。</td>
+              </tr>
+              <tr>
+                <td>BL-022<br />P1・v187 fix 出荷済</td>
+                <td>Hazama FM 再生の音詰まり（同時起動音での負荷スパイク）</td>
+                <td><code>fm.html</code>（v187）を再生し、複数音が重なる場面（genre 切替・dense ambient・techno+acid 等）を聴く</td>
+                <td>v187 で <code>maxPolyphony</code> を 64/48→24 に capping 済み。詰まりが減ったか試聴判定。まだ残れば cap 再調整か <code>lookAhead</code>/<code>latencyHint</code>。</td>
+              </tr>
+              <tr>
+                <td>BL-019<br />P2・眠ってる資源</td>
+                <td>archive repo (namima-lab / test) の harvest 素材を翻訳取り込み</td>
+                <td>namima-lab の organic-pluck recipe、test の style-interpolation math。1 PR = 1 idea で翻訳（agent が小PR化可）</td>
+                <td>どの素材を target repo の言葉に翻訳して採るか。blind copy しない。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="human-review-block">
+        <h3>SYNC snapshots (live)</h3>
+        <p class="human-review-note">
+          Hazama FM の <code>SYNC</code> ボタン押下時に保存された localStorage の文脈。
+          音声・歌詞は保存していません（metadata only）。
+          <span class="human-review-live-actions">
+            <button class="packet-button secondary human-review-button" id="hr-sync-copy" type="button">Copy JSON</button>
+            <button class="packet-button secondary human-review-button" id="hr-sync-clear" type="button">Clear</button>
+          </span>
+        </p>
+        <div class="human-review-live-list" id="hr-sync-list">読み込み中…</div>
+      </section>
+
+      <section class="human-review-block">
+        <h3>Listening trace (live)</h3>
+        <p class="human-review-note">
+          各ジャンルの滞在時間と遷移履歴。Hazama FM 起動中に自動で蓄積。
+          <span class="human-review-live-actions">
+            <button class="packet-button secondary human-review-button" id="hr-trace-copy" type="button">Copy JSON</button>
+            <button class="packet-button secondary human-review-button" id="hr-trace-clear" type="button">Clear</button>
+          </span>
+        </p>
+        <div class="human-review-live-list" id="hr-trace-list">読み込み中…</div>
+      </section>
+
+      <section class="human-review-block">
+        <h3>今すぐ見る順番</h3>
+        <div class="human-review-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>確認するもの</th>
+                <th>見る場所</th>
+                <th>人間確認ポイント</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>出音の大きさ</td>
+                <td>Hazama FM / Music Core Rig</td>
+                <td>iPhone Apple Music の通常音量と比べて、OS音量を上げ切らずに聴けるか。OUTPUT 100 の新しい天井で割れず、GenreFlavor の compressor / limiter が効きすぎて潰れていないか。</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>techno / acid</td>
+                <td>Hazama FM <code>techno</code>、Core Rig <code>ACID</code></td>
+                <td>4つ打ちの胴、acid のビョンビョン、硬い必要音だけが前に出ているか。音量を上げてもhatやacidが割れないか。</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>piano</td>
+                <td>Hazama FM <code>piano</code>、chill reference</td>
+                <td>ファーっとした常設washではなく、piano主体に聴こえるか。OUTPUT 96–100 でも打鍵が平たく潰れないか。</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>IDM / high BPM</td>
+                <td>Hazama FM <code>shuffle</code>、Core Rig <code>AUTO MIX</code></td>
+                <td>16分以上の細かい刻みが、うるささではなく脳内ダンサブルに聴こえるか。</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>genre translation</td>
+                <td>ambient / jazz / funk / lofi</td>
+                <td>同じ常設音が全ジャンルに貼り付かず、jazz/funk/lofi/piano/techno が別々の演奏身体に聴こえるか。</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Desk導線</td>
+                <td><code>Desk / openclaw repo hub</code></td>
+                <td>LLM処理先ではなく、openclaw repo の Pages ハブとして読めるか。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="human-review-block">
+        <h3>次の小PR候補</h3>
+        <div class="human-review-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>内容</th>
+                <th>境界</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tone.js runtime error cleanup</td>
+                <td>ブラウザconsoleに残る Tone.js <code>time</code> error と polyphony warning を追う。</td>
+                <td>音量PRで消えない場合は、schedule系の別PRに分ける。</td>
+              </tr>
+              <tr>
+                <td>Genre foreground balance</td>
+                <td>jazz / funk / lofi / piano / techno の前景レイヤーとドラム身体感を聴感で合わせる。</td>
+                <td>sample / dependency は追加しない。音量を足す時は compressor / limiter の潰れを先に確認する。</td>
+              </tr>
+              <tr>
+                <td>Core Rig translation pass</td>
+                <td>FMで磨いた genre identity を Core Rig の fader / SRC / CULT 側へmetadataとして反映する。</td>
+                <td>全ジャンルをMusicに吸収しない。</td>
+              </tr>
+              <tr>
+                <td>Desk wording pass</td>
+                <td>openclaw repo 側でも <code>OpenClaw Desk = repo hub</code> を明記する。</td>
+                <td>repo rename は別判断。</td>
+              </tr>
+              <tr>
+                <td>Listening checklist refresh</td>
+                <td>聴感確認項目を最新UIに合わせる。</td>
+                <td>自動判定にしない。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="human-review-block">
+        <h3>人間ゲート</h3>
+        <ul>
+          <li>出音の最終音量、マスタリング感、低域の圧。音割れ、limiter pumping、平坦化がないこと。</li>
+          <li>techno / acid の「気持ちよさ」と「やりすぎ」の境界。</li>
+          <li>piano が Music に残るべきか、chill に寄せるべきか。</li>
+          <li>OpenClaw という repo 名を残すか、将来 rename / alias するか。</li>
+          <li>Desk が次PR候補を出すだけでよいか、将来 orchestrator runtime に進めるか。</li>
+        </ul>
+      </section>
+
+      <section class="human-review-block">
+        <h3>触らないもの</h3>
+        <ul>
+          <li>raw audio、sample、lyrics、外部音源。</li>
+          <li>dependency、schema、release設定。</li>
+          <li>自動PR、自動merge、自動archive。</li>
+          <li><code>drum-floor</code>、<code>namima</code>、<code>chill</code>、<code>openclaw</code> 側の実装。</li>
+        </ul>
+      </section>
     </section>
 
     <section class="wide-panel" aria-label="Listening destinations">
@@ -2351,6 +2691,122 @@
         });
       });
     }
+  </script>
+  <script>
+  (function () {
+    "use strict";
+
+    const SYNC_KEYS = ["music:fm:sync:v1", "music:fm:sync"];
+    const TRACE_KEYS = ["music:fm:listening-trace:v1", "music:fm:trace"];
+
+    function readJsonFromKeys(keys) {
+      for (const k of keys) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (raw) return { key: k, data: JSON.parse(raw) };
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    function fmtTime(ts) {
+      try { return new Date(ts).toLocaleString("ja-JP", { hour12: false }); }
+      catch (e) { return String(ts); }
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[c]);
+    }
+
+    function renderSync() {
+      const el = document.getElementById("hr-sync-list");
+      if (!el) return;
+      const result = readJsonFromKeys(SYNC_KEYS);
+      if (!result) {
+        el.innerHTML = "<em>（SYNC スナップショットなし — Hazama FM で SYNC ボタンを押すと貯まります）</em>";
+        return;
+      }
+      const list = Array.isArray(result.data) ? result.data
+                 : Array.isArray(result.data.snapshots) ? result.data.snapshots
+                 : [result.data];
+      if (list.length === 0) {
+        el.innerHTML = "<em>（SYNC スナップショットなし）</em>";
+        return;
+      }
+      el.innerHTML = list.slice().reverse().map((snap) => {
+        const when = snap.timestamp || snap.captured_at || snap.t || Date.now();
+        const summary = [snap.genre, snap.energy, snap.bpm ? `bpm ${snap.bpm}` : null]
+          .filter(Boolean).join(" · ") || "snapshot";
+        return `<div style="margin: 8px 0; padding: 10px 12px; background: rgba(159,211,127,0.06); border-left: 2px solid rgba(159,211,127,0.46); border-radius: 4px;">
+          <div style="font-size: 11px; opacity: 0.6;">${esc(fmtTime(when))}</div>
+          <div style="font-size: 13px; color: var(--text);">${esc(summary)}</div>
+          <pre style="margin: 6px 0 0; font-size: 11px; opacity: 0.72; white-space: pre-wrap; word-break: break-word; background: transparent; padding: 0; border: 0;">${esc(JSON.stringify(snap, null, 2))}</pre>
+        </div>`;
+      }).join("");
+    }
+
+    function renderTrace() {
+      const el = document.getElementById("hr-trace-list");
+      if (!el) return;
+      const result = readJsonFromKeys(TRACE_KEYS);
+      if (!result) {
+        el.innerHTML = "<em>（リスニングトレース未収集 — Hazama FM を再生すると貯まります）</em>";
+        return;
+      }
+      const data = result.data || {};
+      const dwell = data.dwell_ms_by_genre || {};
+      const transitions = data.transitions || [];
+      const totalMs = Object.values(dwell).reduce((s, v) => s + (Number(v) || 0), 0) || 1;
+      const dwellRows = Object.entries(dwell)
+        .sort((a, b) => b[1] - a[1])
+        .map(([g, ms]) => {
+          const pct = ((ms / totalMs) * 100).toFixed(1);
+          const min = (ms / 60000).toFixed(1);
+          return `  ${g.padEnd(10, " ")} ${min.padStart(5, " ")}m  ${pct.padStart(5, " ")}%`;
+        }).join("\n");
+      const transRows = transitions.slice(-12).map((t) => {
+        const from = (t.from_genre || "—").padEnd(8, " ");
+        const to = (t.to_genre || "—").padEnd(8, " ");
+        const dwellSec = t.dwell_ms != null ? `${(t.dwell_ms / 1000).toFixed(0)}s` : "—";
+        return `  ${from} → ${to} (${dwellSec.padStart(5, " ")}) [${esc(t.reason || "")}]`;
+      }).join("\n");
+      el.innerHTML = `<pre style="font-size: 11px; color: var(--muted); background: rgba(0,0,0,0.18); padding: 12px 14px; border-radius: 6px; overflow-x: auto;">genre dwell
+${dwellRows || "  (empty)"}
+
+recent transitions (${transitions.length} total)
+${transRows || "  (empty)"}</pre>`;
+    }
+
+    async function copyJson(keys) {
+      const result = readJsonFromKeys(keys);
+      if (!result) { alert("data なし"); return; }
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(result.data, null, 2));
+        alert("JSON をクリップボードにコピーしました");
+      } catch (e) {
+        alert("コピー失敗: " + (e && e.message ? e.message : e));
+      }
+    }
+
+    function clearKeys(keys, label) {
+      if (!confirm(label + " を削除しますか？")) return;
+      for (const k of keys) {
+        try { localStorage.removeItem(k); } catch (e) {}
+      }
+      renderSync();
+      renderTrace();
+    }
+
+    document.getElementById("hr-sync-copy")?.addEventListener("click", () => copyJson(SYNC_KEYS));
+    document.getElementById("hr-sync-clear")?.addEventListener("click", () => clearKeys(SYNC_KEYS, "SYNC snapshots"));
+    document.getElementById("hr-trace-copy")?.addEventListener("click", () => copyJson(TRACE_KEYS));
+    document.getElementById("hr-trace-clear")?.addEventListener("click", () => clearKeys(TRACE_KEYS, "listening trace"));
+
+    renderSync();
+    renderTrace();
+  })();
   </script>
 </body>
 </html>
