@@ -1181,8 +1181,8 @@
         </div>
       </section>
 
-      <section class="human-review-block">
-        <h3>Human-gate backlog（待ち行列）</h3>
+      <details class="desk-details">
+        <summary>Human-gate backlog（待ち行列）</summary>
         <p class="human-review-note">
           自律実装で進められる作業は枯れました。残る backlog はすべて人間の耳・手・taste 判断待ちです。
           正本は <code>docs/autonomy/BACKLOG.md</code>。
@@ -1231,10 +1231,10 @@
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section class="human-review-block">
-        <h3>SYNC snapshots (live)</h3>
+      <details class="desk-details">
+        <summary>SYNC snapshots (live)</summary>
         <p class="human-review-note">
           Hazama FM の <code>SYNC</code> ボタン押下時に保存された localStorage の文脈。
           音声・歌詞は保存していません（metadata only）。
@@ -1244,10 +1244,10 @@
           </span>
         </p>
         <div class="human-review-live-list" id="hr-sync-list">読み込み中…</div>
-      </section>
+      </details>
 
-      <section class="human-review-block">
-        <h3>Listening trace (live)</h3>
+      <details class="desk-details">
+        <summary>Listening trace (live)</summary>
         <p class="human-review-note">
           各ジャンルの滞在時間と遷移履歴。Hazama FM 起動中に自動で蓄積。
           <span class="human-review-live-actions">
@@ -1256,10 +1256,10 @@
           </span>
         </p>
         <div class="human-review-live-list" id="hr-trace-list">読み込み中…</div>
-      </section>
+      </details>
 
-      <section class="human-review-block">
-        <h3>今すぐ見る順番</h3>
+      <details class="desk-details">
+        <summary>今すぐ見る順番</summary>
         <div class="human-review-table-wrap">
           <table>
             <thead>
@@ -1310,10 +1310,10 @@
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section class="human-review-block">
-        <h3>次の小PR候補</h3>
+      <details class="desk-details">
+        <summary>次の小PR候補</summary>
         <div class="human-review-table-wrap">
           <table>
             <thead>
@@ -1352,10 +1352,10 @@
             </tbody>
           </table>
         </div>
-      </section>
+      </details>
 
-      <section class="human-review-block">
-        <h3>人間ゲート</h3>
+      <details class="desk-details">
+        <summary>人間ゲート</summary>
         <ul>
           <li>出音の最終音量、マスタリング感、低域の圧。音割れ、limiter pumping、平坦化がないこと。</li>
           <li>techno / acid の「気持ちよさ」と「やりすぎ」の境界。</li>
@@ -1363,17 +1363,7 @@
           <li>OpenClaw という repo 名を残すか、将来 rename / alias するか。</li>
           <li>Desk が次PR候補を出すだけでよいか、将来 orchestrator runtime に進めるか。</li>
         </ul>
-      </section>
-
-      <section class="human-review-block">
-        <h3>触らないもの</h3>
-        <ul>
-          <li>raw audio、sample、lyrics、外部音源。</li>
-          <li>dependency、schema、release設定。</li>
-          <li>自動PR、自動merge、自動archive。</li>
-          <li><code>drum-floor</code>、<code>namima</code>、<code>chill</code>、<code>openclaw</code> 側の実装。</li>
-        </ul>
-      </section>
+      </details>
     </section>
 
     <section class="wide-panel" aria-label="Listening destinations">
