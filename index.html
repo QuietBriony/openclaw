@@ -1196,14 +1196,14 @@
           確認待ちの本番ページ。クリックで GitHub Pages 本番を別タブで開く。
         </p>
         <ul>
-          <li><a href="https://quietbriony.github.io/Music/fm.html" target="_blank" rel="noopener">Hazama FM</a> — BL-022 音詰まり / engine モジュール化 v182–185 / モバイル v186</li>
+          <li><a href="https://quietbriony.github.io/Music/fm.html" target="_blank" rel="noopener">Hazama FM</a> — BL-022 音詰まり対策 fix2（v340 放送モード context）：同時起動音で詰まり減ったか</li>
           <li><a href="https://quietbriony.github.io/Music/fm.html?focusDepth=5" target="_blank" rel="noopener">Hazama FM（40Hz depth 5%）</a> — BL-004 A/B 用（通常の fm.html が 8%）</li>
           <li><a href="https://quietbriony.github.io/Music/" target="_blank" rel="noopener">Music Core Rig</a> — 出音 / AUTO MIX / ACID</li>
           <li><a href="https://quietbriony.github.io/Music/band-room.html" target="_blank" rel="noopener">Band Room</a></li>
-          <li><a href="https://quietbriony.github.io/chill/" target="_blank" rel="noopener">chill（radio）</a> — 新 recipe: Midnight Whisper / Morning Light</li>
+          <li><a href="https://quietbriony.github.io/chill/" target="_blank" rel="noopener">chill（radio）</a> — harmonic spine / 復帰修正 / long-form weather（数分で景色が移る）</li>
           <li><a href="https://quietbriony.github.io/chill/session.html" target="_blank" rel="noopener">chill（trio session）</a></li>
-          <li><a href="https://quietbriony.github.io/namima/" target="_blank" rel="noopener">namima</a> — モバイル safe-area 修正</li>
-          <li><a href="https://quietbriony.github.io/drum-floor/" target="_blank" rel="noopener">drum-floor</a></li>
+          <li><a href="https://quietbriony.github.io/namima/" target="_blank" rel="noopener">namima</a> — 潮 tide + self-voice（Tap 後は自走）+ 水面の音画同期</li>
+          <li><a href="https://quietbriony.github.io/drum-floor/" target="_blank" rel="noopener">drum-floor</a> — 🎤 バンドを聴いて鳴らす（mic 追従）/ phrase coherence</li>
           <li><a href="https://quietbriony.github.io/openclaw/" target="_blank" rel="noopener">OpenClaw Desk</a>（このページ）</li>
         </ul>
       </section>
@@ -1211,7 +1211,7 @@
       <section class="human-review-block">
         <h3>直近の出荷（試聴 / 実機で確認）</h3>
         <p class="human-review-note">
-          今セッション（〜v188）で出した変更。ship-then-verify — Pages で聴いて / 実機で触って確認する。
+          2026-06-13 セッションで出した変更。ship-then-verify — Pages で聴いて / 実機で触って確認する。正本は <code>docs/autonomy/BACKLOG.md</code>（BL-026 / BL-027）。
         </p>
         <div class="human-review-table-wrap">
           <table>
@@ -1224,34 +1224,29 @@
             </thead>
             <tbody>
               <tr>
-                <td>音詰まり対策（BL-022）</td>
-                <td>v187</td>
-                <td><code>fm.html</code> を再生し、同時起動音（genre 切替・dense ambient・techno+acid）で詰まりが減ったか</td>
+                <td>Hazama FM 放送モード context（BL-022 fix2）</td>
+                <td>Music v340</td>
+                <td><code>fm.html</code> を再生し、同時起動音（accent+chord+fill が重なる瞬間）で詰まり / プチが減ったか。副作用: pill 切替の反応が最大 ~0.3s 遅れるのが許容か</td>
               </tr>
               <tr>
-                <td>40Hz depth A/B（BL-004）</td>
-                <td>v188</td>
-                <td><code>fm.html</code>（8%）↔ <code>fm.html?focusDepth=5</code>（5%）で <code>40HZ</code> を聴き比べ、default を決める</td>
+                <td>chill — harmonic spine / 復帰修正 / long-form weather</td>
+                <td>chill #37 / #38 / #39</td>
+                <td>フレーズが「進行」に聴こえるか / タブ裏→表で鳴り続けるか / 数分かけて明るさ・空間がゆっくり旅するか</td>
               </tr>
               <tr>
-                <td>モバイル / PWA レイアウト</td>
-                <td>FM v186 / namima</td>
-                <td>実機スマホの PWA で、上下の見切れ解消・下部の操作子（<code>40HZ</code> 等）に到達できるか</td>
+                <td>namima — 潮 tide / self-voice / 視覚同期</td>
+                <td>namima #33–#36</td>
+                <td><code>Tap to start</code> 後、タップせず放置で穏やかに自走するか / 3–4 分で潮（使う音と景色）が移るか / 鳴る位置で水面が揺れるか</td>
               </tr>
               <tr>
-                <td>engine.js モジュール化</td>
-                <td>v182–185</td>
-                <td>FM が従来どおり鳴るか通し試聴（挙動保存のはず・回帰確認）。mic / SYNC も動くか</td>
+                <td>drum-floor — 🎤 バンドを聴いて鳴らす（mic 導線）</td>
+                <td>drum-floor #53</td>
+                <td>既定画面の <code>🎤 バンドを聴いて鳴らす</code> → マイク許可 → 周りの音（楽器/手拍子）にドラムが追従するか</td>
               </tr>
               <tr>
-                <td>chill 新 recipe ×2</td>
-                <td>chill #35</td>
-                <td>chill radio で <code>Midnight Whisper</code> / <code>Morning Light</code> を選んで試聴</td>
-              </tr>
-              <tr>
-                <td>pad のコード進行</td>
-                <td>v189</td>
-                <td><code>fm.html</code> を genre 別に再生し、pad の和声が意図した進行に聴こえるか（ambient I-vi-IV-I / jazz ii-V-I-vi 等）。違和感あれば進行を調整</td>
+                <td>drum-floor — phrase coherence</td>
+                <td>drum-floor #54</td>
+                <td>（既定 16 小節）フレーズの最後で盛り上がって落ちるか（以前は途中で暴発）。フィル / キックの図形がフレーズ内で一貫するか</td>
               </tr>
             </tbody>
           </table>
