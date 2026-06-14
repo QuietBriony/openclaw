@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "openclaw-pwa";
-const VERSION = `${CACHE_PREFIX}-v4`;
+const VERSION = `${CACHE_PREFIX}-v5`;
 
 const PRECACHE_URLS = [
   "./",
