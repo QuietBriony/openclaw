@@ -1118,7 +1118,7 @@
         <div>
           <h1>Music SYNCから、次に聴く場所へ。</h1>
           <p class="summary">
-            やることは3つだけ。MusicでSYNC、ここでlatestを見る、出た行き先を開いて再生。Hazama FM v172、Band Room、Drum Floor、Namima、Chillの現在役割を揃えて読みます。録音、生成、armは人間が選ぶまでしません。
+            やることは3つだけ。MusicでSYNC、ここでlatestを見る、出た行き先を開いて再生。Hazama FM、Band Room、Drum Floor、Namima、Chillの現在役割を揃えて読みます。録音、生成、armは人間が選ぶまでしません。
           </p>
         </div>
         <div class="hero-actions">
@@ -1196,10 +1196,11 @@
           確認待ちの本番ページ。クリックで GitHub Pages 本番を別タブで開く。
         </p>
         <ul>
-          <li><a href="https://quietbriony.github.io/Music/fm.html" target="_blank" rel="noopener">Hazama FM</a> — BL-022 音詰まり対策 fix2（v340 放送モード context）：同時起動音で詰まり減ったか</li>
+          <li><a href="https://quietbriony.github.io/Music/fm.html" target="_blank" rel="noopener">Hazama FM</a> — genre-flavor 弱端末 light ゲート（v359）+ 画面内 <code>⚙ auto / 🪶 light / 💎 full</code> トグル（v360）。同時起動音で詰まり減ったか / トグルで音が切り替わるか</li>
+          <li><a href="https://quietbriony.github.io/Music/fm.html?aiLight=1" target="_blank" rel="noopener">Hazama FM（軽量強制 <code>?aiLight=1</code>）</a> — light パスをどの端末でも試聴（重い端末向け FX 軽量化の効きを確認）</li>
           <li><a href="https://quietbriony.github.io/Music/fm.html?focusDepth=5" target="_blank" rel="noopener">Hazama FM（40Hz depth 5%）</a> — BL-004 A/B 用（通常の fm.html が 8%）</li>
           <li><a href="https://quietbriony.github.io/Music/" target="_blank" rel="noopener">Music Core Rig</a> — 出音 / AUTO MIX / ACID</li>
-          <li><a href="https://quietbriony.github.io/Music/band-room.html" target="_blank" rel="noopener">Band Room</a></li>
+          <li><a href="https://quietbriony.github.io/Music/band-room.html" target="_blank" rel="noopener">Band Room</a> — 原音 / AI 再現の合奏卓（Music 内だが独自改善の別アプリ）。原音の音切れ全面対策（v352–v358: 常時リバーブ撤去・master light ゲート・AI→原音 で synth band 破棄・stem 端末ゲート・iPhone watchdog/軽め盛り）。スマホで原音が止まらず鳴り続けるか / AI→原音 切替後にプチが残らないか</li>
           <li><a href="https://quietbriony.github.io/chill/" target="_blank" rel="noopener">chill（radio）</a> — harmonic spine / 復帰修正 / long-form weather（数分で景色が移る）</li>
           <li><a href="https://quietbriony.github.io/chill/session.html" target="_blank" rel="noopener">chill（trio session）</a></li>
           <li><a href="https://quietbriony.github.io/namima/" target="_blank" rel="noopener">namima</a> — 潮 tide + self-voice（Tap 後は自走）+ 水面の音画同期</li>
@@ -1223,6 +1224,16 @@
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td>Band Room — 原音の音切れ全面対策（別アプリ・独自改善）</td>
+                <td>Music v352–v358</td>
+                <td><code>band-room.html</code> をスマホで再生。原音（📻）が途切れず鳴り続けるか / AI 再現（🎛）→原音 に切替えた後もプチ・詰まりが残らないか。内訳: 常時リバーブ2基撤去(v352) / master light ゲートの mode 依存解消(v353) / AI→原音 で synth band 破棄(v354) / stem 2x歪み端末ゲート(v355) / iPhone watchdog debounce + 軽め盛り(v357/v358)</td>
+              </tr>
+              <tr>
+                <td>Hazama FM — genre-flavor 弱端末 light ゲート + 画面トグル</td>
+                <td>Music v359 / v360</td>
+                <td><code>fm.html</code> をスマホで再生し詰まりが減ったか。<code>⚙ auto / 🪶 light / 💎 full</code> トグル（40HZ の下）で音の重さが切り替わるか。<code>?aiLight=1</code> でどの端末でも light を試聴可。auto は端末を自動判定（弱端末→自動で light）</td>
+              </tr>
               <tr>
                 <td>Hazama FM 放送モード context（BL-022 fix2）</td>
                 <td>Music v340</td>
@@ -1289,10 +1300,16 @@
                 <td>次の tuning PR を 1 本だけ選ぶ。multi-repo 同時 tuning はしない。</td>
               </tr>
               <tr>
-                <td>BL-022<br />P1・v187 fix 出荷済</td>
+                <td>BL-022<br />P1・v187/v340/v359 fix 出荷済</td>
                 <td>Hazama FM 再生の音詰まり（同時起動音での負荷スパイク）</td>
-                <td><code>fm.html</code>（v187）を再生し、複数音が重なる場面（genre 切替・dense ambient・techno+acid 等）を聴く</td>
-                <td>v187 で <code>maxPolyphony</code> を 64/48→24 に capping 済み。詰まりが減ったか試聴判定。まだ残れば cap 再調整か <code>lookAhead</code>/<code>latencyHint</code>。</td>
+                <td><code>fm.html</code> をスマホで再生し、複数音が重なる場面（genre 切替・dense ambient・techno+acid 等）を聴く</td>
+                <td>fix の積み重ね: <code>maxPolyphony</code> cap 64/48→24(v187) → 放送モード context(v340) → genre-flavor 弱端末 light ゲート(v359)。まだ残れば cap 再調整 or 別 genre の常時 FX を追加でゲート。</td>
+              </tr>
+              <tr>
+                <td>BL-028<br />P1・v359/v360 実装済</td>
+                <td>Hazama FM genre-flavor の常時 DSP 負荷（弱端末）</td>
+                <td><code>fm.html?aiLight=1</code> か弱端末で再生。<code>⚙</code> トグル（40HZ の下）で light / full を切替えて聴き比べ</td>
+                <td><code>addAcousticFunField</code> の 2 常時 Reverb / 4 AutoPanner / 2 oversample を弱端末で軽量化(v359) + 画面トグル(v360)。スマホで詰まりが減ったか試聴判定 → OK なら BL-028 done。</td>
               </tr>
               <tr>
                 <td>BL-019<br />P2・眠ってる資源</td>
