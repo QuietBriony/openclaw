@@ -80,7 +80,8 @@ def drum_floor_generate_command(
 
     safe_candidate_id = candidate_id or str(intent.get("candidate_id") or manifest.get("session_id") or "candidate")
     out_root = str(drum_floor.get("candidate_root") or "../drum-floor/live/candidates")
-    out_path = f"{out_root.rstrip('/').rstrip('\\\\')}/{safe_candidate_id}"
+    trimmed_root = out_root.rstrip("/").rstrip("\\")
+    out_path = f"{trimmed_root}/{safe_candidate_id}"
 
     style = str(intent.get("style") or "nerdy_jazzy_hiphop")
     bpm = int(intent.get("bpm") or bpm_range.get("target") or bpm_range.get("min") or 92)
@@ -122,5 +123,6 @@ def drum_floor_inspect_command(
     intent = drum_floor.get("intent") or {}
     safe_candidate_id = candidate_id or str(intent.get("candidate_id") or manifest.get("session_id") or "candidate")
     out_root = str(drum_floor.get("candidate_root") or "../drum-floor/live/candidates")
-    out_path = f"{out_root.rstrip('/').rstrip('\\\\')}/{safe_candidate_id}"
+    trimmed_root = out_root.rstrip("/").rstrip("\\")
+    out_path = f"{trimmed_root}/{safe_candidate_id}"
     return ["python", "-m", "drum_floor", "inspect", out_path]
