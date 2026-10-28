@@ -1,5 +1,17 @@
 # AGENTS.md — openclaw repo operating contract
 
+## 通常の改善は検証後に本番へ（2026-10-28・本人指示）
+
+本人が任せたMusic関連の改善は、公開前の人間レビュー・試聴承認を必須にしない。
+PWAは既存の本番へ出してから本人が聴く運用とし、実装 → 必須検証 → 自分の差分確認 →
+merge / main push → 既存の本番へdeploy → 公開版とPWAの更新確認 → 本人の感想で調整、まで進める。
+通常の全件検査経路では、別担当の独立レビューも公開の必須条件にしない。
+同じ最終HEADのstack-check（FAIL 0 / SKIP 0 / 0 BAD）、各repoの必須検査、cache同期、
+担当scope・clean状態・変更履歴・公開反映の証拠・ロールバック手段は維持する。
+実iPhoneの聴感が未確認でも公開を止めず、未確認と明記して本番での試聴へ渡す。
+新しい公開先、未承認の音源追加、認証や権限の変更、外部機器のarm・record・MIDI送信などは
+この通常公開ルールへ含めない。各アプリ自身の手動開始・metadata-onlyの境界も維持する。
+
 この repo を触る agent (claude code / codex / 他) が **最初に読む** ルール。
 music-stack 全体の自走開発エンジンは `Music/docs/autonomy/` にある。
 
@@ -84,7 +96,7 @@ UI（`index.html` 等）や precache 対象を変えたら:
 |---|---|
 | docs only | main 直 push 可 |
 | 非 runtime コード（test / script の微修正等） | feature branch → PR |
-| runtime / routing / schema を変える（`openclaw/` package・`index.html`・`sw.js`・`schemas/`） | feature branch → PR → 人間レビュー |
+| runtime / routing / schema を変える（`openclaw/` package・`index.html`・`sw.js`・`schemas/`） | feature branch → PR → 必須検証・差分確認 → agent merge・既存本番へdeploy |
 
 作業前に **必ず `git pull --ff-only origin main`** で最新化する。
 
@@ -102,9 +114,9 @@ UI（`index.html` 等）や precache 対象を変えたら:
 自律ランの安全上限:
 
 - ✅ docs は main 直 push 可
-- ✅ 非 runtime コードは feature branch + PR まで（merge は人間）
-- ❌ runtime / routing / schema は人間レビュー必須
-- ❌ 無人 merge は不可
+- ✅ 非 runtime コードはfeature branch + PR、検証後にagent merge・既存本番へdeploy
+- ✅ runtime / routing / schemaは必須検証後にagent merge・既存本番へdeployし、公開版で確認
+- ❌ 未検証・他担当の変更のmergeは不可。Deskアプリ自身の実行・arm・record・mergeを禁止するHard rulesは維持
 - ❌ arm / record / 実行系の自動操作・GitHub Actions 追加・dependency 追加・
   archive 操作は不可
 
